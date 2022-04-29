@@ -1,4 +1,4 @@
-package com.github.q11hackermans.slakeoverflow_server.nomarix_classes;
+package com.github.q11hackermans.slakeoverflow_server.game;
 
 public interface GameObject {
     /**
