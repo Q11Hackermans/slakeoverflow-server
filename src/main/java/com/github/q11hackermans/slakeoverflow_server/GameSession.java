@@ -31,4 +31,37 @@ public class GameSession {
     public boolean isFree(int posX, int posY) {
         return this.getField(posX, posY) == null;
     }
+
+    /**
+     * Returns if the specified field is a food item
+     * @param posX Position X
+     * @param posY Position Y
+     * @return boolean (true = is a food item)
+     */
+    public boolean hasApple(int posX, int posY) {
+        GameObject gameObject = this.getField(posX, posY);
+        return (gameObject instanceof Food);
+    }
+
+    public int getAppleValue(int posX, int posy) {
+        GameObject gameObject = this.getField(posX, posy);
+        if(gameObject instanceof Food) {
+            return ((Food) gameObject).getFoodValue();
+        } else {
+            return 0;
+        }
+    }
+
+    private GameObject getField(int posX, int posY) {
+        for(GameObject gameObject : this.gameObjects) {
+            if(gameObject.getPosX() == posX && gameObject.getPosY() == posY) {
+                return gameObject;
+            }
+        }
+        return null;
+    }
+
+    public void kill(Snake snake) {
+        this.gameObjects.remove(snake);
+    }
 }
