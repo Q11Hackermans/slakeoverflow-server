@@ -14,7 +14,7 @@ public class Snake implements GameObject {
     private int posy;
     private GameSession gameSession;
     private int length;
-    private int growthStock; // The internal "apple balance" the snake can grow
+    private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
 
@@ -43,6 +43,9 @@ public class Snake implements GameObject {
         return 0;
     }
 
+    /**
+     * Add one element to the tale of the snake
+     */
     private void addTale(){
         this.length ++;
         this.bodyPositions.add(this.bodyPositions.size(), new int[]{0, 0});
@@ -52,51 +55,68 @@ public class Snake implements GameObject {
         this.move(this.facing);
     }
 
+    /**
+     * Moves the snake one field into the given direction
+     * @param dir Direction the snake should move
+     */
     public void move(int dir) {
         if(dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isFree(this.posx, (this.posy - 1)) && this.posy > 1) {
 
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
-            if(this.growthStock > 0 ) {
-                this.growthStock --;
-                this.addTale();
-                this.growthStock += appleValue;
-            } else{
-                this.addTale();
-                this.growthStock += (appleValue - 1);
-            }
-                this.moveBodies();
-                this.posy --;
+            growSnake(appleValue);
+
+            this.moveBodies();
+            this.posy --;
 
             this.facing = Direction.NORTH;
 
         } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isFree((this.posx + 1), this.posy) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
 
-            int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
-            if(this.growthStock > 0 ) {
-                this.growthStock --;
-                this.addTale();
-                this.growthStock += appleValue;
-            } else{
-                this.addTale();
-                this.growthStock += (appleValue - 1);
-            }
+            int appleValue = gameSession.getAppleValue((this.posx + 1), this.posy);
+            growSnake(appleValue);
+
             this.moveBodies();
-            this.posy --;
+            this.posx ++;
 
             this.facing = Direction.EAST;
 
-        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH) {
+        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isFree(this.posx, (this.posy + 1)) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
 
+            int appleValue = gameSession.getAppleValue(this.posx, (this.posy + 1));
+            growSnake(appleValue);
+
+            this.moveBodies();
+            this.posy ++;
 
             this.facing = Direction.SOUTH;
 
-        } else if(dir == Direction.WEST && this.facing != Direction.EAST) {
+        } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isFree((this.posx - 1), this.posy) && this.posx > 1) {
 
+            int appleValue = gameSession.getAppleValue((this.posx - 1), this.posy);
+            growSnake(appleValue);
+
+            this.moveBodies();
+            this.posx --;
 
             this.facing = Direction.WEST;
 
         } else {
             this.gameSession.kill(this);
+        }
+    }
+
+    /**
+     * Adds one element to the tale if it has apples on its balance or expands the snake by the consumed amount of apples
+     * @param appleValue The value of apples the snake has consumed
+     */
+    private void growSnake(int appleValue) {
+        if(this.growthBalance > 0 ) {
+            this.growthBalance--;
+            this.addTale();
+            this.growthBalance += appleValue;
+        } else if(appleValue > 0){
+            this.addTale();
+            this.growthBalance += (appleValue - 1);
         }
     }
 
