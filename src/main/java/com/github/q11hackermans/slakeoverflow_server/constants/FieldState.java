@@ -15,8 +15,9 @@ public class FieldState {
     //public static final int PLAYER_TAIL_OTHER = 203;
 
     // ITEMS
-    public static final int ITEM_APPLE = 501; // The default food item
-    public static final int ITEM_DEATH_PLAYER_POINTS = 502; // This item will be dropped when a player dies
+    public static final int ITEM_UNKNOWN = 501; // If it is an unknown item
+    public static final int ITEM_APPLE = 502; // The default food item
+    public static final int ITEM_DEATH_PLAYER_POINTS = 503; // This item will be dropped when a player dies
 
     private FieldState() {}
 }

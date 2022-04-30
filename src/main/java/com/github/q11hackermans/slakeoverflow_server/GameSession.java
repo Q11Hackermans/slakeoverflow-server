@@ -1,21 +1,118 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.GameObject;
+import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameSession {
-    private final List<GameObject> gameObjects;
+    private final List<Snake> snakeList;
+    private final List<Item> itemList;
     private final int borderX;
     private final int borderY;
+    private final int fovsizeX;
+    private final int fovsizeY;
 
-    public GameSession(int x, int y){
-        this.gameObjects = new ArrayList<>();
+    public GameSession(int x, int y) {
+        this.snakeList = new ArrayList<>();
+        this.itemList = new ArrayList<>();
         this.borderX = x;
         this.borderY = y;
+        this.fovsizeX = 50;
+        this.fovsizeY = 50;
+    }
+
+    // TICK
+    public void tick() {
+        // RUNNING TICK ON SNAKES
+        for(Snake snake : this.snakeList) {
+            snake.tick();
+        }
+
+        // SENDING PLAYERDATA TO SNAKES
+        for(Snake snake : this.snakeList) {
+            try {
+                snake.getPlayer().getDataIOStreamHandler().writeUTF(this.getSendablePlayerData(snake));
+            } catch(Exception e) {
+                // THIS WILL BE FILLED SOON (i guess...)
+            }
+        }
+    }
+
+    /**
+     * This method returns the final String (in JSONObject format) which is ready for sending to the player.
+     * @param snake The snake
+     * @return String (in JSONObject format)
+     */
+    private String getSendablePlayerData(Snake snake) {
+        JSONObject playerData = new JSONObject();
+        playerData.put("cmd", "playerdata");
+
+        JSONArray fields = new JSONArray();
+
+        int minY = snake.getPosY() - this.fovsizeY;
+        int maxY = snake.getPosY() + this.fovsizeY;
+
+        if(minY < 0) {
+            minY = 0;
+        }
+        if(maxY > this.borderY) {
+            maxY = this.borderY;
+        }
+
+        for(int iy = minY; iy < maxY; iy++) {
+            int minX = snake.getPosX() - this.fovsizeX;
+            int maxX = snake.getPosX() + this.fovsizeX;
+
+            if(minX < 0) {
+                minX = 0;
+            }
+            if(maxX > this.borderX) {
+                maxX = this.borderX;
+            }
+
+            JSONArray fieldsx = new JSONArray();
+
+            for(int ix = minX; ix < maxX; ix++) {
+                GameObject field = this.getField(ix, iy);
+                if(field instanceof Snake) {
+                    if(field == snake) {
+                        if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
+                            fieldsx.put(FieldState.PLAYER_HEAD_OWN);
+                        } else {
+                            fieldsx.put(FieldState.PLAYER_BODY_OWN);
+                        }
+                    } else {
+                        if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
+                            fieldsx.put(FieldState.PLAYER_HEAD_OTHER);
+                        } else {
+                            fieldsx.put(FieldState.PLAYER_BODY_OTHER);
+                        }
+                    }
+                } else if(field instanceof Item) {
+                    if(field instanceof Food) {
+                        fieldsx.put(FieldState.ITEM_APPLE);
+                    } else {
+                        fieldsx.put(FieldState.ITEM_UNKNOWN);
+                    }
+                } else {
+                    fieldsx.put(FieldState.EMPTY);
+                }
+            }
+
+            fields.put(fieldsx);
+        }
+
+        playerData.put("fields", fields);
+
+        return playerData.toString();
     }
 
     // FIELD MANAGEMENT
@@ -74,9 +171,20 @@ public class GameSession {
      * @return GameObject
      */
     public GameObject getField(int posX, int posY) {
-        for(GameObject gameObject : this.gameObjects) {
-            if(gameObject.getPosX() == posX && gameObject.getPosY() == posY) {
-                return gameObject;
+        for(Snake snake : this.snakeList) {
+            if(snake.getPosX() == posX && snake.getPosY() == posY) {
+                return snake;
+            } else {
+                for(int[] pos : snake.getBodyPositions()) {
+                    if(pos[0] == posX && pos[1] == posY) {
+                        return snake;
+                    }
+                }
+            }
+        }
+        for(Item item : this.itemList) {
+            if(item.getPosX() == posX && item.getPosY() == posY) {
+                return item;
             }
         }
         return null;
@@ -98,6 +206,6 @@ public class GameSession {
      * @param snake
      */
     public void killSnake(Snake snake) {
-        this.gameObjects.remove(snake);
+        this.snakeList.remove(snake);
     }
 }

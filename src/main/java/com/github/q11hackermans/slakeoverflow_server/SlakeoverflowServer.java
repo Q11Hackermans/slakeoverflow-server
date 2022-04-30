@@ -87,6 +87,14 @@ public class SlakeoverflowServer {
         return this.logger;
     }
 
+    public CMSServer getConnectionhandler() {
+        return this.connectionhandler;
+    }
+
+    public DataIOManager getDataIOManager() {
+        return this.dataIOManager;
+    }
+
     /*
     -----------------------------------------------------------------
     STATIC METHODS

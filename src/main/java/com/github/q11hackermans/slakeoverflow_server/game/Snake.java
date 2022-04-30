@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
+import com.github.q11hackermans.slakeoverflow_server.Player;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
@@ -9,22 +10,24 @@ import java.util.Queue;
 import java.util.UUID;
 
 public class Snake implements GameObject {
-    private UUID connectionId;
+    // MANAGEMENT
+    private final Player player;
+    private GameSession gameSession;
+    // MOVEMENT
     private int speed;
     private int posx;
     private int posy;
-    private GameSession gameSession;
     private int length;
     private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
     private int newFacing;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
 
-    public Snake(int x, int y, UUID connectionID, int facing, GameSession session) {
+    public Snake(Player player, int x, int y, int facing, GameSession session) {
+        this.player = player;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
         this.posy = y;
-        this.connectionId = connectionID;
         this.length = 0;
         this.facing = facing;
         this.gameSession = session;
@@ -45,6 +48,24 @@ public class Snake implements GameObject {
         return 0;
     }
 
+    public List<int[]> getBodyPositions() {
+        return List.copyOf(bodyPositions);
+    }
+
+    /**
+     * Get the player related to this snake
+     * @return Player related to this snake
+     */
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    // TICK
+    public void tick() {
+        this.move(Direction.NORTH);
+    }
+
+    // MOVEMENT
     /**
      * Add one element to the tale of the snake
      */
