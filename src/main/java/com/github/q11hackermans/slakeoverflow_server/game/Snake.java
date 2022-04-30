@@ -60,7 +60,7 @@ public class Snake implements GameObject {
      * @param dir Direction the snake should move
      */
     public void move(int dir) {
-        if(dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isFree(this.posx, (this.posy - 1)) && this.posy > 1) {
+        if(dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isPlayerFree(this.posx, (this.posy - 1)) && this.posy > 1) {
 
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
             growSnake(appleValue);
@@ -70,7 +70,7 @@ public class Snake implements GameObject {
 
             this.facing = Direction.NORTH;
 
-        } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isFree((this.posx + 1), this.posy) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
+        } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isPlayerFree((this.posx + 1), this.posy) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
 
             int appleValue = gameSession.getAppleValue((this.posx + 1), this.posy);
             growSnake(appleValue);
@@ -80,7 +80,7 @@ public class Snake implements GameObject {
 
             this.facing = Direction.EAST;
 
-        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isFree(this.posx, (this.posy + 1)) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
+        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isPlayerFree(this.posx, (this.posy + 1)) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
 
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy + 1));
             growSnake(appleValue);
@@ -90,7 +90,7 @@ public class Snake implements GameObject {
 
             this.facing = Direction.SOUTH;
 
-        } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isFree((this.posx - 1), this.posy) && this.posx > 1) {
+        } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isPlayerFree((this.posx - 1), this.posy) && this.posx > 1) {
 
             int appleValue = gameSession.getAppleValue((this.posx - 1), this.posy);
             growSnake(appleValue);
@@ -121,7 +121,7 @@ public class Snake implements GameObject {
     }
 
     private void moveBodies() {
-        for(int i = this.bodyPositions.size() - 1; i > 0; i--) {
+        for(int i = this.bodyPositions.size() - 1; i >= 0; i--) {
             if(i == 0) {
                 this.bodyPositions.set(i, new int[]{this.posx, this.posy});
             } else {
