@@ -30,6 +30,7 @@ public class Snake implements GameObject {
         this.posy = y;
         this.length = 0;
         this.facing = facing;
+        this.newFacing = facing;
         this.gameSession = session;
     }
 
@@ -54,6 +55,7 @@ public class Snake implements GameObject {
 
     /**
      * Get the player related to this snake
+     *
      * @return Player related to this snake
      */
     public Player getPlayer() {
@@ -61,35 +63,54 @@ public class Snake implements GameObject {
     }
 
     // TICK
+
+    /**
+     * TICK
+     */
     public void tick() {
-        this.move(Direction.NORTH);
+        if (this.facing != this.newFacing) {
+            this.move(this.newFacing);
+            return;
+        }
+        this.move();
+    }
+
+    /**
+     * Set the direction the snake will move during the next tick
+     *
+     * @param newFacing The direction the snake will move during the next tick
+     */
+    public void setNewFacing(int newFacing) {
+        this.newFacing = newFacing;
     }
 
     // MOVEMENT
+
     /**
      * Add one element to the tale of the snake
      */
-    private void addTale(){
-        this.length ++;
+    private void addTale() {
+        this.length++;
         this.bodyPositions.add(this.bodyPositions.size(), new int[]{0, 0});
     }
 
-    public void move() {
+    private void move() {
         this.move(this.facing);
     }
 
     /**
      * Moves the snake one field into the given direction
+     *
      * @param dir Direction the snake should move
      */
-    public void move(int dir) {
-        if(dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isPlayerFree(this.posx, (this.posy - 1)) && this.posy > 1) {
+    private void move(int dir) {
+        if (dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isPlayerFree(this.posx, (this.posy - 1)) && this.posy > 1) {
 
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
             growSnake(appleValue);
 
             this.moveBodies();
-            this.posy --;
+            this.posy--;
 
             this.facing = Direction.NORTH;
 

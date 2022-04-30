@@ -1,6 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server.constants;
 
-public class FieldState {
+public final class FieldState {
     // EMPTY
     public static final int EMPTY = 0;
 
