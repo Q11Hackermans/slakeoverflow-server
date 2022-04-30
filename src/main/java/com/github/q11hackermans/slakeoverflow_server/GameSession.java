@@ -9,13 +9,13 @@ import java.util.List;
 
 public class GameSession {
     private final List<GameObject> gameObjects;
-    private final int borderx;
-    private final int bordery;
+    private final int borderX;
+    private final int borderY;
 
     public GameSession(int x, int y){
         this.gameObjects = new ArrayList<>();
-        this.borderx = x;
-        this.bordery = y;
+        this.borderX = x;
+        this.borderY = y;
     }
 
     // FIELD MANAGEMENT
@@ -88,7 +88,7 @@ public class GameSession {
      * @return int[]{posX, posY}
      */
     public int[] getBorder() {
-        return new int[]{this.borderx, this.bordery};
+        return new int[]{this.borderX, this.borderY};
     }
 
     // SNAKE MANAGEMENT
