@@ -5,6 +5,7 @@ import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 
 public class Snake implements GameObject {
@@ -16,6 +17,7 @@ public class Snake implements GameObject {
     private int length;
     private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
+    private int newFacing;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
 
     public Snake(int x, int y, UUID connectionID, int facing, GameSession session) {

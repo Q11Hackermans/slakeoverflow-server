@@ -9,6 +9,9 @@ import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType
 
 import java.io.IOException;
 
+import static java.lang.Math.sqrt;
+import static java.lang.Math.pow;
+
 public class SlakeoverflowServer {
     // STATIC
     private static SlakeoverflowServer server;
@@ -58,6 +61,23 @@ public class SlakeoverflowServer {
         System.exit(0);
     }
 
+    /**
+     *
+     */
+    private void setupGame(int sizeX, int sizeY) {
+        if (this.gameState == GameState.STOPPED){
+            this.game = new GameSession(sizeX,sizeY);
+        }
+    }
+
+    /**
+     *
+     */
+    public void setupGame() {
+        double x = 3;
+        this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+    }
+
     // GETTER METHODS
     public ServerConsole getConsole() {
         return this.console;
@@ -75,6 +95,7 @@ public class SlakeoverflowServer {
     // HIER GEHTS LOS :) {"cmd":"tick","fields":[[0,1,0],[],[]]}  {"cmd":"auth","username":"vollidiot123"} {"cmd":"auth2","sizex":100,"sizey":100} {"cmd":"auth3"}
     public static void main(String[] args) throws IOException {
         new SlakeoverflowServer();
+
     }
 
     public static SlakeoverflowServer getServer() {
