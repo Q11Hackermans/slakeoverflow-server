@@ -18,18 +18,25 @@ public class GameSession {
         this.bordery = y;
     }
 
-    public int[] getBorder() {
-        return new int[]{this.borderx, this.bordery};
-    }
-
+    // FIELD MANAGEMENT
     /**
      * Returns true if the specified field is free
      * @param posX Position X
      * @param posY Position Y
-     * @return
+     * @return boolean
      */
     public boolean isFree(int posX, int posY) {
         return this.getField(posX, posY) == null;
+    }
+
+    /**
+     * Returns true if the specified field is not a player
+     * @param posX Position X
+     * @param posY Position Y
+     * @return boolean
+     */
+    public boolean isPlayerFree(int posX, int posY) {
+        return !(this.getField(posX, posY) instanceof Snake);
     }
 
     /**
@@ -43,6 +50,13 @@ public class GameSession {
         return (gameObject instanceof Food);
     }
 
+    /**
+     * Returns the food value if food is on the specified field.
+     * Returns 0 if there is no food on the specified field.
+     * @param posX Position X
+     * @param posy Position Y
+     * @return int (!=0 when food, =0 when no food)
+     */
     public int getAppleValue(int posX, int posy) {
         GameObject gameObject = this.getField(posX, posy);
         if(gameObject instanceof Food) {
@@ -52,7 +66,14 @@ public class GameSession {
         }
     }
 
-    private GameObject getField(int posX, int posY) {
+    /**
+     * Returns the GameObject that is on the specified field.
+     * If the specified field is empty, this will return 0.
+     * @param posX Position X
+     * @param posY Position Y
+     * @return GameObject
+     */
+    public GameObject getField(int posX, int posY) {
         for(GameObject gameObject : this.gameObjects) {
             if(gameObject.getPosX() == posX && gameObject.getPosY() == posY) {
                 return gameObject;
@@ -61,7 +82,22 @@ public class GameSession {
         return null;
     }
 
-    public void kill(Snake snake) {
+    /**
+     * Get the world border
+     * The world border is from X: 0-getBorder()[0], Y: 0-getBorder()[1].
+     * @return int[]{posX, posY}
+     */
+    public int[] getBorder() {
+        return new int[]{this.borderx, this.bordery};
+    }
+
+    // SNAKE MANAGEMENT
+    /**
+     * This method will kill a snake.
+     * This will remove the snake from the list.
+     * @param snake
+     */
+    public void killSnake(Snake snake) {
         this.gameObjects.remove(snake);
     }
 }

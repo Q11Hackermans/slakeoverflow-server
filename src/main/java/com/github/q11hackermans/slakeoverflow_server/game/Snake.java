@@ -101,7 +101,7 @@ public class Snake implements GameObject {
             this.facing = Direction.WEST;
 
         } else {
-            this.gameSession.kill(this);
+            this.gameSession.killSnake(this);
         }
     }
 
