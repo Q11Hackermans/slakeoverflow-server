@@ -1,9 +1,20 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+
 import java.util.Scanner;
 
 public class ServerConsole implements Runnable {
     private Thread thread;
+    private final ConsoleLogger logger;
+
+    public ServerConsole() {
+        this.logger = SlakeoverflowServer.getServer().getLogger();
+    }
+
+    public ServerConsole(ConsoleLogger logger) {
+        this.logger = logger;
+    }
 
     /**
      * Start the console
@@ -52,7 +63,7 @@ public class ServerConsole implements Runnable {
     public void run() {
         while(!Thread.currentThread().isInterrupted() && thread != null) {
             Scanner scanner = new Scanner(System.in);
-            ConsoleCommands.run(scanner.nextLine().split(" "));
+            this.logger.info("CONSOLE", ConsoleCommands.run(scanner.nextLine().split(" ")));
         }
     }
 }

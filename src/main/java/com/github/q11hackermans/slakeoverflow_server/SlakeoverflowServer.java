@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
@@ -10,17 +11,19 @@ public class SlakeoverflowServer {
     // STATIC
     private static SlakeoverflowServer server;
     // CONSOLE
-    private ServerConsole console;
+    private final ServerConsole console;
+    private final ConsoleLogger logger;
     // CONNECTION MANAGER
     private CMSServer connectionhandler;
     private DataIOManager dataIOManager;
 
 
     public SlakeoverflowServer() throws IOException {
-        // SET SERVER
+        // SET SERVER (RUN ALWAYS FIRST)
         server = this;
         // CONSOLE
-        this.console = new ServerConsole();
+        this.logger = new ConsoleLogger();
+        this.console = new ServerConsole(this.logger);
         this.console.start();
         // CONNECTION MANAGER
         this.connectionhandler = new CMSServer(55555);
@@ -31,9 +34,20 @@ public class SlakeoverflowServer {
      */
     public void stop() {
         try {
-
+            this.dataIOManager.close();
+            this.connectionhandler.close();
+            this.console.stop();
         } catch(Exception ignored) {}
         System.exit(0);
+    }
+
+    // GETTER METHODS
+    public ServerConsole getConsole() {
+        return this.console;
+    }
+
+    public ConsoleLogger getLogger() {
+        return this.logger;
     }
 
     /*
