@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
@@ -21,6 +22,8 @@ public class SlakeoverflowServer {
     // CONSOLE
     private final ServerConsole console;
     private final ConsoleLogger logger;
+    // CONFIG
+    private final ConfigManager configManager;
     // CONNECTION MANAGER
     private final CMSServer connectionhandler;
     private final DataIOManager dataIOManager;
@@ -43,8 +46,11 @@ public class SlakeoverflowServer {
         this.console = new ServerConsole(this.logger);
         this.console.start();
 
+        // CONFIG
+        this.configManager = new ConfigManager();
+
         // CONNECTION MANAGER
-        this.connectionhandler = new CMSServer(55555);
+        this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
         this.connectionhandler.addListener(new EventListener());
         this.connectionhandler.addGlobalListener(new EventListener());
         this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, false);
