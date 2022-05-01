@@ -54,6 +54,7 @@ public class SlakeoverflowServer {
         this.connectionhandler.addListener(new EventListener());
         this.connectionhandler.addGlobalListener(new EventListener());
         this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, false);
+        this.dataIOManager.addEventListener(new EventListener());
 
         // GAME SESSION
         this.gameState = GameState.STOPPED;
