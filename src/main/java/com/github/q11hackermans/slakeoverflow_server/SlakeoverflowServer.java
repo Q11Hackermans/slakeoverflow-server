@@ -8,6 +8,9 @@ import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOMana
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.Math.sqrt;
 import static java.lang.Math.pow;
@@ -21,9 +24,14 @@ public class SlakeoverflowServer {
     // CONNECTION MANAGER
     private final CMSServer connectionhandler;
     private final DataIOManager dataIOManager;
+    // THREADS
+    private Thread managerThread;
+    private Thread tickThread;
     // GAME SESSION
     private int gameState;
     private GameSession game;
+    // PLAYER MANAGEMENT
+    private final List<Player> playerList;
 
 
     public SlakeoverflowServer() throws IOException {
@@ -45,15 +53,58 @@ public class SlakeoverflowServer {
         this.gameState = GameState.STOPPED;
         this.game = null;
 
+        // PLAYER MANAGEMENT
+        this.playerList = new ArrayList<>();
+
+        // THREADS
+        this.managerThread = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted() && this.managerThread != null) {
+                try {
+                    checkConnectionManager();
+                    checkPlayerList();
+                } catch(Exception e) {
+                    try {
+                        this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
+                        e.printStackTrace();
+                    } catch(Exception ignored) {}
+                    stop();
+                }
+            }
+        });
+        this.managerThread.setName("SLAKEOVERFLOW-MANAGER-" + this.toString());
+        this.managerThread.start();
+        this.logger.debug("INIT", "Started Thread MANAGER");
+
+        this.tickThread = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted() && this.tickThread != null) {
+                try {
+                    if(this.game != null && gameState == GameState.RUNNING) {
+                        this.game.tick();
+                    }
+                    Thread.sleep(50);
+                } catch(Exception e) {
+                    Thread.currentThread().interrupt();
+                    this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
+                    e.printStackTrace();
+                }
+            }
+        });
+        this.tickThread.setName("SLAKEOVERFLOW-TICK-" + this.toString());
+        this.tickThread.start();
+        this.logger.debug("INIT", "Started Thread TICK");
+
         // FINISHED (RUN ALWAYS LAST)
         this.logger.info("INIT", "Setup complete");
     }
 
+    // SERVER MANAGEMENT
     /**
      * This will stop the server.
      */
     public void stop() {
         try {
+            this.managerThread.interrupt();
+            this.tickThread.interrupt();
             this.dataIOManager.close();
             this.connectionhandler.close();
             this.console.stop();
@@ -61,6 +112,7 @@ public class SlakeoverflowServer {
         System.exit(0);
     }
 
+    // GAME MANAGEMENT
     /**
      *
      */
@@ -76,6 +128,15 @@ public class SlakeoverflowServer {
     public void setupGame() {
         double x = 3;
         this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+    }
+
+    // PRIVATE METHODS
+    private void checkConnectionManager() {
+
+    }
+
+    private void checkPlayerList() {
+
     }
 
     // GETTER METHODS
@@ -103,7 +164,6 @@ public class SlakeoverflowServer {
     // HIER GEHTS LOS :) {"cmd":"tick","fields":[[0,1,0],[],[]]}  {"cmd":"auth","username":"vollidiot123"} {"cmd":"auth2","sizex":100,"sizey":100} {"cmd":"auth3"}
     public static void main(String[] args) throws IOException {
         new SlakeoverflowServer();
-
     }
 
     public static SlakeoverflowServer getServer() {
