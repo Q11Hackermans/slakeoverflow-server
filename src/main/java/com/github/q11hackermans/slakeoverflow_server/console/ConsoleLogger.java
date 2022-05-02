@@ -65,7 +65,7 @@ public class ConsoleLogger {
             return;
         }
         FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write(this.log.toString());
+        fileWriter.write(this.log.toString(4));
         fileWriter.flush();
         fileWriter.close();
     }
