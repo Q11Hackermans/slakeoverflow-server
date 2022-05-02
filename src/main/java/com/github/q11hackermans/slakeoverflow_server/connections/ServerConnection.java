@@ -1,14 +1,15 @@
-package com.github.q11hackermans.slakeoverflow_server;
+package com.github.q11hackermans.slakeoverflow_server.connections;
 
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 
 import java.util.UUID;
 
-public class Player {
+public class ServerConnection {
     private UUID clientId;
 
-    public Player(UUID clientId) {
+    public ServerConnection(UUID clientId) {
         this.clientId = clientId;
     }
 

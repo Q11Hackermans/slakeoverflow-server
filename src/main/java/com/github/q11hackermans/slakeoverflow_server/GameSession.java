@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.GameObject;
@@ -207,5 +208,19 @@ public class GameSession {
      */
     public void killSnake(Snake snake) {
         this.snakeList.remove(snake);
+    }
+
+    /**
+     * Returns the snake of a specific player
+     * @param player Player
+     * @return Snake
+     */
+    public Snake getSnakeOfPlayer(Player player) {
+        for(Snake snake : this.snakeList) {
+            if(snake.getPlayer() == player) {
+                return snake;
+            }
+        }
+        return null;
     }
 }

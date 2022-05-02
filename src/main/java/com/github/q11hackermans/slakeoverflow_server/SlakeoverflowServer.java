@@ -1,6 +1,8 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
+import com.github.q11hackermans.slakeoverflow_server.connections.Player;
+import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
@@ -8,6 +10,7 @@ import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +37,7 @@ public class SlakeoverflowServer {
     private int gameState;
     private GameSession game;
     // PLAYER MANAGEMENT
-    private final List<Player> playerList;
+    private final List<ServerConnection> connectionList;
 
 
     public SlakeoverflowServer() throws IOException {
@@ -61,14 +64,15 @@ public class SlakeoverflowServer {
         this.game = null;
 
         // PLAYER MANAGEMENT
-        this.playerList = new ArrayList<>();
+        this.connectionList = new ArrayList<>();
 
         // THREADS
         this.managerThread = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted() && this.managerThread != null) {
                 try {
+                    checkThreads();
                     checkConnectionManager();
-                    checkPlayerList();
+                    checkConnections();
                 } catch(Exception e) {
                     try {
                         this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
@@ -115,6 +119,8 @@ public class SlakeoverflowServer {
             this.dataIOManager.close();
             this.connectionhandler.close();
             this.console.stop();
+            this.logger.info("STOP", "Server shutdown.");
+            this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
         } catch(Exception ignored) {}
         System.exit(0);
     }
@@ -139,11 +145,21 @@ public class SlakeoverflowServer {
 
     // PRIVATE METHODS
     private void checkConnectionManager() {
+        if(this.connectionhandler == null || this.connectionhandler.isClosed()) {
+            this.getLogger().warning("MANAGER", "Connection manager is closed. Stopping server.");
+            this.stop();
+        }
+    }
+
+    private void checkThreads() {
 
     }
 
-    private void checkPlayerList() {
-
+    private void checkConnections() {
+        this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
+        this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
+        this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
+        this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
     }
 
     // GETTER METHODS

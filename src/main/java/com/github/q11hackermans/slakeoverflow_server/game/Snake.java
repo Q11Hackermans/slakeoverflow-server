@@ -1,13 +1,11 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
-import com.github.q11hackermans.slakeoverflow_server.Player;
+import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
 
 public class Snake implements GameObject {
     // MANAGEMENT
