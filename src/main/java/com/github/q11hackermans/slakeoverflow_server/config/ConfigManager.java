@@ -23,29 +23,31 @@ public class ConfigManager {
 
     public void reloadConfig() {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(this.configFile));
+            synchronized(this.configFile) {
+                BufferedReader br = new BufferedReader(new FileReader(this.configFile));
 
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
 
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
+                while (line != null) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                    line = br.readLine();
+                }
 
-            String out = sb.toString();
+                String out = sb.toString();
 
-            try {
-                JSONObject jsonConfig = new JSONObject(out);
+                try {
+                    JSONObject jsonConfig = new JSONObject(out);
 
-                this.config.setPort(jsonConfig.getInt("port"));
-                this.config.setWhitelist(jsonConfig.getBoolean("whitelist"));
+                    this.config.setPort(jsonConfig.getInt("port"));
+                    this.config.setWhitelist(jsonConfig.getBoolean("whitelist"));
 
-                SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
-            } catch(JSONException e) {
-                SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file corrupt");
-                this.recreateConfig();
+                    SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
+                } catch(JSONException e) {
+                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file corrupt");
+                    this.recreateConfig();
+                }
             }
         } catch(IOException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
@@ -55,7 +57,6 @@ public class ConfigManager {
     public void recreateConfig() {
         try {
             synchronized(this.configFile) {
-                SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config created");
                 if(this.configFile.exists()) {
                     this.configFile.delete();
                 }
@@ -69,6 +70,8 @@ public class ConfigManager {
                 writer.write(config.toString(4));
                 writer.flush();
                 writer.close();
+
+                SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config created");
             }
         } catch(IOException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
