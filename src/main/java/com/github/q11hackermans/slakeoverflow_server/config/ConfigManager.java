@@ -42,6 +42,7 @@ public class ConfigManager {
 
                     this.config.setPort(jsonConfig.getInt("port"));
                     this.config.setWhitelist(jsonConfig.getBoolean("whitelist"));
+                    this.config.setSlots(jsonConfig.getInt("slots"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch(JSONException e) {
