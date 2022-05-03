@@ -11,6 +11,7 @@ import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +37,8 @@ public class SlakeoverflowServer {
     private GameSession game;
     // PLAYER MANAGEMENT
     private final List<ServerConnection> connectionList;
+    // LISTS
+    private final List<InetAddress> ipBlacklist;
 
 
     public SlakeoverflowServer() throws IOException {
@@ -67,6 +70,9 @@ public class SlakeoverflowServer {
 
         // PLAYER MANAGEMENT
         this.connectionList = new ArrayList<>();
+
+        // LIST
+        this.ipBlacklist = new ArrayList<>();
 
         // THREADS
         this.managerThread = new Thread(() -> {
@@ -183,6 +189,10 @@ public class SlakeoverflowServer {
 
     public ConfigManager getConfigManager() {
         return this.configManager;
+    }
+
+    public List<InetAddress> getIpBlacklist() {
+        return List.copyOf(this.ipBlacklist);
     }
 
     /*
