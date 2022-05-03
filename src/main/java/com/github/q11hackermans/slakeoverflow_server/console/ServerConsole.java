@@ -34,17 +34,19 @@ public class ServerConsole implements Runnable {
      */
     public void stop() {
         this.thread.interrupt();
-        int stopcount = 60;
-        while(this.thread.isAlive()) {
-            if(stopcount > 1) {
-                stopcount--;
-                try {
-                    Thread.sleep(1000);
-                } catch(Exception ignored) {}
-            } else {
-                this.thread.stop();
+        new Thread(() ->{
+            int stopcount = 10;
+            while(this.thread.isAlive()) {
+                if(stopcount > 1) {
+                    stopcount--;
+                    try {
+                        Thread.sleep(1000);
+                    } catch(Exception ignored) {}
+                } else {
+                    this.thread.stop();
+                }
             }
-        }
+        }).start();
     }
 
     /**
