@@ -77,7 +77,7 @@ public class SlakeoverflowServer {
                     checkConnections();
                 } catch(Exception e) {
                     try {
-                        this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
+                        this.logger.warning("MANAGER", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
                         e.printStackTrace();
                     } catch(Exception ignored) {}
                     stop();
