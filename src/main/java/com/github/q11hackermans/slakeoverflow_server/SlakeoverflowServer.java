@@ -1,7 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
-import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
@@ -15,8 +14,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Math.sqrt;
 import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 
 public class SlakeoverflowServer {
     // STATIC
@@ -180,6 +179,10 @@ public class SlakeoverflowServer {
 
     public DataIOManager getDataIOManager() {
         return this.dataIOManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return this.configManager;
     }
 
     /*
