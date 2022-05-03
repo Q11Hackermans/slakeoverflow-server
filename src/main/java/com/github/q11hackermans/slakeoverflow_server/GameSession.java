@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import static java.lang.Math.sqrt;
 
 public class GameSession {
     private final List<Snake> snakeList;
@@ -36,6 +37,7 @@ public class GameSession {
         for(Snake snake : this.snakeList) {
             snake.tick();
         }
+        this.spawnFood((int) sqrt(0.5*snakeList.size()));
 
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
@@ -45,6 +47,39 @@ public class GameSession {
                 // THIS WILL BE FILLED SOON (i guess...)
             }
         }
+    }
+
+    /**
+     * Tries to spawn the amount of food with the value of 1 if the fields are free
+     * @param count Amount of food to be spawned
+     */
+    private void spawnFood(int count){
+        for (int i = count; i > 0; i--){
+            int posX = this.randomPosX();
+            int posY = this.randomPosY();
+
+            if(isFree(posX, posY)){
+                Food food = new Food(posX, posY,1);
+                this.itemList.add(food);
+            }
+
+        }
+    }
+
+    /**
+     * Returns a random number on the fields x-axis
+     * @return Random x coordinate
+     */
+    private int randomPosX(){
+        return (int) ((Math.random() * ((this.borderX - 1) - 1)) + 1);
+    }
+
+    /**
+     * Returns a random number on the fields y-axis
+     * @return Random y coordinate
+     */
+    private int randomPosY(){
+        return (int) ((Math.random() * ((this.borderY - 1) - 1)) + 1);
     }
 
     /**
