@@ -163,13 +163,14 @@ public class GameSession {
     }
 
     /**
-     * Returns true if the specified field is not a player
+     * Returns true if the specified field is not another player
      * @param posX Position X
      * @param posY Position Y
      * @return boolean
      */
-    public boolean isPlayerFree(int posX, int posY) {
-        return !(this.getField(posX, posY) instanceof Snake);
+    public boolean isOtherPlayerFree(int posX, int posY, Snake snake) {
+        GameObject fieldObject = this.getField(posX,posY);
+        return (!(fieldObject instanceof Snake) || fieldObject == snake);
     }
 
     /**

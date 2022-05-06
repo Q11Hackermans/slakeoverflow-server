@@ -5,6 +5,7 @@ import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Snake implements GameObject {
@@ -49,6 +50,16 @@ public class Snake implements GameObject {
 
     public List<int[]> getBodyPositions() {
         return List.copyOf(bodyPositions);
+    }
+
+    /**
+     * Get the body-id of this snake at this position
+     * @param posX Position X
+     * @param posY Position Y
+     * @return int - [-1 not this snake, 0 <= bodypositions]
+     */
+    private int getPosBodyID(int posX, int posY){
+                return bodyPositions.indexOf(new int[]{posX, posY});
     }
 
     /**
@@ -102,8 +113,15 @@ public class Snake implements GameObject {
      * @param dir Direction the snake should move
      */
     private void move(int dir) {
-        if (dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isPlayerFree(this.posx, (this.posy - 1)) && this.posy > 1) {
+        if (dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isOtherPlayerFree(this.posx, (this.posy - 1), this) && this.posy > 1) {
 
+            GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
+            if(newHeadField == this){
+                int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
+                while (bodyId < bodyPositions.size()) {
+                    bodyPositions.remove(bodyId);
+                }
+            }
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
             growSnake(appleValue);
 
@@ -112,8 +130,15 @@ public class Snake implements GameObject {
 
             this.facing = Direction.NORTH;
 
-        } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isPlayerFree((this.posx + 1), this.posy) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
+        } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
 
+            GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
+            if(newHeadField == this){
+                int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
+                while (bodyId < bodyPositions.size()) {
+                    bodyPositions.remove(bodyId);
+                }
+            }
             int appleValue = gameSession.getAppleValue((this.posx + 1), this.posy);
             growSnake(appleValue);
 
@@ -122,8 +147,15 @@ public class Snake implements GameObject {
 
             this.facing = Direction.EAST;
 
-        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isPlayerFree(this.posx, (this.posy + 1)) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
+        } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
 
+            GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
+            if(newHeadField == this){
+                int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
+                while (bodyId < bodyPositions.size()) {
+                    bodyPositions.remove(bodyId);
+                }
+            }
             int appleValue = gameSession.getAppleValue(this.posx, (this.posy + 1));
             growSnake(appleValue);
 
@@ -132,8 +164,15 @@ public class Snake implements GameObject {
 
             this.facing = Direction.SOUTH;
 
-        } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isPlayerFree((this.posx - 1), this.posy) && this.posx > 1) {
+        } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
 
+            GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
+            if(newHeadField == this){
+                int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
+                while (bodyId < bodyPositions.size()) {
+                    bodyPositions.remove(bodyId);
+                }
+            }
             int appleValue = gameSession.getAppleValue((this.posx - 1), this.posy);
             growSnake(appleValue);
 
