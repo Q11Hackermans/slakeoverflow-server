@@ -13,6 +13,10 @@ public class Player extends ServerConnection {
         super(clientId);
         this.username = "";
     }
+    public Player(UUID clientId, String username) {
+        super(clientId);
+        this.username = username;
+    }
 
     public String getUsername() {
         return this.username;

@@ -28,4 +28,11 @@ public class ServerConnection {
     public DataIOStreamHandler getDataIOStreamHandler() {
         return SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(this.clientId);
     }
+
+    /**
+     * Get UUID of client
+     */
+    public UUID getClientId() {
+        return this.clientId;
+    }
 }

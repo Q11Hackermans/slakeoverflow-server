@@ -1,7 +1,9 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
+import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.connections.Spectator;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
@@ -149,6 +151,35 @@ public class SlakeoverflowServer {
     public void setupGame() {
         double x = 3;
         this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+    }
+
+    // CONNECTION MANAGEMENT
+    public void addPlayer(UUID uuid, String username) {
+        for(ServerConnection connection : this.connectionList) {
+            if(connection.getClientId().equals(uuid)) {
+                return;
+            }
+        }
+        this.connectionList.add(new Player(uuid, username));
+        this.getLogger().debug("PLAYERMANAGEMENT", "Player created for connection " + uuid);
+    }
+
+    public void addSpectator(UUID uuid) {
+        for(ServerConnection connection : this.connectionList) {
+            if(connection.getClientId().equals(uuid)) {
+                return;
+            }
+        }
+        this.connectionList.add(new Spectator(uuid));
+        this.getLogger().debug("PLAYERMANAGEMENT", "Spectator created for connection " + uuid);
+    }
+
+    public void removeConnection(UUID uuid) {
+        this.connectionList.removeIf(connection -> connection.getClientId().equals(uuid));
+    }
+
+    public void removeConnection(ServerConnection connection) {
+        this.connectionList.remove(connection);
     }
 
     // PRIVATE METHODS
