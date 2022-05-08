@@ -47,7 +47,8 @@ public class GameSession {
             try {
                 snake.getConnection().getDataIOStreamHandler().writeUTF(this.getSendablePlayerData(snake));
             } catch(Exception e) {
-                // THIS WILL BE FILLED SOON (i guess...)
+                SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Error while sending data to " + snake.getConnection().getClientId());
+                snake.getConnection().getClient().close();
             }
         }
     }

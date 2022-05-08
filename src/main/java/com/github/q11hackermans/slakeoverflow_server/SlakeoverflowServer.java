@@ -77,7 +77,10 @@ public class SlakeoverflowServer {
 
         // THREADS
         this.managerThread = new Thread(() -> {
-            while(!Thread.currentThread().isInterrupted() && this.managerThread != null) {
+            try {
+                Thread.sleep(1000);
+            } catch(Exception ignored) {}
+            while(!Thread.currentThread().isInterrupted() && this.managerThread == Thread.currentThread()) {
                 try {
                     checkThreads();
                     checkConnectionManager();
@@ -90,26 +93,13 @@ public class SlakeoverflowServer {
                     stop();
                 }
             }
+            stop();
         });
         this.managerThread.setName("SLAKEOVERFLOW-MANAGER-" + this.toString());
         this.managerThread.start();
         this.logger.debug("INIT", "Started Thread MANAGER");
 
-        this.tickThread = new Thread(() -> {
-            while(!Thread.currentThread().isInterrupted() && this.tickThread != null) {
-                try {
-                    if(this.game != null && gameState == GameState.RUNNING) {
-                        this.game.tick();
-                    }
-                    Thread.sleep(50);
-                } catch(Exception e) {
-                    Thread.currentThread().interrupt();
-                    this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
-                    e.printStackTrace();
-                }
-            }
-        });
-        this.tickThread.setName("SLAKEOVERFLOW-TICK-" + this.toString());
+        this.tickThread = this.getTickThreadTemplate();
         this.tickThread.start();
         this.logger.debug("INIT", "Started Thread TICK");
 
@@ -124,7 +114,9 @@ public class SlakeoverflowServer {
     public void stop() {
         try {
             this.managerThread.interrupt();
-            this.tickThread.interrupt();
+            if(this.tickThread != null) {
+                this.tickThread.interrupt();
+            }
             this.dataIOManager.close();
             this.connectionhandler.close();
             this.console.stop();
@@ -177,7 +169,11 @@ public class SlakeoverflowServer {
     }
 
     private void checkThreads() {
-
+        if(this.tickThread == null || !this.tickThread.isAlive()) {
+            this.tickThread = this.getTickThreadTemplate();
+            this.tickThread.start();
+            this.logger.info("MANAGER", "Started Thread TICK");
+        }
     }
 
     private void checkConnections() {
@@ -220,6 +216,26 @@ public class SlakeoverflowServer {
 
     public List<ServerConnection> getConnectionList() {
         return List.copyOf(this.connectionList);
+    }
+
+    // THREAD TEMPLATES
+    private Thread getTickThreadTemplate() {
+        Thread thread = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
+                try {
+                    if(this.game != null && gameState == GameState.RUNNING) {
+                        this.game.tick();
+                    }
+                    Thread.sleep(50);
+                } catch(Exception e) {
+                    Thread.currentThread().interrupt();
+                    this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.setName("SLAKEOVERFLOW-TICK-" + this.toString());
+        return thread;
     }
 
     /*
