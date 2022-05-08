@@ -9,6 +9,7 @@ import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,6 +190,31 @@ public class SlakeoverflowServer {
         }
     }
 
+    private void checkGameSession() {
+        if(this.game == null && this.gameState != GameState.STOPPED) {
+            this.gameState = GameState.STOPPED;
+        }
+        if(this.gameState == GameState.STOPPED && this.game != null) {
+            this.game = null;
+        }
+    }
+
+    private void sendStatusMessage() {
+        for(ServerConnection connection : this.connectionList) {
+            JSONObject statusMessage = new JSONObject();
+            statusMessage.put("cmd", "status");
+            statusMessage.put("status", this.gameState);
+            statusMessage.put("type", connection.getConnectionType());
+
+            try {
+                connection.getDataIOStreamHandler().writeUTF(statusMessage.toString());
+            } catch (IOException e) {
+                this.logger.warning("CONNECTION", "Error while sending data to " + connection.getClientId());
+                connection.getClient().close();
+            }
+        }
+    }
+
     // GETTER METHODS
     public ServerConsole getConsole() {
         return this.console;
@@ -223,8 +249,11 @@ public class SlakeoverflowServer {
         Thread thread = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
                 try {
+                    this.sendStatusMessage();
                     if(this.game != null && gameState == GameState.RUNNING) {
                         this.game.tick();
+                    } else {
+                        Thread.sleep(950);
                     }
                     Thread.sleep(50);
                 } catch(Exception e) {

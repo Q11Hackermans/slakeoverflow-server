@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class ServerConnection {
     private UUID clientId;
-    private ConnectionType connectionType;
+    private int connectionType;
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
@@ -48,7 +48,7 @@ public class ServerConnection {
      * Get the connection type
      * @return ConnectionType
      */
-    public ConnectionType getConnectionType() {
+    public int getConnectionType() {
         return this.connectionType;
     }
 
