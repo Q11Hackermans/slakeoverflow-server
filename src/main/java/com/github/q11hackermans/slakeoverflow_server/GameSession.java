@@ -33,6 +33,9 @@ public class GameSession {
 
     // TICK
     public void tick() {
+        // CHECK IF SNAKE IS ALIVE
+        this.checkSnakes();
+
         // RUNNING TICK ON SNAKES
         for(Snake snake : this.snakeList) {
             snake.tick();
@@ -80,6 +83,10 @@ public class GameSession {
      */
     private int randomPosY(){
         return (int) ((Math.random() * ((this.borderY - 1) - 1)) + 1);
+    }
+
+    private void checkSnakes() {
+        this.snakeList.removeIf(snake -> !snake.isAlive());
     }
 
     /**
@@ -242,6 +249,7 @@ public class GameSession {
      * This will remove the snake from the list.
      * @param snake
      */
+    @Deprecated
     public void killSnake(Snake snake) {
         this.snakeList.remove(snake);
     }

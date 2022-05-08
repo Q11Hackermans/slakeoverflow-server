@@ -16,6 +16,42 @@ public class ServerConnection {
         this.connectionType = ConnectionType.UNAUTHORIZED;
     }
 
+    // AUTHORISATION
+    /**
+     * This method authorizes this connection as player
+     */
+    public void authorizeAsPlayer() {
+        this.connectionType = ConnectionType.PLAYER;
+    }
+
+    /**
+     * This method authorizes this connection as spectator
+     */
+    public void authorizeAsSpectator() {
+        this.connectionType = ConnectionType.SPECTATOR;
+    }
+
+    /**
+     * This method deauthorizes the connection
+     */
+    public void deauthorize() {
+        this.connectionType = ConnectionType.UNAUTHORIZED;
+    }
+
+    // CONNECTION
+    public boolean isConnected() {
+        return SlakeoverflowServer.getServer().getConnectionList().contains(this);
+    }
+
+    // GETTER METHODS
+    /**
+     * Get the connection type
+     * @return ConnectionType
+     */
+    public ConnectionType getConnectionType() {
+        return this.connectionType;
+    }
+
     /**
      * Get UUID of client
      */
@@ -37,25 +73,5 @@ public class ServerConnection {
      */
     public DataIOStreamHandler getDataIOStreamHandler() {
         return SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(this.clientId);
-    }
-
-    /**
-     * Get the connection type
-     * @return ConnectionType
-     */
-    public ConnectionType getConnectionType() {
-        return this.connectionType;
-    }
-
-    public void authorizeAsPlayer() {
-        this.connectionType = ConnectionType.PLAYER;
-    }
-
-    public void authorizeAsSpectator() {
-        this.connectionType = ConnectionType.SPECTATOR;
-    }
-
-    public void deauthorize() {
-        this.connectionType = ConnectionType.UNAUTHORIZED;
     }
 }

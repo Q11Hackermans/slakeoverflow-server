@@ -20,6 +20,7 @@ public class Snake implements GameObject {
     private int facing;
     private int newFacing;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
+    private boolean alive;
 
     public Snake(ServerConnection connection, int x, int y, int facing, GameSession session) {
         this.connection = connection;
@@ -30,25 +31,42 @@ public class Snake implements GameObject {
         this.facing = facing;
         this.newFacing = facing;
         this.gameSession = session;
+        this.alive = true;
     }
 
     @Override
     public int[] getPos() {
-        return new int[]{this.posx, this.posy};
+        if(this.alive) {
+            return new int[]{this.posx, this.posy};
+        } else {
+            return new int[]{-1, -1};
+        }
     }
 
     @Override
     public int getPosX() {
-        return 0;
+        if(this.alive) {
+            return this.posx;
+        } else {
+            return -1;
+        }
     }
 
     @Override
     public int getPosY() {
-        return 0;
+        if(this.alive) {
+            return this.posy;
+        } else {
+            return -1;
+        }
     }
 
     public List<int[]> getBodyPositions() {
-        return List.copyOf(bodyPositions);
+        if(this.alive) {
+            return List.copyOf(bodyPositions);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -58,7 +76,7 @@ public class Snake implements GameObject {
      * @return int - [-1 not this snake, 0 <= bodypositions]
      */
     private int getPosBodyID(int posX, int posY){
-                return bodyPositions.indexOf(new int[]{posX, posY});
+        return bodyPositions.indexOf(new int[]{posX, posY});
     }
 
     /**
@@ -76,7 +94,12 @@ public class Snake implements GameObject {
      * TICK
      */
     public void tick() {
-        if (this.facing != this.newFacing) {
+        if(!this.connection.isConnected()) {
+            this.killSnake();
+            return;
+        }
+
+        if(this.facing != this.newFacing) {
             this.move(this.newFacing);
             return;
         }
@@ -181,7 +204,7 @@ public class Snake implements GameObject {
             this.facing = Direction.WEST;
 
         } else {
-            this.gameSession.killSnake(this);
+            this.killSnake();
         }
     }
 
@@ -209,5 +232,17 @@ public class Snake implements GameObject {
                 this.bodyPositions.set(i, new int[]{prev[0], prev[1]});
             }
         }
+    }
+
+    /**
+     * This method will kill the snake.
+     * After killing the snake, it cant be used anymore.
+     */
+    public void killSnake() {
+        this.alive = false;
+    }
+
+    public boolean isAlive() {
+        return this.alive;
     }
 }
