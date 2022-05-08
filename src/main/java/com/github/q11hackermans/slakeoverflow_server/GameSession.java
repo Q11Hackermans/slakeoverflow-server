@@ -1,6 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
-import com.github.q11hackermans.slakeoverflow_server.connections.Player;
+import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.GameObject;
@@ -42,7 +42,7 @@ public class GameSession {
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
             try {
-                snake.getPlayer().getDataIOStreamHandler().writeUTF(this.getSendablePlayerData(snake));
+                snake.getConnection().getDataIOStreamHandler().writeUTF(this.getSendablePlayerData(snake));
             } catch(Exception e) {
                 // THIS WILL BE FILLED SOON (i guess...)
             }
@@ -248,12 +248,12 @@ public class GameSession {
 
     /**
      * Returns the snake of a specific player
-     * @param player Player
+     * @param connection Player
      * @return Snake
      */
-    public Snake getSnakeOfPlayer(Player player) {
+    public Snake getSnakeOfConnection(ServerConnection connection) {
         for(Snake snake : this.snakeList) {
-            if(snake.getPlayer() == player) {
+            if(snake.getConnection() == connection) {
                 return snake;
             }
         }

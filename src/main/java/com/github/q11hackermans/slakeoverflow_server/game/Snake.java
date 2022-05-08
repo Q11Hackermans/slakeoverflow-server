@@ -1,16 +1,15 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
-import com.github.q11hackermans.slakeoverflow_server.connections.Player;
+import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Snake implements GameObject {
     // MANAGEMENT
-    private final Player player;
+    private final ServerConnection connection;
     private GameSession gameSession;
     // MOVEMENT
     private int speed;
@@ -22,8 +21,8 @@ public class Snake implements GameObject {
     private int newFacing;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
 
-    public Snake(Player player, int x, int y, int facing, GameSession session) {
-        this.player = player;
+    public Snake(ServerConnection connection, int x, int y, int facing, GameSession session) {
+        this.connection = connection;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
         this.posy = y;
@@ -67,8 +66,8 @@ public class Snake implements GameObject {
      *
      * @return Player related to this snake
      */
-    public Player getPlayer() {
-        return this.player;
+    public ServerConnection getConnection() {
+        return this.connection;
     }
 
     // TICK

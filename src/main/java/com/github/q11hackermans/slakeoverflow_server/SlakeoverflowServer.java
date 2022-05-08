@@ -1,12 +1,11 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
-import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
-import com.github.q11hackermans.slakeoverflow_server.connections.Spectator;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType;
@@ -154,32 +153,19 @@ public class SlakeoverflowServer {
     }
 
     // CONNECTION MANAGEMENT
-    public void addPlayer(UUID uuid, String username) {
+
+    /**
+     * Check if a connection with a specific ConnectionManager UUID exists
+     * @param uuid Unique Connection ID
+     * @return boolean
+     */
+    public boolean containsConnection(UUID uuid) {
         for(ServerConnection connection : this.connectionList) {
             if(connection.getClientId().equals(uuid)) {
-                return;
+                return true;
             }
         }
-        this.connectionList.add(new Player(uuid, username));
-        this.getLogger().debug("PLAYERMANAGEMENT", "Player created for connection " + uuid);
-    }
-
-    public void addSpectator(UUID uuid) {
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getClientId().equals(uuid)) {
-                return;
-            }
-        }
-        this.connectionList.add(new Spectator(uuid));
-        this.getLogger().debug("PLAYERMANAGEMENT", "Spectator created for connection " + uuid);
-    }
-
-    public void removeConnection(UUID uuid) {
-        this.connectionList.removeIf(connection -> connection.getClientId().equals(uuid));
-    }
-
-    public void removeConnection(ServerConnection connection) {
-        this.connectionList.remove(connection);
+        return false;
     }
 
     // PRIVATE METHODS
@@ -199,6 +185,12 @@ public class SlakeoverflowServer {
         this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
         this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
         this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
+
+        for(CMSClient cmsClient : this.connectionhandler.getClientList()) {
+            if(!this.containsConnection(cmsClient.getUniqueId())) {
+                this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
+            }
+        }
     }
 
     // GETTER METHODS
@@ -224,6 +216,10 @@ public class SlakeoverflowServer {
 
     public List<InetAddress> getIpBlacklist() {
         return List.copyOf(this.ipBlacklist);
+    }
+
+    public List<ServerConnection> getConnectionList() {
+        return List.copyOf(this.connectionList);
     }
 
     /*

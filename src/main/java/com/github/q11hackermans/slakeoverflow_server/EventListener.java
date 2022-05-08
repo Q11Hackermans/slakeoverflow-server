@@ -1,6 +1,5 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
-import com.github.q11hackermans.slakeoverflow_server.connections.Player;
 import net.jandie1505.connectionmanager.CMListenerAdapter;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.events.CMClientClosedEvent;
@@ -9,7 +8,6 @@ import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAcceptedEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAttemptEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionRefusedEvent;
-import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.events.DataIOUTFReceivedEvent;
 import org.json.JSONException;
@@ -95,7 +93,7 @@ public class EventListener extends CMListenerAdapter {
                         if(data.has("type")) {
                             if(data.getString("type").equalsIgnoreCase("player")) {
                                 if(data.has("username")) {
-                                    SlakeoverflowServer.getServer().addPlayer(cmsClient.getUniqueId(), data.getString("username"));
+                                    // REGISTER PLAYER
                                 }
                             } else if(data.getString("type").equalsIgnoreCase("spectator")) {
                                 cmsClient.close();
