@@ -41,6 +41,7 @@ public class SlakeoverflowServer {
     private final List<ServerConnection> connectionList;
     // LISTS
     private final List<InetAddress> ipBlacklist;
+    private boolean alreadyStopping;
 
 
     public SlakeoverflowServer() throws IOException {
@@ -76,6 +77,9 @@ public class SlakeoverflowServer {
         // LIST
         this.ipBlacklist = new ArrayList<>();
 
+        // MISC
+        this.alreadyStopping = false;
+
         // THREADS
         this.managerThread = new Thread(() -> {
             try {
@@ -94,7 +98,9 @@ public class SlakeoverflowServer {
                     stop();
                 }
             }
-            stop();
+            if(!alreadyStopping) {
+                stop();
+            }
         });
         this.managerThread.setName("SLAKEOVERFLOW-MANAGER-" + this.toString());
         this.managerThread.start();
@@ -114,6 +120,7 @@ public class SlakeoverflowServer {
      */
     public void stop() {
         try {
+            this.alreadyStopping = true;
             this.managerThread.interrupt();
             if(this.tickThread != null) {
                 this.tickThread.interrupt();
@@ -123,7 +130,9 @@ public class SlakeoverflowServer {
             this.console.stop();
             this.logger.info("STOP", "Server shutdown.");
             this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
-        } catch(Exception ignored) {}
+        } catch(Exception ignored) {
+            ignored.printStackTrace();
+        }
         System.exit(0);
     }
 
@@ -173,7 +182,7 @@ public class SlakeoverflowServer {
         if(this.tickThread == null || !this.tickThread.isAlive()) {
             this.tickThread = this.getTickThreadTemplate();
             this.tickThread.start();
-            this.logger.info("MANAGER", "Started Thread TICK");
+            this.logger.debug("MANAGER", "Started Thread TICK");
         }
     }
 
