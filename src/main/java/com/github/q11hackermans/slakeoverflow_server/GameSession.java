@@ -227,7 +227,7 @@ public class GameSession {
 
     /**
      * Returns the GameObject that is on the specified field.
-     * If the specified field is empty, this will return 0.
+     * If the specified field is empty, this will return null.
      * @param posX Position X
      * @param posY Position Y
      * @return GameObject
