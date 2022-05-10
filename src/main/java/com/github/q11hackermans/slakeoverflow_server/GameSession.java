@@ -68,7 +68,7 @@ public class GameSession {
     }
 
     /**
-     * Tries to spawn the amount of food with the value of 1 if the fields are free
+     * Tries to spawn the amount of food with the value of 1-3 if the fields are free
      * @param count Amount of food to be spawned
      */
     private void spawnFood(int count){
@@ -77,7 +77,7 @@ public class GameSession {
             int posY = this.randomPosY();
 
             if(isFree(posX, posY)){
-                Food food = new Food(posX, posY, new Random().nextInt());
+                Food food = new Food(posX, posY, new Random().nextInt(2) + 1);
                 this.itemList.add(food);
             }
 
