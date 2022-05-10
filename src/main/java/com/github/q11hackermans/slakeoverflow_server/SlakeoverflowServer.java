@@ -138,11 +138,16 @@ public class SlakeoverflowServer {
 
     // GAME MANAGEMENT
     /**
-     *
+     * This will create a new game with a specific size
      */
-    private void setupGame(int sizeX, int sizeY) {
-        if (this.gameState == GameState.STOPPED){
+    private boolean setupGame(int sizeX, int sizeY) {
+        if(this.gameState == GameState.STOPPED && sizeX > 0 && sizeY > 0) {
+            this.gameState = GameState.PREPARING;
             this.game = new GameSession(sizeX,sizeY);
+            this.gameState = GameState.RUNNING;
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -200,11 +205,13 @@ public class SlakeoverflowServer {
     }
 
     private void checkGameSession() {
-        if(this.game == null && this.gameState != GameState.STOPPED) {
-            this.gameState = GameState.STOPPED;
-        }
-        if(this.gameState == GameState.STOPPED && this.game != null) {
-            this.game = null;
+        if((this.game == null) || (this.gameState == GameState.STOPPED)) {
+            if(this.game == null && this.gameState != GameState.STOPPED && this.gameState != GameState.PREPARING) {
+                this.gameState = GameState.STOPPED;
+            }
+            if(this.gameState == GameState.STOPPED && this.game != null) {
+                this.game = null;
+            }
         }
     }
 
