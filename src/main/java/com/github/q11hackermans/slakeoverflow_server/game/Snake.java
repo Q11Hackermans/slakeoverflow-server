@@ -240,6 +240,7 @@ public class Snake implements GameObject {
      */
     public void killSnake() {
         this.alive = false;
+        this.gameSession.spawnXFoodAt((int) (this.bodyPositions.size() * 0.3), this.posx, this.posy);
     }
 
     public boolean isAlive() {
