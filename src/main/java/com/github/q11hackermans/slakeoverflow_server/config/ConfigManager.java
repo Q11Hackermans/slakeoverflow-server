@@ -43,6 +43,8 @@ public class ConfigManager {
                     this.config.setPort(jsonConfig.getInt("port"));
                     this.config.setWhitelist(jsonConfig.getBoolean("whitelist"));
                     this.config.setSlots(jsonConfig.getInt("slots"));
+                    this.config.setMaxFoodValue(jsonConfig.getInt("min_food_value"));
+                    this.config.setMaxFoodValue(jsonConfig.getInt("max_food_value"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch(JSONException e) {
@@ -51,7 +53,7 @@ public class ConfigManager {
                 }
             }
         } catch(IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
+            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
         }
     }
 
@@ -66,6 +68,8 @@ public class ConfigManager {
                 JSONObject config = new JSONObject();
                 config.put("port", 26599);
                 config.put("whitelist", true);
+                config.put("min_food_value", 1);
+                config.put("max_food_value", 2);
 
                 FileWriter writer = new FileWriter(this.configFile);
                 writer.write(config.toString(4));
