@@ -1,5 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
+import com.github.q11hackermans.slakeoverflow_server.config.ServerConfig;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
@@ -77,7 +79,7 @@ public class GameSession {
             int posY = this.randomPosY();
 
             if(isFree(posX, posY)){
-                Food food = new Food(posX, posY, new Random().nextInt(2) + 1);
+                Food food = new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue());
                 this.itemList.add(food);
             }
         }
