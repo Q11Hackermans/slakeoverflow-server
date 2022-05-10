@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+
 import static java.lang.Math.sqrt;
 
 public class GameSession {
@@ -54,19 +56,14 @@ public class GameSession {
     }
 
     /**
-     * Tries to spawn the amount of food with the value of 1 if the fields are free
-     * @param count Amount of food to be spawned
+     * Tries to spawn food with the value at this field
+     * @param value Amount of food to be spawned
+     * @param posX Position X where the food is spawned
+     * @param posY Position Y where the food is spawned
      */
-    private void spawnXFoodAt(int count){
-        for (int i = count; i > 0; i--){
-            int posX = this.randomPosX();
-            int posY = this.randomPosY();
-
-            if(isFree(posX, posY)){
-                Food food = new Food(posX, posY,1);
-                this.itemList.add(food);
-            }
-
+    public void spawnXFoodAt(int value, int posX, int posY){
+        if(isFree(posX, posY)){
+            Food food = new Food(posX, posY, value);
         }
     }
 
@@ -80,7 +77,7 @@ public class GameSession {
             int posY = this.randomPosY();
 
             if(isFree(posX, posY)){
-                Food food = new Food(posX, posY,1);
+                Food food = new Food(posX, posY, new Random().nextInt());
                 this.itemList.add(food);
             }
 
@@ -159,7 +156,7 @@ public class GameSession {
                     }
                 } else if(field instanceof Item) {
                     if(field instanceof Food) {
-                        fieldsx.put(FieldState.ITEM_APPLE);
+                        fieldsx.put(FieldState.ITEM_FOOD);
                     } else {
                         fieldsx.put(FieldState.ITEM_UNKNOWN);
                     }
