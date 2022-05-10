@@ -245,15 +245,6 @@ public class GameSession {
     }
 
     // SNAKE MANAGEMENT
-    /**
-     * This method will kill a snake.
-     * This will remove the snake from the list.
-     * @param snake
-     */
-    @Deprecated
-    public void killSnake(Snake snake) {
-        this.snakeList.remove(snake);
-    }
 
     /**
      * Returns the snake of a specific player
