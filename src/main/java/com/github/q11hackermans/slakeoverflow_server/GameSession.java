@@ -80,7 +80,6 @@ public class GameSession {
                 Food food = new Food(posX, posY, new Random().nextInt(2) + 1);
                 this.itemList.add(food);
             }
-
         }
     }
 
