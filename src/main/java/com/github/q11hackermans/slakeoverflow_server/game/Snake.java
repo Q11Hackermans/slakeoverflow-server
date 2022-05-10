@@ -150,7 +150,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posy--;
 
-            this.facing = Direction.NORTH;
+            this.setNewFacing(Direction.NORTH);
 
         } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
 
@@ -167,7 +167,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posx ++;
 
-            this.facing = Direction.EAST;
+            this.setNewFacing(Direction.EAST);
 
         } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
 
@@ -184,7 +184,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posy ++;
 
-            this.facing = Direction.SOUTH;
+            this.setNewFacing(Direction.SOUTH);
 
         } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
 
@@ -201,7 +201,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posx --;
 
-            this.facing = Direction.WEST;
+            this.setNewFacing(Direction.WEST);
 
         } else {
             this.killSnake();

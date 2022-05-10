@@ -57,6 +57,23 @@ public class GameSession {
      * Tries to spawn the amount of food with the value of 1 if the fields are free
      * @param count Amount of food to be spawned
      */
+    private void spawnXFoodAt(int count){
+        for (int i = count; i > 0; i--){
+            int posX = this.randomPosX();
+            int posY = this.randomPosY();
+
+            if(isFree(posX, posY)){
+                Food food = new Food(posX, posY,1);
+                this.itemList.add(food);
+            }
+
+        }
+    }
+
+    /**
+     * Tries to spawn the amount of food with the value of 1 if the fields are free
+     * @param count Amount of food to be spawned
+     */
     private void spawnFood(int count){
         for (int i = count; i > 0; i--){
             int posX = this.randomPosX();
@@ -245,15 +262,6 @@ public class GameSession {
     }
 
     // SNAKE MANAGEMENT
-    /**
-     * This method will kill a snake.
-     * This will remove the snake from the list.
-     * @param snake
-     */
-    @Deprecated
-    public void killSnake(Snake snake) {
-        this.snakeList.remove(snake);
-    }
 
     /**
      * Returns the snake of a specific player
