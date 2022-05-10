@@ -68,11 +68,11 @@ public class GameSession {
     }
 
     /**
-     * Tries to spawn the amount of food with the value of 1-3 if the fields are free
-     * @param count Amount of food to be spawned
+     * Tries X-times to spawn food with the value of 1-3 if the field is free
+     * @param tries Times the Server tries to spawn food
      */
-    private void spawnFood(int count){
-        for (int i = count; i > 0; i--){
+    private void spawnFood(int tries){
+        for (int i = tries; i > 0; i--){
             int posX = this.randomPosX();
             int posY = this.randomPosY();
 
