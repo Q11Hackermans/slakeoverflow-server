@@ -16,6 +16,7 @@ public class Snake implements GameObject {
     private int speed;
     private int posx;
     private int posy;
+    @Deprecated
     private int length;
     private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
@@ -23,7 +24,7 @@ public class Snake implements GameObject {
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
 
-    public Snake(ServerConnection connection, int x, int y, int facing, GameSession session) {
+    public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
         this.connection = connection;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
@@ -33,6 +34,35 @@ public class Snake implements GameObject {
         this.newFacing = facing;
         this.gameSession = session;
         this.alive = true;
+
+        // set start length body positions
+        if(this.facing == Direction.NORTH) {
+            int bodyY = this.posy + 1;
+            for(int i = length; i > 0; i--) {
+                this.bodyPositions.add(new int[]{this.posx, bodyY});
+                bodyY = bodyY + 1;
+            }
+        } else if(this.facing == Direction.SOUTH) {
+            int bodyY = this.posy - 1;
+            for(int i = length; i > 0; i--) {
+                this.bodyPositions.add(new int[]{this.posx, bodyY});
+                bodyY = bodyY - 1;
+            }
+        } else if(this.facing == Direction.WEST) {
+            int bodyX = this.posx - 1;
+            for(int i = length; i > 0; i--) {
+                this.bodyPositions.add(new int[]{bodyX, this.posy});
+                bodyX = bodyX - 1;
+            }
+        } else if(this.facing == Direction.EAST) {
+            int bodyX = this.posx - 1;
+            for(int i = length; i > 0; i--) {
+                this.bodyPositions.add(new int[]{bodyX, this.posy});
+                bodyX = bodyX - 1;
+            }
+        } else {
+            this.alive = false;
+        }
     }
 
     @Override

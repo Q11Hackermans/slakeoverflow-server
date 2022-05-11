@@ -6,6 +6,7 @@ public class ServerConfig {
     private int slots;
     private int minFoodValue;
     private int maxFoodValue;
+    private int defaultSnakeLength;
 
     public ServerConfig() {
         this.port = 26677;
@@ -13,6 +14,7 @@ public class ServerConfig {
         this.slots = 10;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
+        this.defaultSnakeLength = 3;
     }
 
 
@@ -75,6 +77,20 @@ public class ServerConfig {
             this.maxFoodValue = maxFoodValue;
         } else {
             this.maxFoodValue = 2;
+        }
+    }
+
+    public int getDefaultSnakeLength() {
+        if(this.defaultSnakeLength > 0) {
+            return this.defaultSnakeLength;
+        } else {
+            return 1;
+        }
+    }
+
+    public void setDefaultSnakeLength(int defaultSnakeLength) {
+        if(defaultSnakeLength > 0) {
+            this.defaultSnakeLength = defaultSnakeLength;
         }
     }
 }

@@ -3,6 +3,8 @@ package com.github.q11hackermans.slakeoverflow_server;
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.config.ServerConfig;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.GameObject;
@@ -55,6 +57,9 @@ public class GameSession {
                 snake.getConnection().getClient().close();
             }
         }
+
+        // ADD NEW SNAKES
+        this.addNewSnakes();
     }
 
     /**
@@ -103,6 +108,28 @@ public class GameSession {
 
     private void checkSnakes() {
         this.snakeList.removeIf(snake -> !snake.isAlive());
+    }
+
+    private void addNewSnakes() {
+        for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+            if(connection.isConnected() && connection.getConnectionType() == ConnectionType.PLAYER && this.getSnakeOfConnection(connection) == null) {
+                int posX = this.randomPosX();
+                int posY = this.randomPosY();
+
+                int length = SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
+
+                int count = 3;
+                while(count > 0) {
+                    if(this.isAreaFree(posX, posY, length*2)) {
+                        this.snakeList.add(new Snake(connection, posX, posY, Direction.NORTH, length, this));
+                        count = 0;
+                        break;
+                    } else {
+                        count --;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -183,6 +210,52 @@ public class GameSession {
      */
     public boolean isFree(int posX, int posY) {
         return this.getField(posX, posY) == null;
+    }
+
+    /**
+     * Returns if a specific area is free.
+     * The x and y coordinates are the center field coordinates.
+     * @param x center field x
+     * @param y center field y
+     * @param area area
+     * @return boolean
+     */
+    public boolean isAreaFree(int x, int y, int area) {
+        if(x < 0 || x >= this.borderX) {
+            return false;
+        }
+        if(y < 0 || y >= this.borderY) {
+            return false;
+        }
+
+        int left = x - Math.round(area/2);
+        int top = y - Math.round(area/2);
+
+        if(left < 0) {
+            left = 0;
+        }
+        if(top < 0) {
+            top = 0;
+        }
+
+        int right = x + Math.round(area/2);
+        int bottom = y + Math.round(area/2);
+
+        if(right >= this.borderX) {
+            right = this.borderX - 1;
+        }
+        if(bottom >= this.borderY) {
+            bottom = this.borderY - 1;
+        }
+
+        for(int iy = top; iy < bottom; iy++) {
+            for(int ix = left; ix < right; ix++) {
+                if(!this.isFree(ix, iy)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
