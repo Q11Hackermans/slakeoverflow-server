@@ -1,6 +1,13 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import net.jandie1505.connectionmanager.enums.PendingClientState;
+import net.jandie1505.connectionmanager.server.CMSClient;
+import net.jandie1505.connectionmanager.server.CMSPendingClient;
+
+import java.util.UUID;
 
 public class ConsoleCommands {
     public static String run(String[] cmd) {
@@ -16,6 +23,10 @@ public class ConsoleCommands {
                     return "Shutting down";
                 case "config":
                     return configCommand(cmd);
+                case "connection":
+                    return connectionCommand(cmd);
+                default:
+                    return "Unknown command";
             }
         }
         return "";
@@ -103,5 +114,132 @@ public class ConsoleCommands {
         } else {
             return "Command usage:\nconfig set <OPTION> <VALUE>\nconfig get <OPTION>\nconfig list\n";
         }
+    }
+
+    private static String connectionCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            switch(cmd[1]) {
+                case "list":
+                {
+                    String returnString = "CONNECTIONS:\n";
+                    returnString = returnString + connectionCommandGetEstablishedConnectionList();
+                    returnString = returnString + connectionCommandPendingConnectionList();
+                    return returnString;
+                }
+                case "list-established":
+                    return connectionCommandGetEstablishedConnectionList();
+                case "list-pending":
+                    return connectionCommandPendingConnectionList();
+                case "info":
+                    if(cmd.length == 3) {
+                        try {
+                            UUID uuid = UUID.fromString(cmd[2]);
+                            CMSClient client = SlakeoverflowServer.getServer().getConnectionhandler().getClientById(uuid);
+
+                            if(client != null) {
+                                String returnString = "CONNECTION INFO:\n";
+                                returnString = returnString + "UUID: " + uuid + "\n";
+                                returnString = returnString + "IP: " + client.getIP() + "\n";
+                                ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(uuid);
+                                if(connection != null) {
+                                    returnString = returnString + "SERVERCONNECTION: AVAIL (" + ConnectionType.toString(connection.getConnectionType()) + ")\n";
+                                } else {
+                                    returnString = returnString + "SERVERCONNECTION: N/A\n";
+                                }
+                                return returnString;
+                            } else {
+                                return "The UUID you specified does not exist (you can't use info for pending connections)";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                case "close":
+                    if(cmd.length == 3) {
+                        try {
+                            UUID uuid = UUID.fromString(cmd[2]);
+                            CMSClient client = SlakeoverflowServer.getServer().getConnectionhandler().getClientById(uuid);
+
+                            if(client != null) {
+                                client.close();
+                                return "Connection closed";
+                            } else {
+                                return "The UUID you specified does not exist (if you want to kick a pending connection, use connection deny instead)";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                case "accept":
+                    if(cmd.length == 3) {
+                        try {
+                            UUID uuid = UUID.fromString(cmd[2]);
+                            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+
+                            if(pendingClient != null) {
+                                pendingClient.setState(PendingClientState.ACCEPTED);
+                                return "Connection accepted";
+                            } else {
+                                return "This pending connection does not exist";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                case "deny":
+                    if(cmd.length == 3) {
+                        try {
+                            UUID uuid = UUID.fromString(cmd[2]);
+                            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+
+                            if(pendingClient != null) {
+                                pendingClient.setState(PendingClientState.DENIED);
+                                return "Connection refused";
+                            } else {
+                                return "This pending connection does not exist";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                default:
+                    return "Run command without arguments for help";
+            }
+        } else {
+            return "CONNECTION COMMAND USAGE:\n" +
+                    "connection list\n" +
+                    "connection list-established\n" +
+                    "connection list-pending\n" +
+                    "connection info <UUID>\n" +
+                    "connection close <UUID>\n" +
+                    "connection accept <UUID>\n" +
+                    "connection deny <UUID>\n";
+        }
+    }
+
+    private static String connectionCommandGetEstablishedConnectionList() {
+        String returnString = "ESTABLISHED CONNECTIONS:\n";
+        for(UUID uuid : SlakeoverflowServer.getServer().getConnectionhandler().getClients().keySet()) {
+            CMSClient cmsClient = SlakeoverflowServer.getServer().getConnectionhandler().getClients().get(uuid);
+            returnString = returnString + uuid + " " + cmsClient.getIP() + "\n";
+        }
+        return returnString;
+    }
+
+    private static String connectionCommandPendingConnectionList() {
+        String returnString = "PENDING CONNECTIONS:\n";
+        for(UUID uuid : SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().keySet()) {
+            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+            returnString = returnString + uuid + " " + pendingClient.getState() + " " + pendingClient.getSocket().getInetAddress() + "\n";
+        }
+        return returnString;
     }
 }

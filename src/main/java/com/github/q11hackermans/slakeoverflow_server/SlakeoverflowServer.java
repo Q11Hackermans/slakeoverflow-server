@@ -175,6 +175,20 @@ public class SlakeoverflowServer {
         return false;
     }
 
+    /**
+     * Get a connection with a specific ConnectionManager UUID.
+     * @param uuid ConnectionManager UUID
+     * @return ServerConnection (if exists), null (if not exists)
+     */
+    public ServerConnection getConnectionByUUID(UUID uuid) {
+        for(ServerConnection connection : this.connectionList) {
+            if(connection.getClientId().equals(uuid)) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
     // PRIVATE METHODS
     private void checkConnectionManager() {
         if(this.connectionhandler == null || this.connectionhandler.isClosed()) {

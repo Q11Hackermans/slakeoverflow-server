@@ -8,4 +8,16 @@ public class ConnectionType {
     public static final int SPECTATOR = 2;
 
     private ConnectionType() {}
+
+    public static String toString(int connectionType) {
+        if(connectionType == ConnectionType.UNAUTHORIZED) {
+            return "UNAUTHORIZED";
+        } else if(connectionType == ConnectionType.PLAYER) {
+            return "PLAYER";
+        } else if(connectionType == ConnectionType.SPECTATOR) {
+            return "SPECTATOR";
+        } else {
+            return "";
+        }
+    }
 }
