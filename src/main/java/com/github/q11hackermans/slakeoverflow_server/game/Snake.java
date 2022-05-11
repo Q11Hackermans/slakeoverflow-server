@@ -2,6 +2,7 @@ package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class Snake implements GameObject {
      * TICK
      */
     public void tick() {
-        if(!this.connection.isConnected()) {
+        if(!this.connection.isConnected() && this.connection.getConnectionType() == ConnectionType.PLAYER) {
             this.killSnake();
             return;
         }
