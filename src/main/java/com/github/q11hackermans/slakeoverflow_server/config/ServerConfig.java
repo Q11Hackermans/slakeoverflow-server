@@ -33,11 +33,17 @@ public class ServerConfig {
     }
 
     public int getSlots() {
-        return this.slots;
+        if(slots > 0) {
+            return this.slots;
+        } else {
+            return 1;
+        }
     }
 
     public void setSlots(int slots) {
-        this.slots = slots;
+        if(slots > 0) {
+            this.slots = slots;
+        }
     }
 
     public int getMinFoodValue() {
