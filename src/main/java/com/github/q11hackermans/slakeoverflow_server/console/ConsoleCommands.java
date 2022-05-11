@@ -21,6 +21,8 @@ public class ConsoleCommands {
                 case "stop":
                     SlakeoverflowServer.getServer().stop();
                     return "Shutting down";
+                case "help":
+                    return helpCommand();
                 case "config":
                     return configCommand(cmd);
                 case "connection":
@@ -30,6 +32,26 @@ public class ConsoleCommands {
             }
         }
         return "";
+    }
+
+    private static String helpCommand() {
+        return "COMMAND LIST:\n" +
+                "help: This page\n" +
+                "stop: Shutdown server\n" +
+                "config: Get or set config\n" +
+                "connection: Connection management (ConnectionManager)\n" +
+                "user: User management (ServerConnections)\n" +
+                "blacklist: IP blacklist management\n" +
+                "game: Game management\n" +
+                "logger: Logging management\n" +
+                "Run the specific commands without arguments to show their help page.\n" +
+                "COMMAND SHORTCUTS:\n" +
+                "startgame --> game start default\n" +
+                "stopgame --> game stop\n" +
+                "list --> user list\n" +
+                "kick <UUID> --> connection close <UUID>\n" +
+                "ban <IP> --> blacklist add <IP>\n" +
+                "accept <UUID> --> connection accept <UUID>\n";
     }
 
     private static String configCommand(String[] cmd) {
