@@ -61,7 +61,7 @@ public class EventListener extends CMListenerAdapter {
         }
 
         JSONObject readyMessage = new JSONObject();
-        readyMessage.put("cmd", "ready");
+        readyMessage.put("cmd", "server_ready");
 
         DataIOStreamHandler dataIOStreamHandler = SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId());
         try {
