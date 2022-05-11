@@ -99,6 +99,18 @@ public class ConsoleCommands {
                         } catch (NumberFormatException e) {
                             return "You can only set an int value in range 1-10";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("default_snake_length")) {
+                        try {
+                            int defaultSnakeLength = Integer.parseInt(cmd[3]);
+                            if(defaultSnakeLength >= 1 && defaultSnakeLength <= 10) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setDefaultSnakeLength(defaultSnakeLength);
+                                return "Updated value default_snake_length to " + defaultSnakeLength;
+                            } else {
+                                return "You can only set an int value in range 1-10";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set an int value in range 1-10";
+                        }
                     } else {
                         return "Unknown config option";
                     }
@@ -117,6 +129,8 @@ public class ConsoleCommands {
                         return "Value min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue();
                     } else if(cmd[2].equalsIgnoreCase("max_food_value")) {
                         return "Value max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue();
+                    } else if(cmd[2].equalsIgnoreCase("default_snake_length")) {
+                        return "Value default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
                     } else {
                         return "Unknown config option";
                     }
@@ -129,7 +143,8 @@ public class ConsoleCommands {
                         "slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSlots() + "\n" +
                         "whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist() + "\n" +
                         "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
-                        "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n";
+                        "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
+                        "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n";
             } else {
                 return "Run command without arguments for help";
             }

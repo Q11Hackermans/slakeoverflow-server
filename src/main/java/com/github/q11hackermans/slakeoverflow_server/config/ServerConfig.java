@@ -81,7 +81,7 @@ public class ServerConfig {
     }
 
     public int getDefaultSnakeLength() {
-        if(this.defaultSnakeLength > 0) {
+        if(this.defaultSnakeLength > 0 && this.defaultSnakeLength <= 10) {
             return this.defaultSnakeLength;
         } else {
             return 1;
@@ -89,7 +89,7 @@ public class ServerConfig {
     }
 
     public void setDefaultSnakeLength(int defaultSnakeLength) {
-        if(defaultSnakeLength > 0) {
+        if(defaultSnakeLength > 0 && defaultSnakeLength <= 10) {
             this.defaultSnakeLength = defaultSnakeLength;
         }
     }
