@@ -7,14 +7,28 @@ public class ServerConfig {
     private int minFoodValue;
     private int maxFoodValue;
     private int defaultSnakeLength;
+    private int snakeSpeedBase;
+    private int snakeSpeedModifierValue;
+    private int snakeSpeedModifierBodycount;
 
-    public ServerConfig() {
+    // ADVANCED OPTIONS
+    private final boolean advancedOptionsEnabled;
+    private boolean overrideServerTickrate;
+    private int customServerTickrate;
+    private int customServerTickrateIdle;
+
+    public ServerConfig(boolean advancedOptionsEnabled) {
         this.port = 26677;
         this.whitelist = true;
         this.slots = 10;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
+
+        this.advancedOptionsEnabled = advancedOptionsEnabled;
+        this.overrideServerTickrate = false;
+        this.customServerTickrate = 50;
+        this.customServerTickrateIdle = 950;
     }
 
 
@@ -91,6 +105,42 @@ public class ServerConfig {
     public void setDefaultSnakeLength(int defaultSnakeLength) {
         if(defaultSnakeLength > 0 && defaultSnakeLength <= 10) {
             this.defaultSnakeLength = defaultSnakeLength;
+        }
+    }
+
+    public boolean isOverrideServerTickrate() {
+        return (this.advancedOptionsEnabled && this.overrideServerTickrate);
+    }
+
+    public void setOverrideServerTickrate(boolean overrideServerTickrate) {
+        this.overrideServerTickrate = overrideServerTickrate;
+    }
+
+    public int getCustomServerTickrate() {
+        if(this.advancedOptionsEnabled && this.customServerTickrate > 0 && this.customServerTickrate < 120000) {
+            return this.customServerTickrate;
+        } else {
+            return 50;
+        }
+    }
+
+    public void setCustomServerTickrate(int customServerTickrate) {
+        if(customServerTickrate > 0 && customServerTickrate < 60000) {
+            this.customServerTickrate = customServerTickrate;
+        }
+    }
+
+    public int getCustomServerTickrateIdle() {
+        if(this.advancedOptionsEnabled && this.customServerTickrateIdle >= 0 && this.customServerTickrateIdle < 120000) {
+            return this.customServerTickrateIdle;
+        } else {
+            return 950;
+        }
+    }
+
+    public void setCustomServerTickrateIdle(int customServerTickrateIdle) {
+        if(customServerTickrateIdle >= 0 && customServerTickrateIdle < 120000) {
+            this.customServerTickrateIdle = customServerTickrateIdle;
         }
     }
 }
