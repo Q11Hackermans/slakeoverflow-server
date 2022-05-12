@@ -4,6 +4,7 @@ import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
+import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
@@ -191,6 +192,32 @@ public class SlakeoverflowServer {
             }
         }
         return null;
+    }
+
+    public int getPlayerCount() {
+        int connectionCount = 0;
+        for(ServerConnection connection : this.connectionList) {
+            if(connection.getConnectionType() == ConnectionType.PLAYER) {
+                connectionCount++;
+            }
+        }
+        return connectionCount;
+    }
+
+    public void authorizeConnectionAsPlayer(UUID connectionUUID, boolean ignoreSlots) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        if(connection != null) {
+            if(ignoreSlots || this.getPlayerCount() < this.configManager.getConfig().getSlots()) {
+                connection.authorizeAsPlayer();
+            }
+        }
+    }
+
+    public void deauthorizeConnection(UUID connectionUUID) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        if(connection != null) {
+            connection.deauthorize();
+        }
     }
 
     // PRIVATE METHODS
