@@ -27,6 +27,8 @@ public class ConsoleCommands {
                     return configCommand(cmd);
                 case "connection":
                     return connectionCommand(cmd);
+                case "user":
+                    return userCommand(cmd);
                 default:
                     return "Unknown command";
             }
@@ -339,5 +341,84 @@ public class ConsoleCommands {
             returnString = returnString + uuid + " " + pendingClient.getState() + " " + pendingClient.getSocket().getInetAddress() + "\n";
         }
         return returnString;
+    }
+
+    private static String userCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            switch(cmd[1]) {
+                case "list":
+                {
+                    String returnString = "USER LIST:\n";
+                    for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+                        returnString = returnString + connection.getClientId() + " " + ConnectionType.toString(connection.getConnectionType()) + "\n";
+                    }
+                    return returnString;
+                }
+                case "info":
+                    if(cmd.length == 3) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            if(connection != null) {
+                                return "USER INFO:\n" +
+                                        "UUID: " + connection.getClientId() + "\n" +
+                                        "Auth state: " + ConnectionType.toString(connection.getConnectionType()) + "\n";
+                            } else {
+                                return "This user does not exist";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                case "auth":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            if(connection != null) {
+                                if(cmd[3].equalsIgnoreCase("player")) {
+                                    connection.authorizeAsPlayer();
+                                    return "User authenticated as player";
+                                } else if(cmd[3].equalsIgnoreCase("spectator")) {
+                                    connection.authorizeAsSpectator();
+                                    return "User authenticated as spectator";
+                                } else {
+                                    return "Run command without arguments for help";
+                                }
+                            } else {
+                                return "This user does not exist";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                case "unauth":
+                    if(cmd.length == 3) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            if(connection != null) {
+                                connection.deauthorize();
+                                return "Connection unauthenticated";
+                            } else {
+                                return "This user does not exist";
+                            }
+                        } catch(IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                default:
+                    return "Run command without arguments for help";
+            }
+        } else {
+            return "USER COMMAND USAGE:\n" +
+                    "user list\n" +
+                    "user info <UUID>\n" +
+                    "user auth <UUID> player/spectator\n" +
+                    "user unauth <UUID>\n";
+        }
     }
 }
