@@ -175,7 +175,7 @@ public class Snake implements GameObject {
                     bodyPositions.remove(bodyId);
                 }
             }
-            int appleValue = gameSession.getAppleValue(this.posx, (this.posy - 1));
+            int appleValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
             growSnake(appleValue);
 
             this.moveBodies();
@@ -192,7 +192,7 @@ public class Snake implements GameObject {
                     bodyPositions.remove(bodyId);
                 }
             }
-            int appleValue = gameSession.getAppleValue((this.posx + 1), this.posy);
+            int appleValue = gameSession.getFoodValue((this.posx + 1), this.posy);
             growSnake(appleValue);
 
             this.moveBodies();
@@ -209,7 +209,7 @@ public class Snake implements GameObject {
                     bodyPositions.remove(bodyId);
                 }
             }
-            int appleValue = gameSession.getAppleValue(this.posx, (this.posy + 1));
+            int appleValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
             growSnake(appleValue);
 
             this.moveBodies();
@@ -226,7 +226,7 @@ public class Snake implements GameObject {
                     bodyPositions.remove(bodyId);
                 }
             }
-            int appleValue = gameSession.getAppleValue((this.posx - 1), this.posy);
+            int appleValue = gameSession.getFoodValue((this.posx - 1), this.posy);
             growSnake(appleValue);
 
             this.moveBodies();
@@ -271,7 +271,7 @@ public class Snake implements GameObject {
      */
     public void killSnake() {
         this.alive = false;
-        this.gameSession.spawnXFoodAt((int) (this.bodyPositions.size() * 0.3), this.posx, this.posy);
+        this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
     }
 
     public boolean isAlive() {

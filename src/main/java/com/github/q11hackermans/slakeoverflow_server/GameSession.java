@@ -1,15 +1,10 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
-import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
-import com.github.q11hackermans.slakeoverflow_server.config.ServerConfig;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
-import com.github.q11hackermans.slakeoverflow_server.game.Food;
-import com.github.q11hackermans.slakeoverflow_server.game.GameObject;
-import com.github.q11hackermans.slakeoverflow_server.game.Item;
-import com.github.q11hackermans.slakeoverflow_server.game.Snake;
+import com.github.q11hackermans.slakeoverflow_server.game.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
-import static java.lang.Math.sqrt;
 
 public class GameSession {
     private final List<Snake> snakeList;
@@ -46,7 +39,7 @@ public class GameSession {
         for(Snake snake : this.snakeList) {
             snake.tick();
         }
-        this.spawnFood((int) sqrt(0.5*snakeList.size()));
+        this.spawnFood(this.calcFoodSpawnTries());
 
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
@@ -63,15 +56,13 @@ public class GameSession {
     }
 
     /**
-     * Tries to spawn food with the value at this field
-     * @param value Amount of food to be spawned
-     * @param posX Position X where the food is spawned
-     * @param posY Position Y where the food is spawned
+     * Return a number to use in the spawnFood function depending on the player-count
      */
-    public void spawnXFoodAt(int value, int posX, int posY){
-        if(isFree(posX, posY)){
-            Food food = new Food(posX, posY, value);
+    private int calcFoodSpawnTries() {
+        if (randomIntInRange(1, 3) == 1) {
+            return (int) (1 + Math.round(0.2 * snakeList.size()));
         }
+        return 0;
     }
 
     /**
@@ -79,22 +70,36 @@ public class GameSession {
      * @param tries Times the Server tries to spawn food
      */
     private void spawnFood(int tries){
-        for (int i = tries; i > 0; i--){
-            int posX = this.randomPosX();
-            int posY = this.randomPosY();
+        for (int i = tries; i > 0; i--) {
+            int[] rPos = this.posInRandomPlayerFov();
+            int posX = rPos[0];
+            int posY = rPos[1];
 
-            if(isFree(posX, posY)){
-                Food food = new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue());
-                this.itemList.add(food);
+            if (isFree(posX, posY)) {
+                this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
             }
         }
     }
 
     /**
+     * Tries to spawn a SuperFood with this value at this field
+     *
+     * @param value Value of the super food to be spawned
+     * @param posX  Position X where the super-food is spawned
+     * @param posY  Position Y where the super-food is spawned
+     */
+    public void spawnSuperFoodAt(int value, int posX, int posY) {
+        if (isFree(posX, posY)) {
+            this.itemList.add(new SuperFood(posX, posY, value));
+        }
+    }
+
+    /**
      * Returns a random number on the fields x-axis
+     *
      * @return Random x coordinate
      */
-    private int randomPosX(){
+    private int randomPosX() {
         return (int) ((Math.random() * ((this.borderX - 1) - 1)) + 1);
     }
 
@@ -202,8 +207,10 @@ public class GameSession {
     }
 
     // FIELD MANAGEMENT
+
     /**
      * Returns true if the specified field is free
+     *
      * @param posX Position X
      * @param posY Position Y
      * @return boolean
@@ -213,10 +220,32 @@ public class GameSession {
     }
 
     /**
+     * Returns an integer array with a position within a random players FOV or [-1|-1] if there is no free field within the FOV or no player.
+     *
+     * @return int[]
+     */
+    private int[] posInRandomPlayerFov() {
+        if (snakeList.size() > 0) {
+            Snake rSnake = snakeList.get(randomIntInRange(0, snakeList.size() - 1));
+            int[] randomSnakePos = new int[]{rSnake.getPosX(), rSnake.getPosY()};
+
+            for (int i = 0; i < 20; i++) {
+                int rPosX = this.randomIntInRange(randomSnakePos[0] - Math.round(this.fovsizeX / 2), randomSnakePos[0] + Math.round(this.fovsizeX / 2));
+                int rPosY = this.randomIntInRange(randomSnakePos[1] - Math.round(this.fovsizeY / 2), randomSnakePos[1] + Math.round(this.fovsizeY / 2));
+                if (isFree(rPosX, rPosY)) {
+                    return new int[]{rPosX, rPosY};
+                }
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+    /**
      * Returns if a specific area is free.
      * The x and y coordinates are the center field coordinates.
-     * @param x center field x
-     * @param y center field y
+     *
+     * @param x    center field x
+     * @param y    center field y
      * @param area area
      * @return boolean
      */
@@ -283,14 +312,17 @@ public class GameSession {
     /**
      * Returns the food value if food is on the specified field.
      * Returns 0 if there is no food on the specified field.
+     *
      * @param posX Position X
      * @param posy Position Y
      * @return int (!=0 when food, =0 when no food)
      */
-    public int getAppleValue(int posX, int posy) {
+    public int getFoodValue(int posX, int posy) {
         GameObject gameObject = this.getField(posX, posy);
-        if(gameObject instanceof Food) {
+        if (gameObject instanceof Food) {
             return ((Food) gameObject).getFoodValue();
+        } else if (gameObject instanceof SuperFood) {
+            return ((SuperFood) gameObject).getValue();
         } else {
             return 0;
         }
@@ -315,8 +347,8 @@ public class GameSession {
                 }
             }
         }
-        for(Item item : this.itemList) {
-            if(item.getPosX() == posX && item.getPosY() == posY) {
+        for (Item item : this.itemList) {
+            if (item.getPosX() == posX && item.getPosY() == posY) {
                 return item;
             }
         }
@@ -324,8 +356,25 @@ public class GameSession {
     }
 
     /**
+     * Returns a random int from 1 to the upper bound
+     *
+     * @param upperBound upper bound of the random int
+     * @return int
+     */
+    private int randomIntInRange(int lowerBound, int upperBound) throws IllegalArgumentException {
+
+        if (lowerBound >= upperBound) {
+            IllegalArgumentException e = new IllegalArgumentException("The upper bound is smaller than the lower bound");
+            SlakeoverflowServer.getServer().getLogger().warning("RANDOM-INT-GENERATOR", "Exception: " + e);
+            throw e;
+        }
+        return new Random().nextInt((upperBound - lowerBound) + 1) + lowerBound;
+    }
+
+    /**
      * Get the world border
      * The world border is from X: 0-getBorder()[0], Y: 0-getBorder()[1].
+     *
      * @return int[]{posX, posY}
      */
     public int[] getBorder() {
