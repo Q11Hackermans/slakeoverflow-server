@@ -7,14 +7,31 @@ public class ServerConfig {
     private int minFoodValue;
     private int maxFoodValue;
     private int defaultSnakeLength;
+    private int snakeSpeedBase;
+    private int snakeSpeedModifierValue;
+    private int snakeSpeedModifierBodycount;
 
-    public ServerConfig() {
+    // ADVANCED OPTIONS
+    private final boolean advancedOptionsEnabled;
+    private boolean overrideServerTickrate;
+    private int customServerTickrate;
+    private int customServerTickrateIdle;
+
+    public ServerConfig(boolean advancedOptionsEnabled) {
         this.port = 26677;
         this.whitelist = true;
         this.slots = 10;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
+        this.snakeSpeedBase = 20;
+        this.snakeSpeedModifierValue = 1;
+        this.snakeSpeedModifierBodycount = 2;
+
+        this.advancedOptionsEnabled = advancedOptionsEnabled;
+        this.overrideServerTickrate = false;
+        this.customServerTickrate = 50;
+        this.customServerTickrateIdle = 950;
     }
 
 
@@ -81,7 +98,7 @@ public class ServerConfig {
     }
 
     public int getDefaultSnakeLength() {
-        if(this.defaultSnakeLength > 0) {
+        if(this.defaultSnakeLength > 0 && this.defaultSnakeLength <= 10) {
             return this.defaultSnakeLength;
         } else {
             return 1;
@@ -89,8 +106,91 @@ public class ServerConfig {
     }
 
     public void setDefaultSnakeLength(int defaultSnakeLength) {
-        if(defaultSnakeLength > 0) {
+        if(defaultSnakeLength > 0 && defaultSnakeLength <= 10) {
             this.defaultSnakeLength = defaultSnakeLength;
+        }
+    }
+
+    public int getSnakeSpeedBase() {
+        if(this.snakeSpeedBase > 0) {
+            return snakeSpeedBase;
+        } else {
+            return 20;
+        }
+    }
+
+    public void setSnakeSpeedBase(int snakeSpeedBase) {
+        if(snakeSpeedBase > 0) {
+            this.snakeSpeedBase = snakeSpeedBase;
+        }
+    }
+
+    public int getSnakeSpeedModifierValue() {
+        if(this.snakeSpeedModifierValue >= 0) {
+            return snakeSpeedModifierValue;
+        } else {
+            return 1;
+        }
+    }
+
+    public void setSnakeSpeedModifierValue(int snakeSpeedModifierValue) {
+        if(snakeSpeedModifierValue >= 0) {
+            this.snakeSpeedModifierValue = snakeSpeedModifierValue;
+        }
+    }
+
+    public int getSnakeSpeedModifierBodycount() {
+        if(this.snakeSpeedModifierBodycount > 0) {
+            return snakeSpeedModifierBodycount;
+        } else {
+            return 2;
+        }
+    }
+
+    public void setSnakeSpeedModifierBodycount(int snakeSpeedModifierBodycount) {
+        if(snakeSpeedModifierBodycount > 0) {
+            this.snakeSpeedModifierBodycount = snakeSpeedModifierBodycount;
+        }
+    }
+
+    // ADVANCED
+    public boolean isAdvancedOptionsEnabled() {
+        return this.advancedOptionsEnabled;
+    }
+
+    public boolean isOverrideServerTickrate() {
+        return (this.advancedOptionsEnabled && this.overrideServerTickrate);
+    }
+
+    public void setOverrideServerTickrate(boolean overrideServerTickrate) {
+        this.overrideServerTickrate = overrideServerTickrate;
+    }
+
+    public int getCustomServerTickrate() {
+        if(this.advancedOptionsEnabled && this.customServerTickrate > 0 && this.customServerTickrate < 120000) {
+            return this.customServerTickrate;
+        } else {
+            return 50;
+        }
+    }
+
+    public void setCustomServerTickrate(int customServerTickrate) {
+        if(customServerTickrate > 0 && customServerTickrate < 60000) {
+            this.customServerTickrate = customServerTickrate;
+        }
+    }
+
+    public int getCustomServerTickrateIdle() {
+        if(this.advancedOptionsEnabled && this.customServerTickrateIdle >= 0 && this.customServerTickrateIdle < 120000) {
+            return this.customServerTickrateIdle;
+        } else {
+            return 950;
+        }
+    }
+
+    public void setCustomServerTickrateIdle(int customServerTickrateIdle) {
+        if(customServerTickrateIdle >= 0 && customServerTickrateIdle < 120000) {
+            this.customServerTickrateIdle = customServerTickrateIdle;
         }
     }
 }

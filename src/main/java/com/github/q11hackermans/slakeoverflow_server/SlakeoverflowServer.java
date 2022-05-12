@@ -34,6 +34,8 @@ public class SlakeoverflowServer {
     // THREADS
     private Thread managerThread;
     private Thread tickThread;
+    private final int tickSpeed;
+    private final int idleTickSpeed;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -44,7 +46,7 @@ public class SlakeoverflowServer {
     private boolean alreadyStopping;
 
 
-    public SlakeoverflowServer() throws IOException {
+    public SlakeoverflowServer(boolean advancedConfigOptions) throws IOException {
         // SET SERVER (RUN ALWAYS FIRST)
         server = this;
 
@@ -58,7 +60,9 @@ public class SlakeoverflowServer {
         this.console.start();
 
         // CONFIG
-        this.configManager = new ConfigManager();
+        this.configManager = new ConfigManager(advancedConfigOptions);
+        this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
+        this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
 
         // CONNECTION MANAGER
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
@@ -283,9 +287,9 @@ public class SlakeoverflowServer {
                     if(this.game != null && gameState == GameState.RUNNING) {
                         this.game.tick();
                     } else {
-                        Thread.sleep(950);
+                        Thread.sleep(this.idleTickSpeed);
                     }
-                    Thread.sleep(50);
+                    Thread.sleep(this.tickSpeed);
                 } catch(Exception e) {
                     Thread.currentThread().interrupt();
                     this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
@@ -304,7 +308,7 @@ public class SlakeoverflowServer {
      */
     // HIER GEHTS LOS :) {"cmd":"tick","fields":[[0,1,0],[],[]]}  {"cmd":"auth","username":"vollidiot123"} {"cmd":"auth2","sizex":100,"sizey":100} {"cmd":"auth3"}
     public static void main(String[] args) throws IOException {
-        System.out.println("Slakeoverflow Server by Q11-Hackermans (https://github.com/Q11Hackermans)");
+        System.out.println("Slakeoverflow Server Launcher by Q11-Hackermans (https://github.com/Q11Hackermans)");
 
         int waitTime = 3;
         Map<String, String> startArguments = new HashMap<>();
@@ -329,12 +333,26 @@ public class SlakeoverflowServer {
             waitTime = 30;
         }
 
+        boolean advancedOptions = false;
+        advancedOptions = Boolean.parseBoolean(startArguments.get("enableAdvancedConfigOptions"));
+        if(advancedOptions) {
+            System.out.println("\n" +
+                    "-------------------- WARNING --------------------\n" +
+                    "ADVANCED CONFIG OPTIONS ARE ENABLED.\n" +
+                    "THIS ALLOWS TO MODIFY THE SERVER TICKRATE.\n" +
+                    "THIS IS NOT SUPPORTED AND MAY LEAD TO ERRORS.\n" +
+                    "-------------------------------------------------\n");
+            if(waitTime < 10) {
+                waitTime = 10;
+            }
+        }
+
         System.out.println("Starting server in " + waitTime + " seconds...");
         try {
             TimeUnit.SECONDS.sleep(waitTime);
         } catch(Exception ignored) {}
 
-        new SlakeoverflowServer();
+        new SlakeoverflowServer(advancedOptions);
     }
 
     public static SlakeoverflowServer getServer() {

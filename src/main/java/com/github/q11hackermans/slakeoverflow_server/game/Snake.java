@@ -38,25 +38,25 @@ public class Snake implements GameObject {
         // set start length body positions
         if(this.facing == Direction.NORTH) {
             int bodyY = this.posy + 1;
-            for(int i = length; i > 0; i--) {
+            for(int i = length - 1; i > 0; i--) {
                 this.bodyPositions.add(new int[]{this.posx, bodyY});
                 bodyY = bodyY + 1;
             }
         } else if(this.facing == Direction.SOUTH) {
             int bodyY = this.posy - 1;
-            for(int i = length; i > 0; i--) {
+            for(int i = length - 1; i > 0; i--) {
                 this.bodyPositions.add(new int[]{this.posx, bodyY});
                 bodyY = bodyY - 1;
             }
         } else if(this.facing == Direction.WEST) {
             int bodyX = this.posx - 1;
-            for(int i = length; i > 0; i--) {
+            for(int i = length - 1; i > 0; i--) {
                 this.bodyPositions.add(new int[]{bodyX, this.posy});
                 bodyX = bodyX - 1;
             }
         } else if(this.facing == Direction.EAST) {
             int bodyX = this.posx - 1;
-            for(int i = length; i > 0; i--) {
+            for(int i = length - 1; i > 0; i--) {
                 this.bodyPositions.add(new int[]{bodyX, this.posy});
                 bodyX = bodyX - 1;
             }

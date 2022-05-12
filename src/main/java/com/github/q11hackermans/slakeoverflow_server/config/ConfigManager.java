@@ -10,8 +10,8 @@ public class ConfigManager {
     private final File configFile;
     private final ServerConfig config;
 
-    public ConfigManager() {
-        this.config = new ServerConfig();
+    public ConfigManager(boolean advancedOptionsEnabled) {
+        this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
         if(!this.configFile.exists()) {
@@ -45,6 +45,13 @@ public class ConfigManager {
                     this.config.setSlots(jsonConfig.getInt("slots"));
                     this.config.setMaxFoodValue(jsonConfig.getInt("min_food_value"));
                     this.config.setMaxFoodValue(jsonConfig.getInt("max_food_value"));
+                    this.config.setSnakeSpeedBase(jsonConfig.getInt("snake_speed_base"));
+                    this.config.setSnakeSpeedModifierValue(jsonConfig.getInt("snake_speed_modifier_value"));
+                    this.config.setSnakeSpeedModifierBodycount(jsonConfig.getInt("snake_speed_modifier_bodycount"));
+
+                    this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
+                    this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
+                    this.config.setCustomServerTickrateIdle(jsonConfig.getInt("advanced_custom_server_tickrate_idle"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch(JSONException e) {
@@ -70,6 +77,12 @@ public class ConfigManager {
                 config.put("whitelist", true);
                 config.put("min_food_value", 1);
                 config.put("max_food_value", 2);
+                config.put("snake_speed_base", 20);
+                config.put("snake_speed_modifier_value", 1);
+                config.put("snake_speed_modifier_bodycount", 2);
+                config.put("advanced_override_server_tickrate", false);
+                config.put("advanced_custom_server_tickrate", 50);
+                config.put("advanced_custom_server_tickrate_idle", 950);
 
                 FileWriter writer = new FileWriter(this.configFile);
                 writer.write(config.toString(4));
