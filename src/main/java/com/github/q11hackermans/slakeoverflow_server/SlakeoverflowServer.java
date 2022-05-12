@@ -204,10 +204,10 @@ public class SlakeoverflowServer {
         return connectionCount;
     }
 
-    public void authorizeConnectionAsPlayer(UUID connectionUUID, boolean ignoreSlots) {
+    public void authorizeConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if(connection != null) {
-            if(ignoreSlots || this.getPlayerCount() < this.configManager.getConfig().getSlots()) {
+            if(ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getSlots())) {
                 connection.authorizeAsPlayer();
             }
         }

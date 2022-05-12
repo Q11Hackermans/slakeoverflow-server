@@ -65,6 +65,9 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("whitelist")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setWhitelist(Boolean.parseBoolean(cmd[3]));
                         return "Updated value whitelist to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setUserAuthentication(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value user_authentication to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("slots")) {
                         try {
                             int slots = Integer.parseInt(cmd[3]);
@@ -167,6 +170,8 @@ public class ConsoleCommands {
                         return "Value slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSlots();
                     } else if(cmd[2].equalsIgnoreCase("whitelist")) {
                         return "Value whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist();
+                    } else if(cmd[2].equalsIgnoreCase("user_authentication")) {
+                        return "Value user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
                     } else if(cmd[2].equalsIgnoreCase("min_food_value")) {
                         return "Value min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue();
                     } else if(cmd[2].equalsIgnoreCase("max_food_value")) {
@@ -198,6 +203,7 @@ public class ConsoleCommands {
                         "port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort() + "\n" +
                         "slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSlots() + "\n" +
                         "whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist() + "\n" +
+                        "user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication() + "\n" +
                         "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
                         "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
                         "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n" +

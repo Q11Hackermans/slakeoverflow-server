@@ -3,6 +3,7 @@ package com.github.q11hackermans.slakeoverflow_server.config;
 public class ServerConfig {
     private int port;
     private boolean whitelist;
+    private boolean userAuthentication;
     private int slots;
     private int minFoodValue;
     private int maxFoodValue;
@@ -20,6 +21,7 @@ public class ServerConfig {
     public ServerConfig(boolean advancedOptionsEnabled) {
         this.port = 26677;
         this.whitelist = true;
+        this.userAuthentication = false;
         this.slots = 10;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
@@ -49,6 +51,14 @@ public class ServerConfig {
 
     public void setWhitelist(boolean whitelist) {
         this.whitelist = whitelist;
+    }
+
+    public boolean isUserAuthentication() {
+        return this.userAuthentication;
+    }
+
+    public void setUserAuthentication(boolean userAuthentication) {
+        this.userAuthentication = userAuthentication;
     }
 
     public int getSlots() {
