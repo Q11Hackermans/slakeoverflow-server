@@ -13,29 +13,32 @@ public class ServerConnection {
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
-        this.connectionType = ConnectionType.UNAUTHORIZED;
+        this.connectionType = ConnectionType.UNAUTHENTICATED;
     }
 
     // AUTHORISATION
     /**
-     * This method authorizes this connection as player
+     * This method authenticates this connection as player
      */
-    public void authorizeAsPlayer() {
+    public void authenticateAsPlayer() {
         this.connectionType = ConnectionType.PLAYER;
+        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as player");
     }
 
     /**
-     * This method authorizes this connection as spectator
+     * This method authenticates this connection as spectator
      */
-    public void authorizeAsSpectator() {
+    public void authenticateAsSpectator() {
         this.connectionType = ConnectionType.SPECTATOR;
+        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as spectator");
     }
 
     /**
-     * This method deauthorizes the connection
+     * This method unauthenticate the connection
      */
-    public void deauthorize() {
-        this.connectionType = ConnectionType.UNAUTHORIZED;
+    public void unauthenticate() {
+        this.connectionType = ConnectionType.UNAUTHENTICATED;
+        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " unauthenticated");
     }
 
     // CONNECTION

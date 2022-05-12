@@ -93,7 +93,7 @@ public class EventListener extends CMListenerAdapter {
                         if(data.has("type")) {
                             if(data.getString("type").equalsIgnoreCase("player")) {
                                 if(data.has("username")) {
-                                    SlakeoverflowServer.getServer().authorizeConnectionAsPlayer(cmsClient.getUniqueId(), false);
+                                    SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
                                 }
                             } else if(data.getString("type").equalsIgnoreCase("spectator")) {
                                 cmsClient.close();

@@ -383,10 +383,10 @@ public class ConsoleCommands {
                             ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
                             if(connection != null) {
                                 if(cmd[3].equalsIgnoreCase("player")) {
-                                    connection.authorizeAsPlayer();
+                                    connection.authenticateAsPlayer();
                                     return "User authenticated as player";
                                 } else if(cmd[3].equalsIgnoreCase("spectator")) {
-                                    connection.authorizeAsSpectator();
+                                    connection.authenticateAsSpectator();
                                     return "User authenticated as spectator";
                                 } else {
                                     return "Run command without arguments for help";
@@ -405,7 +405,7 @@ public class ConsoleCommands {
                         try {
                             ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
                             if(connection != null) {
-                                connection.deauthorize();
+                                connection.unauthenticate();
                                 return "Connection unauthenticated";
                             } else {
                                 return "This user does not exist";
