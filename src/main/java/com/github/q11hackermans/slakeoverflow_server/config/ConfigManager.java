@@ -45,6 +45,13 @@ public class ConfigManager {
                     this.config.setSlots(jsonConfig.getInt("slots"));
                     this.config.setMaxFoodValue(jsonConfig.getInt("min_food_value"));
                     this.config.setMaxFoodValue(jsonConfig.getInt("max_food_value"));
+                    this.config.setSnakeSpeedBase(jsonConfig.getInt("snake_speed_base"));
+                    this.config.setSnakeSpeedModifierValue(jsonConfig.getInt("snake_speed_modifier_value"));
+                    this.config.setSnakeSpeedModifierBodycount(jsonConfig.getInt("snake_speed_modifier_bodycount"));
+
+                    this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
+                    this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
+                    this.config.setCustomServerTickrateIdle(jsonConfig.getInt("advanced_custom_server_tickrate_idle"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch(JSONException e) {

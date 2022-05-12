@@ -111,9 +111,49 @@ public class ConsoleCommands {
                         } catch(NumberFormatException e) {
                             return "You can only set an int value in range 1-10";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_base")) {
+                        try {
+                            int snakeSpeedBase = Integer.parseInt(cmd[3]);
+                            if(snakeSpeedBase > 0) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedBase(snakeSpeedBase);
+                                return "Updated value snake_speed_base";
+                            } else {
+                                return "You can only set a positive int value";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_modifier_value")) {
+                        try {
+                            int snakeSpeedModifierValue = Integer.parseInt(cmd[3]);
+                            if(snakeSpeedModifierValue >= 0) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedBase(snakeSpeedModifierValue);
+                                return "Updated value snake_speed_modifier_value";
+                            } else {
+                                return "You can only set a positive (or 0) int value";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set a positive (or 0) int value";
+                        }
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_modifier_bodycount")) {
+                        try {
+                            int snakeSpeedModifierBodycount = Integer.parseInt(cmd[3]);
+                            if(snakeSpeedModifierBodycount > 0) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(snakeSpeedModifierBodycount);
+                                return "Updated value snake_speed_modifier_bodycount";
+                            } else {
+                                return "You can only set a positive int value";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set a positive int value";
+                        }
                     } else {
                         return "Unknown config option";
                     }
+                } else if(cmd[2].equalsIgnoreCase("enable_advanced_options")) {
+                    return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
+                } else if(cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
+                    return "This option can't be changed while the server is running";
                 } else {
                     return "Run command without arguments for help";
                 }
@@ -131,6 +171,20 @@ public class ConsoleCommands {
                         return "Value max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue();
                     } else if(cmd[2].equalsIgnoreCase("default_snake_length")) {
                         return "Value default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_base")) {
+                        return "Value snake_speed_base: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_modifier_value")) {
+                        return "Value snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
+                    } else if(cmd[2].equalsIgnoreCase("snake_speed_modifier_bodycount")) {
+                        return "Value snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+                    } else if(cmd[2].equalsIgnoreCase("enable_advanced_options")) {
+                        return "Value enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled();
+                    } else if(cmd[2].equalsIgnoreCase("advanced_override_server_tickrate")) {
+                        return "Value advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate();
+                    } else if(cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate")) {
+                        return "Value advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate();
+                    } else if(cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
+                        return "Value advanced_custom_server_tickrate_idle: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrateIdle();
                     } else {
                         return "Unknown config option";
                     }
@@ -144,7 +198,14 @@ public class ConsoleCommands {
                         "whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist() + "\n" +
                         "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
                         "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
-                        "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n";
+                        "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n" +
+                        "snake_speed_base: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase() + "\n" +
+                        "snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue() + "\n" +
+                        "snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount() + "\n" +
+                        "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
+                        "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
+                        "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +
+                        "advanced_custom_server_tickrate_idle: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrateIdle() + "\n";
             } else {
                 return "Run command without arguments for help";
             }
