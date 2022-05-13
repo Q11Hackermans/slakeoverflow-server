@@ -7,6 +7,7 @@ import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
 
+import java.net.InetAddress;
 import java.util.UUID;
 
 public class ConsoleCommands {
@@ -425,6 +426,27 @@ public class ConsoleCommands {
                     "user info <UUID>\n" +
                     "user auth <UUID> player/spectator\n" +
                     "user unauth <UUID>\n";
+        }
+    }
+
+    private String blacklistCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            switch(cmd[1]) {
+                case "list":
+                    String returnString = "BLACKLIST:\n";
+                    for(InetAddress ip : SlakeoverflowServer.getServer().getIpBlacklist()) {
+                        returnString = returnString + ip.toString() + "\n";
+                    }
+                    return returnString;
+                default:
+                    return "Run command without arguments for help";
+            }
+        } else {
+            return "BLACKLIST COMMAND USAGE:\n" +
+                    "blacklist list\n" +
+                    "blacklist add <IP>\n" +
+                    "blacklist remove <IP>\n" +
+                    "blacklist clear\n";
         }
     }
 }
