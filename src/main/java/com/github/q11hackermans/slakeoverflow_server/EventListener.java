@@ -1,5 +1,10 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
+import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import net.jandie1505.connectionmanager.CMListenerAdapter;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.events.CMClientClosedEvent;
@@ -91,15 +96,48 @@ public class EventListener extends CMListenerAdapter {
                 switch(data.getString("cmd")) {
                     case "auth":
                         if(data.has("type")) {
-                            if(data.getString("type").equalsIgnoreCase("player")) {
+                            if(data.getString("type").equalsIgnoreCase(String.valueOf(ConnectionType.PLAYER))) {
                                 if(data.has("username")) {
                                     SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
                                 }
-                            } else if(data.getString("type").equalsIgnoreCase("spectator")) {
+                            } else if(data.getString("type").equalsIgnoreCase(String.valueOf(ConnectionType.SPECTATOR))) {
+                                // SPECTATOR AUTHENTICATION IS CURRENTLY NOT SUPPORTED
                                 cmsClient.close();
+                            } else {
+                                SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId());
                             }
                         }
                         break;
+                    case "game_direction_change":
+                        if(SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                            if(data.has("direction")) {
+                                try {
+                                    int button = data.getInt("direction");
+
+                                    ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                                    if(connection != null && connection.getConnectionType() == ConnectionType.PLAYER) {
+                                        Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
+
+                                        if(snake != null) {
+                                            int facing = 0;
+
+                                            if(button == 0) {
+                                                facing = Direction.NORTH;
+                                            } else if(button == 3) {
+                                                facing = Direction.SOUTH;
+                                            } else if(button == 1) {
+                                                facing = Direction.WEST;
+                                            } else if(button == 2) {
+                                                facing = Direction.EAST;
+                                            }
+
+                                            snake.setNewFacing(facing);
+                                        }
+                                    }
+                                } catch(JSONException ignored) {}
+                            }
+                        }
                 }
             }
         } catch(JSONException e) {

@@ -305,6 +305,14 @@ public class SlakeoverflowServer {
         return List.copyOf(this.connectionList);
     }
 
+    public int getGameState() {
+        return this.gameState;
+    }
+
+    public GameSession getGameSession() {
+        return this.game;
+    }
+
     // THREAD TEMPLATES
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
