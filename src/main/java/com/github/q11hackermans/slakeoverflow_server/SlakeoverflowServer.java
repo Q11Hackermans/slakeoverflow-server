@@ -265,7 +265,7 @@ public class SlakeoverflowServer {
             JSONObject statusMessage = new JSONObject();
             statusMessage.put("cmd", "status");
             statusMessage.put("status", this.gameState);
-            statusMessage.put("type", connection.getConnectionType());
+            statusMessage.put("auth", connection.getConnectionType());
 
             try {
                 connection.getDataIOStreamHandler().writeUTF(statusMessage.toString());
