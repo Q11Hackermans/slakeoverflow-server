@@ -8,6 +8,7 @@ import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 public class ConsoleCommands {
@@ -438,6 +439,33 @@ public class ConsoleCommands {
                         returnString = returnString + ip.toString() + "\n";
                     }
                     return returnString;
+                case "add":
+                    if(cmd.length == 3) {
+                        try {
+                            InetAddress inetAddress = InetAddress.getByName(cmd[2]);
+                            SlakeoverflowServer.getServer().addIpToBlacklist(inetAddress);
+                            return "Added IP to blacklist";
+                        } catch (UnknownHostException e) {
+                            return "Please enter a valid IP address";
+                        }
+                    } else {
+                        return "blacklist add <IP>";
+                    }
+                case "remove":
+                    if(cmd.length == 3) {
+                        try {
+                            InetAddress inetAddress = InetAddress.getByName(cmd[2]);
+                            SlakeoverflowServer.getServer().removeIpFromBlacklist(inetAddress);
+                            return "Removed IP from blacklist";
+                        } catch (UnknownHostException e) {
+                            return "Please enter a valid IP address";
+                        }
+                    } else {
+                        return "blacklist add <IP>";
+                    }
+                case "clear":
+                    SlakeoverflowServer.getServer().clearIpBlacklist();
+                    return "Cleared IP blacklist";
                 default:
                     return "Run command without arguments for help";
             }

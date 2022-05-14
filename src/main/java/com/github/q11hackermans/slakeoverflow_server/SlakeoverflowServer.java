@@ -276,6 +276,22 @@ public class SlakeoverflowServer {
         }
     }
 
+    // IP BLACKLIST
+    public void addIpToBlacklist(InetAddress inetAddress) {
+        this.ipBlacklist.add(inetAddress);
+        this.logger.info("BLACKLIST", "Added " + inetAddress.toString() + " to IP blacklist");
+    }
+
+    public void removeIpFromBlacklist(InetAddress inetAddress) {
+        this.ipBlacklist.removeIf(inetAddress1 -> inetAddress1.equals(inetAddress));
+        this.logger.info("BLACKLIST", "Removed " + inetAddress.toString() + " from IP blacklist");
+    }
+
+    public void clearIpBlacklist() {
+        this.ipBlacklist.clear();
+        this.logger.info("BLACKLIST", "Cleared IP blacklist");
+    }
+
     // GETTER METHODS
     public ServerConsole getConsole() {
         return this.console;
