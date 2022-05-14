@@ -15,11 +15,8 @@
 
     <repositories>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/jandie1505/ConnectionManager</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -31,8 +28,8 @@
             <version>20220320</version>
         </dependency>
         <dependency>
-            <groupId>net.jandie1505</groupId>
-            <artifactId>connectionmanager</artifactId>
+            <groupId>com.github.jandie1505</groupId>
+            <artifactId>ConnectionManager</artifactId>
             <version>0.2.6</version>
         </dependency>
     </dependencies>
