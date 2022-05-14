@@ -74,7 +74,7 @@ public class ConfigManager {
                 this.configFile.createNewFile();
 
                 JSONObject config = new JSONObject();
-                config.put("port", 26599);
+                config.put("port", 26677);
                 config.put("whitelist", true);
                 config.put("user_authentication", false);
                 config.put("min_food_value", 1);
