@@ -9,10 +9,12 @@ import net.jandie1505.connectionmanager.CMListenerAdapter;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.events.CMClientClosedEvent;
 import net.jandie1505.connectionmanager.events.CMClientCreatedEvent;
+import net.jandie1505.connectionmanager.events.CMClientInputStreamByteLimitReachedEvent;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAcceptedEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAttemptEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionRefusedEvent;
+import net.jandie1505.connectionmanager.streams.CMInputStream;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.events.DataIOUTFReceivedEvent;
 import org.json.JSONException;
@@ -53,6 +55,8 @@ public class EventListener extends CMListenerAdapter {
     public void onClientCreated(CMClientCreatedEvent event) {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
+        ((CMInputStream) cmsClient.getInputStream()).setStreamByteLimit(10000000);
+
         int count = 3;
         while((SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
             try {
@@ -82,6 +86,13 @@ public class EventListener extends CMListenerAdapter {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
         SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Client " + cmsClient.getUniqueId() + " (" + cmsClient.getIP() + ") disconnected with reason " + event.getReason());
+    }
+
+    @Override
+    public void onClientInputStreamByteLimitReached(CMClientInputStreamByteLimitReachedEvent event) {
+        CMSClient cmsClient = (CMSClient) event.getClient();
+
+        SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + event.getStream().getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
     }
 
     // DATA IO EVENTS
