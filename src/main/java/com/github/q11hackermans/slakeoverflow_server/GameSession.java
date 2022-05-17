@@ -55,6 +55,8 @@ public class GameSession {
         this.addNewSnakes();
     }
 
+    // ITEM MANAGEMENT
+
     /**
      * Return a number to use in the spawnFood function depending on the player-count
      */
@@ -93,6 +95,22 @@ public class GameSession {
             this.itemList.add(new SuperFood(posX, posY, value));
         }
     }
+
+    public void killItem(int index) {
+        synchronized(this.itemList) {
+            try {
+                this.itemList.remove(index);
+            } catch(IndexOutOfBoundsException ignored) {}
+        }
+    }
+
+    public void killItems() {
+        synchronized(this.itemList) {
+            this.itemList.clear();
+        }
+    }
+
+    // UTILITY
 
     /**
      * Returns a random number on the fields x-axis

@@ -609,7 +609,37 @@ public class ConsoleCommands {
                     return "No game available";
                 }
             } else if(cmd[1].equalsIgnoreCase("modify")) {
-                return "";
+                if(SlakeoverflowServer.getServer().isGameAvail()) {
+                    if(cmd.length >= 3) {
+                        if(cmd[2].equalsIgnoreCase("snake")) {
+
+                        } else if(cmd[2].equalsIgnoreCase("item")) {
+
+                        } else if(cmd[2].equalsIgnoreCase("items")) {
+                            if(cmd.length == 4 && cmd[3].equalsIgnoreCase("kill")) {
+                                SlakeoverflowServer.getServer().getGameSession().killItems();
+                                return "Killed items";
+                            } else {
+                                return "Value not found";
+                            }
+                        } else {
+                            return "Value not found";
+                        }
+                    } else {
+                        return "GAME MODIFY COMMAND USAGE\n" +
+                                "game modify snake <UUID> kill\n" +
+                                "game modify snake <UUID> position <X> <Y>\n" +
+                                "game modify snake <UUID> bodies add <length>\n" +
+                                "game modify snake <UUID> bodies remove <length>\n" +
+                                "game modify snake <UUID> bodies clear\n" +
+                                "game modify snake <UUID> facing <N=0,E=1,S=2,W=3>\n" +
+                                "game modify item <INDEX> kill\n" +
+                                "game modify item <INDEX> position <X> <Y>\n" +
+                                "game modify items kill\n";
+                    }
+                } else {
+                    return "No game available";
+                }
             } else {
                 return "Run command without arguments for help";
             }
