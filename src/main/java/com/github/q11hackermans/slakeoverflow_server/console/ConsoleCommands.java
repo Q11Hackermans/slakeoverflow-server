@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
+import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
@@ -9,6 +10,7 @@ import net.jandie1505.connectionmanager.server.CMSPendingClient;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class ConsoleCommands {
@@ -475,6 +477,90 @@ public class ConsoleCommands {
                     "blacklist add <IP>\n" +
                     "blacklist remove <IP>\n" +
                     "blacklist clear\n";
+        }
+    }
+
+    private String gameCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            if(cmd[1].equalsIgnoreCase("start")) {
+                if(cmd.length >= 3) {
+                    if(cmd[2].equalsIgnoreCase("default") && cmd.length == 3) {
+                        SlakeoverflowServer.getServer().setupGameDefault();
+                        return "Set up game with default settings";
+                    } else if(cmd[2].equalsIgnoreCase("automatic") && cmd.length == 3) {
+                        SlakeoverflowServer.getServer().setupGameAutomatically();
+                        return "Set up game with player count based settings";
+                    } else if(cmd[2].equalsIgnoreCase("custom") && cmd.length == 5) {
+                        try {
+                            int sizex = Integer.parseInt(cmd[3]);
+                            int sizey = Integer.parseInt(cmd[3]);
+
+                            if(sizex > 10 && sizey > 10) {
+                                SlakeoverflowServer.getServer().setupGame(sizex, sizey);
+                                return "Set up game with custom settings";
+                            } else {
+                                return "Both values have to be 10 or more";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "Please specify an int value";
+                        }
+                    } else {
+                        return "Run command without arguments for help";
+                    }
+                } else {
+                    return "GAME START COMMAND USAGE\n" +
+                            "game start default\n" +
+                            "game start automatic\n" +
+                            "game start custom <sizex> <sizey>\n";
+                }
+            } else if(cmd[1].equalsIgnoreCase("stop")) {
+                if(SlakeoverflowServer.getServer().stopGame()) {
+                    return "Stopped game";
+                } else {
+                    return "No game running";
+                }
+            } else if(cmd[1].equalsIgnoreCase("pause")) {
+                if(SlakeoverflowServer.getServer().pauseGame()) {
+                    return "Paused game";
+                } else {
+                    return "Game is not running";
+                }
+            } else if(cmd[1].equalsIgnoreCase("resume")) {
+                if(SlakeoverflowServer.getServer().resumeGame()) {
+                    return "Resumed game";
+                } else {
+                    return "Game is not paused";
+                }
+            } else if(cmd[1].equalsIgnoreCase("info")) {
+                if(SlakeoverflowServer.getServer().isGameAvail()) {
+                    String returnString = "GAME INFORMATION:\n" +
+                            "Game state: " + SlakeoverflowServer.getServer().getGameState() + "\n";
+                    try {
+                        returnString = returnString + "Players: " + SlakeoverflowServer.getServer().getGameSession().getSnakeList().size() + "\n" +
+                                "Items: " + SlakeoverflowServer.getServer().getGameSession().getItemList().size() + "\n" +
+                                "World border: x=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[0] + " y=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[1] + "\n";
+                    } catch(Exception e) {
+                        returnString = returnString + "ERROR: " + Arrays.toString(e.getStackTrace());
+                    }
+                    return returnString;
+                } else {
+                    return "Currently is no game running";
+                }
+            } else if(cmd[1].equalsIgnoreCase("get")) {
+
+            } else if(cmd[1].equalsIgnoreCase("modify")) {
+
+            }
+        } else {
+            return "GAME COMMAND USAGE:\n" +
+                    "game start default/automatic\n" +
+                    "game start custom <sizex> <sizey>\n" +
+                    "game stop\n" +
+                    "game pause\n" +
+                    "game resume\n" +
+                    "game info\n" +
+                    "game getvalue <...>\n" +
+                    "game modify <...>\n";
         }
     }
 }

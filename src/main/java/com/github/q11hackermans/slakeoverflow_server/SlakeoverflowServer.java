@@ -95,6 +95,7 @@ public class SlakeoverflowServer {
                     checkThreads();
                     checkConnectionManager();
                     checkConnections();
+                    checkGameSession();
                 } catch(Exception e) {
                     try {
                         this.logger.warning("MANAGER", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
@@ -145,11 +146,12 @@ public class SlakeoverflowServer {
     /**
      * This will create a new game with a specific size
      */
-    private boolean setupGame(int sizeX, int sizeY) {
+    public boolean setupGame(int sizeX, int sizeY) {
         if(this.gameState == GameState.STOPPED && sizeX > 0 && sizeY > 0) {
             this.gameState = GameState.PREPARING;
             this.game = new GameSession(sizeX,sizeY);
             this.gameState = GameState.RUNNING;
+            this.logger.info("GAME", "Game with size " + sizeX + " " + sizeY + " was set up");
             return true;
         } else {
             return false;
@@ -157,11 +159,62 @@ public class SlakeoverflowServer {
     }
 
     /**
-     *
+     * Setup game automatically
      */
-    public void setupGame() {
+    public boolean setupGameAutomatically() {
         double x = 3;
-        this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+        return this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+    }
+
+    /**
+     * Setup game with default config values
+     */
+    public boolean setupGameDefault() {
+        return false;
+    }
+
+    /**
+     * Stop a running game
+     */
+    public boolean stopGame() {
+        boolean success = false;
+
+        if(this.isGameAvail()) {
+            success = true;
+        }
+
+        this.gameState = GameState.STOPPED;
+        this.game = null;
+
+        this.logger.info("GAME", "Stopped game (success=" + success + ")");
+
+        return success;
+    }
+
+    /**
+     * Pause a currently running game
+     * @return true if the game could be paused
+     */
+    public boolean pauseGame() {
+        if(this.gameState == GameState.RUNNING) {
+            this.gameState = GameState.PAUSED;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Resumes a paused game
+     * @return true if the game could be resumed
+     */
+    public boolean resumeGame() {
+        if(this.gameState == GameState.PAUSED) {
+            this.gameState = GameState.RUNNING;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // CONNECTION MANAGEMENT
@@ -327,6 +380,10 @@ public class SlakeoverflowServer {
 
     public GameSession getGameSession() {
         return this.game;
+    }
+
+    public boolean isGameAvail() {
+        return (this.gameState == GameState.RUNNING || this.gameState == GameState.PAUSED);
     }
 
     // THREAD TEMPLATES

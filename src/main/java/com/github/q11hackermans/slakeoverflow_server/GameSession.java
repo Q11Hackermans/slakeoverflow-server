@@ -439,4 +439,20 @@ public class GameSession {
         }
         return null;
     }
+
+    /**
+     * Get a copy of the snake list.
+     * @return copy of snake list
+     */
+    public List<Snake> getSnakeList() {
+        return List.copyOf(this.snakeList);
+    }
+
+    /**
+     * Get a copy of the item list.
+     * @return copy of item list
+     */
+    public List<Item> getItemList() {
+        return List.copyOf(this.itemList);
+    }
 }
