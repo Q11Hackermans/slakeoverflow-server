@@ -101,6 +101,22 @@ public class Snake implements GameObject {
     }
 
     /**
+     * Returns the facing
+     * @return facing
+     */
+    public int getFacing() {
+        return this.facing;
+    }
+
+    /**
+     * Returns the length
+     * @return length
+     */
+    public int getLength() {
+        return this.bodyPositions.size() + 1;
+    }
+
+    /**
      * Get the body-id of this snake at this position
      * @param posX Position X
      * @param posY Position Y

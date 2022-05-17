@@ -4,6 +4,10 @@ import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.game.Food;
+import com.github.q11hackermans.slakeoverflow_server.game.Item;
+import com.github.q11hackermans.slakeoverflow_server.game.Snake;
+import com.github.q11hackermans.slakeoverflow_server.game.SuperFood;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
@@ -11,6 +15,7 @@ import net.jandie1505.connectionmanager.server.CMSPendingClient;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class ConsoleCommands {
@@ -547,9 +552,66 @@ public class ConsoleCommands {
                     return "Currently is no game running";
                 }
             } else if(cmd[1].equalsIgnoreCase("get")) {
-
+                if(SlakeoverflowServer.getServer().isGameAvail()) {
+                    if(cmd.length >= 3) {
+                        if(cmd[2].equalsIgnoreCase("snakes")) {
+                            String returnString = "SNAKES:\n";
+                            for(Snake snake : SlakeoverflowServer.getServer().getGameSession().getSnakeList()) {
+                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + " " + snake.getLength() + " " + snake.isAlive();
+                            }
+                            return returnString;
+                        } else if(cmd[2].equalsIgnoreCase("snake") && cmd.length == 4) {
+                            try {
+                                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
+                                if(snake != null) {
+                                    return "SNAKE INFORMATION:\n" +
+                                            "UUID: " + snake.getConnection().getClientId() + "\n" +
+                                            "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
+                                            "Length: " + snake.getLength() + "\n" +
+                                            "Facing: " + snake.getFacing() + "\n" +
+                                            "Body positions: " + snake.getBodyPositions().toString() + "\n";
+                                } else {
+                                    return "This snake does not exist";
+                                }
+                            } catch(IllegalArgumentException e) {
+                                return "Please specify a valid UUID";
+                            }
+                        } else if(cmd[2].equalsIgnoreCase("items")) {
+                            String returnString = "ITEMS:\n";
+                            List<Item> itemList = SlakeoverflowServer.getServer().getGameSession().getItemList();
+                            for(int i = 0; i < itemList.size(); i++) {
+                                Item item = itemList.get(i);
+                                returnString = returnString + i + " " + item.getDescription() + " " + item.getPosX() + " " + item.getPosY() + " ";
+                                if(item instanceof Food) {
+                                    returnString = returnString + ((Food) item).getFoodValue() + " ";
+                                } else if(item instanceof SuperFood) {
+                                    returnString = returnString + ((SuperFood) item).getValue() + " ";
+                                }
+                                returnString = returnString + "\n";
+                            }
+                            return returnString;
+                        } else if(cmd[2].equalsIgnoreCase("border")) {
+                            return "Worldborder: x1=-1, y1=-1, x2= " + SlakeoverflowServer.getServer().getGameSession().getBorder()[0] + ", y2=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[1];
+                        } else if(cmd[2].equalsIgnoreCase("fov")) {
+                            return "Player FOV: x=" + SlakeoverflowServer.getServer().getGameSession().getPlayerFOV()[0] + ", y=" + SlakeoverflowServer.getServer().getGameSession().getPlayerFOV()[1];
+                        } else {
+                            return "Value not found";
+                        }
+                    } else {
+                        return "GAME GET COMMAND USAGE:\n" +
+                                "game get snakes\n" +
+                                "game get snake <connectionUUID>\n" +
+                                "game get items\n" +
+                                "game get border\n" +
+                                "game get fov\n";
+                    }
+                } else {
+                    return "No game available";
+                }
             } else if(cmd[1].equalsIgnoreCase("modify")) {
-
+                return "";
+            } else {
+                return "Run command without arguments for help";
             }
         } else {
             return "GAME COMMAND USAGE:\n" +

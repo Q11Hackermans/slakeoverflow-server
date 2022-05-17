@@ -15,4 +15,9 @@ public class SuperFood extends Item {
     public int getValue() {
         return this.value;
     }
+
+    @Override
+    public String getDescription() {
+        return "SUPERFOOD";
+    }
 }

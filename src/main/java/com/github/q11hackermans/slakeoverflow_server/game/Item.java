@@ -23,4 +23,6 @@ public abstract class Item implements GameObject {
     public int getPosY() {
         return this.posy;
     }
+
+    public abstract String getDescription();
 }

@@ -424,6 +424,10 @@ public class GameSession {
         return new int[]{this.borderX, this.borderY};
     }
 
+    public int[] getPlayerFOV() {
+        return new int[]{this.fovsizeX, this.fovsizeY};
+    }
+
     // SNAKE MANAGEMENT
 
     /**
