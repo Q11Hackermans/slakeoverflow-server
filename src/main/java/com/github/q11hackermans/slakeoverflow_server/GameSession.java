@@ -77,8 +77,10 @@ public class GameSession {
             int posX = rPos[0];
             int posY = rPos[1];
 
-            if (isFree(posX, posY)) {
-                this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
+            if(isFree(posX, posY)) {
+                synchronized(this.itemList) {
+                    this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
+                }
             }
         }
     }
@@ -91,8 +93,10 @@ public class GameSession {
      * @param posY  Position Y where the super-food is spawned
      */
     public void spawnSuperFoodAt(int value, int posX, int posY) {
-        if (isFree(posX, posY)) {
-            this.itemList.add(new SuperFood(posX, posY, value));
+        if(isFree(posX, posY)) {
+            synchronized(this.itemList) {
+                this.itemList.add(new SuperFood(posX, posY, value));
+            }
         }
     }
 
@@ -408,9 +412,11 @@ public class GameSession {
                 }
             }
         }
-        for (Item item : this.itemList) {
-            if (item.getPosX() == posX && item.getPosY() == posY) {
-                return item;
+        synchronized(this.itemList) {
+            for (Item item : this.itemList) {
+                if (item.getPosX() == posX && item.getPosY() == posY) {
+                    return item;
+                }
             }
         }
         return null;
