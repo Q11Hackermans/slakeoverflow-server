@@ -23,6 +23,7 @@ public class Snake implements GameObject {
     private boolean newFacingUpdated;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
+    private int moveIn;
 
     public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
         this.connection = connection;
@@ -34,6 +35,7 @@ public class Snake implements GameObject {
         this.newFacingUpdated = false;
         this.gameSession = session;
         this.alive = true;
+        this.moveIn = 0;
 
         // set start length body positions
         if(this.facing == Direction.NORTH) {
@@ -192,11 +194,17 @@ public class Snake implements GameObject {
             return;
         }
 
-        if(this.facing != this.newFacing) {
-            this.move(this.newFacing);
-            return;
+        if(this.moveIn <= 0) {
+            if(this.facing != this.newFacing) {
+                this.move(this.newFacing);
+                return;
+            } else {
+                this.move();
+            }
+            this.moveIn = this.calcMoveIn();
+        } else {
+            this.moveIn--;
         }
-        this.move();
     }
 
     /**
@@ -327,6 +335,17 @@ public class Snake implements GameObject {
                 this.bodyPositions.set(i, new int[]{prev[0], prev[1]});
             }
         }
+    }
+
+    private int calcMoveIn() {
+        int speedModifierValue = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
+        int speedModifierBodycount = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+
+        int value = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+        for(int i = 0; i < (this.bodyPositions.size() / speedModifierBodycount); i++) {
+            value = value + speedModifierValue;
+        }
+        return value;
     }
 
     /**
