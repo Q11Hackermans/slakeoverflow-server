@@ -612,7 +612,84 @@ public class ConsoleCommands {
                 if(SlakeoverflowServer.getServer().isGameAvail()) {
                     if(cmd.length >= 3) {
                         if(cmd[2].equalsIgnoreCase("snake")) {
+                            if(cmd.length >= 4) {
+                                try {
+                                    Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
 
+                                    if(snake != null) {
+
+                                        if(cmd.length >= 5) {
+                                            if(cmd[4].equalsIgnoreCase("kill")) {
+                                                snake.killSnake();
+                                                return "Killed snake";
+                                            } else if(cmd[4].equalsIgnoreCase("position")) {
+                                                if(cmd.length == 7) {
+                                                    try {
+                                                        snake.setPosition(Integer.parseInt(cmd[5]), Integer.parseInt(cmd[6]));
+                                                        return "Updated snake position";
+                                                    } catch(IllegalArgumentException e) {
+                                                        return "Please specify a valid value";
+                                                    }
+                                                } else {
+                                                    return "USAGE: game modify snake <UUID> position <X> <Y>";
+                                                }
+                                            } else if(cmd[4].equalsIgnoreCase("bodies")) {
+                                                if(cmd.length >= 6) {
+                                                    if(cmd[5].equalsIgnoreCase("add")) {
+                                                        if(cmd.length == 7) {
+                                                            snake.addBody(Integer.parseInt(cmd[6]));
+                                                            return "Updated snake length";
+                                                        } else {
+                                                            return "Value required";
+                                                        }
+                                                    } else if(cmd[5].equalsIgnoreCase("remove")) {
+                                                        if(cmd.length == 7) {
+                                                            snake.removeBody(Integer.parseInt(cmd[6]));
+                                                            return "Updated snake length";
+                                                        } else {
+                                                            return "Value required";
+                                                        }
+                                                    } else if(cmd[5].equalsIgnoreCase("clear")) {
+                                                        snake.clearBodies();
+                                                        return "Cleared snake length";
+                                                    } else {
+                                                        return "USAGE: game modify snake <UUID> bodies add/remove/clear <Value for add/remove>";
+                                                    }
+                                                } else {
+                                                    return "USAGE: game modify snake <UUID> bodies add/remove/clear <Value for add/remove>";
+                                                }
+                                            } else if(cmd[4].equalsIgnoreCase("facing")) {
+                                                if(cmd.length == 6) {
+                                                    try {
+                                                        int value = Integer.parseInt(cmd[5]);
+                                                        if(value >= 0 && value <= 3) {
+                                                            snake.setNewFacing(value, true);
+                                                            return "Updated snake facing";
+                                                        } else {
+                                                            return "Wrong facing value (0-3)";
+                                                        }
+                                                    } catch(IllegalArgumentException e) {
+                                                        return "Please specify a valid value";
+                                                    }
+                                                } else {
+                                                    return "USAGE: game modify snake <UUID> facing <newFacing>";
+                                                }
+                                            } else {
+                                                return "Unknown action";
+                                            }
+                                        } else {
+                                            return "This snake does exist (you need to specify what you want to do with it)";
+                                        }
+
+                                    } else {
+                                        return "This snake does not exist";
+                                    }
+                                } catch(IllegalArgumentException e) {
+                                    return "Please specify a valid UUID";
+                                }
+                            } else {
+                                return "UUID required";
+                            }
                         } else if(cmd[2].equalsIgnoreCase("item")) {
 
                         } else if(cmd[2].equalsIgnoreCase("items")) {

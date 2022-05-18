@@ -143,7 +143,7 @@ public class EventListener extends CMListenerAdapter {
                                                 facing = Direction.EAST;
                                             }
 
-                                            snake.setNewFacing(facing);
+                                            snake.setNewFacing(facing, false);
                                         }
                                     }
                                 } catch(JSONException ignored) {}

@@ -16,11 +16,10 @@ public class Snake implements GameObject {
     private int speed;
     private int posx;
     private int posy;
-    @Deprecated
-    private int length;
     private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
     private int newFacing;
+    private boolean newFacingUpdated;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
 
@@ -29,9 +28,9 @@ public class Snake implements GameObject {
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
         this.posy = y;
-        this.length = 0;
         this.facing = facing;
         this.newFacing = facing;
+        this.newFacingUpdated = false;
         this.gameSession = session;
         this.alive = true;
 
@@ -92,6 +91,23 @@ public class Snake implements GameObject {
         }
     }
 
+    /**
+     * Set the position manually
+     * @param x X Coordinates
+     * @param y Y Coordinates
+     * @deprecated It takes time until all bodies of the snake are updated to the new position
+     * @throws IllegalArgumentException If value is lower/higher than the world border
+     */
+    @Deprecated
+    public void setPosition(int x, int y) {
+        if(x >= 0 && x < this.gameSession.getBorder()[0] && y >= 0 && y < this.gameSession.getBorder()[1]) {
+            this.posx = x;
+            this.posy = y;
+        } else {
+            throw new IllegalArgumentException("Value out of range");
+        }
+    }
+
     public List<int[]> getBodyPositions() {
         if(this.alive) {
             return List.copyOf(bodyPositions);
@@ -114,6 +130,35 @@ public class Snake implements GameObject {
      */
     public int getLength() {
         return this.bodyPositions.size() + 1;
+    }
+
+    /**
+     * Add bodies to the snake
+     * @param length the length to add
+     */
+    public void addBody(int length) {
+        for(int i = 0; i < length; i++) {
+            this.addTale();
+        }
+    }
+
+    /**
+     * Remove bodies from the snake
+     * @param length the length to remove
+     */
+    public void removeBody(int length) {
+        for(int i = 0; i < length; i++) {
+            if(!this.bodyPositions.isEmpty()) {
+                this.bodyPositions.remove(this.bodyPositions.size() - 1);
+            }
+        }
+    }
+
+    /**
+     * Clears the snake bodies
+     */
+    public void clearBodies() {
+        this.bodyPositions.clear();
     }
 
     /**
@@ -158,8 +203,11 @@ public class Snake implements GameObject {
      *
      * @param newFacing The direction the snake will move during the next tick
      */
-    public void setNewFacing(int newFacing) {
-        this.newFacing = newFacing;
+    public void setNewFacing(int newFacing, boolean forced) {
+        if(forced || !this.newFacingUpdated) {
+            this.newFacing = newFacing;
+            this.newFacingUpdated = true;
+        }
     }
 
     // MOVEMENT
@@ -168,7 +216,6 @@ public class Snake implements GameObject {
      * Add one element to the tale of the snake
      */
     private void addTale() {
-        this.length++;
         this.bodyPositions.add(this.bodyPositions.size(), new int[]{0, 0});
     }
 
