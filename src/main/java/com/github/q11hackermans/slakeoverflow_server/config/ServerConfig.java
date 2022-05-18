@@ -13,6 +13,7 @@ public class ServerConfig {
     private int snakeSpeedModifierBodycount;
     private int defaultGameFieldSizeX;
     private int defaultGameFieldSizeY;
+    private boolean unauthenticatePlayerOnDeath;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -33,6 +34,7 @@ public class ServerConfig {
         this.snakeSpeedModifierBodycount = 2;
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
+        this.unauthenticatePlayerOnDeath = true;
 
         this.advancedOptionsEnabled = advancedOptionsEnabled;
         this.overrideServerTickrate = false;
@@ -191,6 +193,14 @@ public class ServerConfig {
 
     public void setDefaultGameFieldSizeY(int defaultGameFieldSizeY) {
         this.defaultGameFieldSizeY = defaultGameFieldSizeY;
+    }
+
+    public boolean isUnauthenticatePlayerOnDeath() {
+        return unauthenticatePlayerOnDeath;
+    }
+
+    public void setUnauthenticatePlayerOnDeath(boolean unauthenticatePlayerOnDeath) {
+        this.unauthenticatePlayerOnDeath = unauthenticatePlayerOnDeath;
     }
 
     // ADVANCED

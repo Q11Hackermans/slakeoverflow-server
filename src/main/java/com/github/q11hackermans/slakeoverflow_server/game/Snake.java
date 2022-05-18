@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
@@ -335,6 +336,10 @@ public class Snake implements GameObject {
     public void killSnake() {
         this.alive = false;
         this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
+
+        if(this.connection.getConnectionType() == ConnectionType.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
+            this.connection.unauthenticate();
+        }
     }
 
     public boolean isAlive() {

@@ -189,6 +189,9 @@ public class ConsoleCommands {
                         } catch(NumberFormatException e) {
                             return "You can only set a positive int value (50 or higher)";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value unauthenticate_player_on_death to " + cmd[3];
                     } else {
                         return "Unknown config option";
                     }
@@ -233,6 +236,8 @@ public class ConsoleCommands {
                         return "Value default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX();
                     } else if(cmd[2].equalsIgnoreCase("default_gamefield_size_y")) {
                         return "Value default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY();
+                    } else if(cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
+                        return "Value unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath();
                     } else {
                         return "Unknown config option";
                     }
@@ -253,6 +258,7 @@ public class ConsoleCommands {
                         "snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount() + "\n" +
                         "default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX() + "\n" +
                         "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
+                        "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
                         "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +
