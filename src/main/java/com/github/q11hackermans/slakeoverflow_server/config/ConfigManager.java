@@ -10,14 +10,16 @@ public class ConfigManager {
     private final File configFile;
     private final ServerConfig config;
 
-    public ConfigManager(boolean advancedOptionsEnabled) {
+    public ConfigManager(boolean advancedOptionsEnabled, boolean loadConfigFile) {
         this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
-        if(!this.configFile.exists()) {
-            this.recreateConfig();
-        } else {
-            this.reloadConfig();
+        if(loadConfigFile) {
+            if(!this.configFile.exists()) {
+                this.recreateConfig();
+            } else {
+                this.reloadConfig();
+            }
         }
     }
 

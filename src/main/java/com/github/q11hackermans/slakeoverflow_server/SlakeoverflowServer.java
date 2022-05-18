@@ -47,7 +47,7 @@ public class SlakeoverflowServer {
     private boolean alreadyStopping;
 
 
-    public SlakeoverflowServer(boolean advancedConfigOptions) throws IOException {
+    public SlakeoverflowServer(boolean advancedConfigOptions, boolean defaultConfigValues) throws IOException {
         // SET SERVER (RUN ALWAYS FIRST)
         server = this;
 
@@ -61,9 +61,15 @@ public class SlakeoverflowServer {
         this.console.start();
 
         // CONFIG
-        this.configManager = new ConfigManager(advancedConfigOptions);
-        this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
-        this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
+        this.configManager = new ConfigManager(advancedConfigOptions, !defaultConfigValues);
+        if(!defaultConfigValues) {
+            this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
+            this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
+        } else {
+            this.tickSpeed = 50;
+            this.idleTickSpeed = 950;
+        }
+
 
         // CONNECTION MANAGER
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
@@ -457,12 +463,18 @@ public class SlakeoverflowServer {
             }
         }
 
+        boolean defaultConfigValues = false;
+        defaultConfigValues = Boolean.parseBoolean(startArguments.get("defaultConfigValues"));
+        if(defaultConfigValues) {
+            System.out.println("Starting with default config values");
+        }
+
         System.out.println("Starting server in " + waitTime + " seconds...");
         try {
             TimeUnit.SECONDS.sleep(waitTime);
         } catch(Exception ignored) {}
 
-        new SlakeoverflowServer(advancedOptions);
+        new SlakeoverflowServer(advancedOptions, defaultConfigValues);
     }
 
     public static SlakeoverflowServer getServer() {
