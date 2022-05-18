@@ -14,7 +14,9 @@ import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAcceptedEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAttemptEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionRefusedEvent;
+import net.jandie1505.connectionmanager.streams.CMConsumingInputStream;
 import net.jandie1505.connectionmanager.streams.CMInputStream;
+import net.jandie1505.connectionmanager.streams.CMTimedInputStream;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.events.DataIOUTFReceivedEvent;
 import org.json.JSONException;
@@ -55,7 +57,7 @@ public class EventListener extends CMListenerAdapter {
     public void onClientCreated(CMClientCreatedEvent event) {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
-        ((CMInputStream) cmsClient.getInputStream()).setStreamByteLimit(10000000);
+        cmsClient.getInputStream().setStreamByteLimit(10000000);
 
         int count = 3;
         while((SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
@@ -92,7 +94,11 @@ public class EventListener extends CMListenerAdapter {
     public void onClientInputStreamByteLimitReached(CMClientInputStreamByteLimitReachedEvent event) {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
-        SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + event.getStream().getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
+        if(event.getStream() instanceof CMTimedInputStream) {
+            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
+        } else if(event.getStream() instanceof CMConsumingInputStream) {
+            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
+        }
     }
 
     // DATA IO EVENTS

@@ -9,6 +9,7 @@ import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
+import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamType;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType;
 import org.json.JSONObject;
 
@@ -75,7 +76,7 @@ public class SlakeoverflowServer {
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
         this.connectionhandler.addListener(new EventListener());
         this.connectionhandler.addGlobalListener(new EventListener());
-        this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, false);
+        this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.DEFAULT_TIMED);
         this.dataIOManager.addEventListener(new EventListener());
 
         // GAME SESSION
