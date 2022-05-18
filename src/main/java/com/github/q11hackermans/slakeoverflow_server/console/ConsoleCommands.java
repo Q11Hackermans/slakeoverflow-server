@@ -38,6 +38,10 @@ public class ConsoleCommands {
                     return connectionCommand(cmd);
                 case "user":
                     return userCommand(cmd);
+                case "blacklist":
+                    blacklistCommand(cmd);
+                case "game":
+                    return gameCommand(cmd);
                 default:
                     return "Unknown command";
             }
@@ -437,7 +441,7 @@ public class ConsoleCommands {
         }
     }
 
-    private String blacklistCommand(String[] cmd) {
+    private static String blacklistCommand(String[] cmd) {
         if(cmd.length >= 2) {
             switch(cmd[1]) {
                 case "list":
@@ -485,7 +489,7 @@ public class ConsoleCommands {
         }
     }
 
-    private String gameCommand(String[] cmd) {
+    private static String gameCommand(String[] cmd) {
         if(cmd.length >= 2) {
             if(cmd[1].equalsIgnoreCase("start")) {
                 if(cmd.length >= 3) {
