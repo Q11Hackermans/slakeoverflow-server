@@ -291,7 +291,7 @@ public class SlakeoverflowServer {
         if(this.tickThread == null || !this.tickThread.isAlive()) {
             this.tickThread = this.getTickThreadTemplate();
             this.tickThread.start();
-            this.logger.debug("MANAGER", "Started Thread TICK");
+            this.logger.warning("MANAGER", "Restarting Thread TICK");
         }
     }
 
