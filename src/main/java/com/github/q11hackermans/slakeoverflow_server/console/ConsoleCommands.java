@@ -691,7 +691,46 @@ public class ConsoleCommands {
                                 return "UUID required";
                             }
                         } else if(cmd[2].equalsIgnoreCase("item")) {
+                            if(cmd.length >= 4) {
+                                try {
+                                    int itemIndex = Integer.parseInt(cmd[3]);
+                                    Item item = SlakeoverflowServer.getServer().getGameSession().getItemList().get(itemIndex);
 
+                                    if(item != null) {
+
+                                        if(cmd.length >= 5) {
+                                            if(cmd[4].equalsIgnoreCase("kill")) {
+                                                SlakeoverflowServer.getServer().getGameSession().killItem(itemIndex);
+                                                return "Killed item";
+                                            } else if(cmd[4].equalsIgnoreCase("position")) {
+                                                if(cmd.length == 7) {
+                                                    try {
+                                                        item.setPosition(Integer.parseInt(cmd[5]), Integer.parseInt(cmd[6]));
+                                                        return "Updated item position";
+                                                    } catch(IllegalArgumentException e) {
+                                                        return "Please specify a valid position";
+                                                    }
+                                                } else {
+                                                    return "game modify item <ID> position <X> <Y>";
+                                                }
+                                            } else {
+                                                return "Unknown action";
+                                            }
+                                        } else {
+                                            return "This item does exist (you need to specify what you want to do with it)";
+                                        }
+
+                                    } else {
+                                        return "This item does not exist";
+                                    }
+                                } catch(IndexOutOfBoundsException e) {
+                                    return "This item does not exist";
+                                } catch(IllegalArgumentException e) {
+                                    return "Please specify a valid int";
+                                }
+                            } else {
+                                return "Item id required";
+                            }
                         } else if(cmd[2].equalsIgnoreCase("items")) {
                             if(cmd.length == 4 && cmd[3].equalsIgnoreCase("kill")) {
                                 SlakeoverflowServer.getServer().getGameSession().killItems();
