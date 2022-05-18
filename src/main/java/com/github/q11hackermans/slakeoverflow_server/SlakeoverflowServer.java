@@ -170,7 +170,7 @@ public class SlakeoverflowServer {
      * Setup game with default config values
      */
     public boolean setupGameDefault() {
-        return false;
+        return this.setupGame(this.configManager.getConfig().getDefaultGameFieldSizeX(), this.configManager.getConfig().getDefaultGameFieldSizeY());
     }
 
     /**

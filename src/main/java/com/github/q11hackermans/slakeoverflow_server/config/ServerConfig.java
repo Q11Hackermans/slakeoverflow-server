@@ -11,6 +11,8 @@ public class ServerConfig {
     private int snakeSpeedBase;
     private int snakeSpeedModifierValue;
     private int snakeSpeedModifierBodycount;
+    private int defaultGameFieldSizeX;
+    private int defaultGameFieldSizeY;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -29,6 +31,8 @@ public class ServerConfig {
         this.snakeSpeedBase = 20;
         this.snakeSpeedModifierValue = 1;
         this.snakeSpeedModifierBodycount = 2;
+        this.defaultGameFieldSizeX = 100;
+        this.defaultGameFieldSizeY = 100;
 
         this.advancedOptionsEnabled = advancedOptionsEnabled;
         this.overrideServerTickrate = false;
@@ -158,9 +162,35 @@ public class ServerConfig {
     }
 
     public void setSnakeSpeedModifierBodycount(int snakeSpeedModifierBodycount) {
-        if(snakeSpeedModifierBodycount > 0) {
+        if(snakeSpeedModifierBodycount >= 0) {
             this.snakeSpeedModifierBodycount = snakeSpeedModifierBodycount;
         }
+    }
+
+    public int getDefaultGameFieldSizeX() {
+        if(this.defaultGameFieldSizeX >= 50) {
+            return this.defaultGameFieldSizeX;
+        } else {
+            return 50;
+        }
+    }
+
+    public void setDefaultGameFieldSizeX(int defaultGameFieldSizeX) {
+        if(defaultGameFieldSizeX >= 50) {
+            this.defaultGameFieldSizeX = defaultGameFieldSizeX;
+        }
+    }
+
+    public int getDefaultGameFieldSizeY() {
+        if(this.defaultGameFieldSizeY >= 50) {
+            return defaultGameFieldSizeY;
+        } else {
+            return 50;
+        }
+    }
+
+    public void setDefaultGameFieldSizeY(int defaultGameFieldSizeY) {
+        this.defaultGameFieldSizeY = defaultGameFieldSizeY;
     }
 
     // ADVANCED

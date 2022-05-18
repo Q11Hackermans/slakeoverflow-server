@@ -165,6 +165,30 @@ public class ConsoleCommands {
                         } catch(NumberFormatException e) {
                             return "You can only set a positive int value";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("default_gamefield_size_x")) {
+                        try {
+                            int defaultGameFiendSizeX = Integer.parseInt(cmd[3]);
+                            if(defaultGameFiendSizeX >= 50) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeX);
+                                return "Updated value default_gamefield_size_x";
+                            } else {
+                                return "You can only set a positive int value (50 or higher)";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set a positive int value (50 or higher)";
+                        }
+                    } else if(cmd[2].equalsIgnoreCase("default_gamefield_size_y")) {
+                        try {
+                            int defaultGameFiendSizeY = Integer.parseInt(cmd[3]);
+                            if(defaultGameFiendSizeY >= 50) {
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeY);
+                                return "Updated value default_gamefield_size_y";
+                            } else {
+                                return "You can only set a positive int value (50 or higher)";
+                            }
+                        } catch(NumberFormatException e) {
+                            return "You can only set a positive int value (50 or higher)";
+                        }
                     } else {
                         return "Unknown config option";
                     }
@@ -205,6 +229,10 @@ public class ConsoleCommands {
                         return "Value advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate();
                     } else if(cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
                         return "Value advanced_custom_server_tickrate_idle: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrateIdle();
+                    } else if(cmd[2].equalsIgnoreCase("default_gamefield_size_x")) {
+                        return "Value default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX();
+                    } else if(cmd[2].equalsIgnoreCase("default_gamefield_size_y")) {
+                        return "Value default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY();
                     } else {
                         return "Unknown config option";
                     }
@@ -223,6 +251,8 @@ public class ConsoleCommands {
                         "snake_speed_base: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase() + "\n" +
                         "snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue() + "\n" +
                         "snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount() + "\n" +
+                        "default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX() + "\n" +
+                        "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
                         "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +
