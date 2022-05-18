@@ -182,8 +182,8 @@ public class GameSession {
             maxY = this.borderY;
         }
 
-        int relativey = -1;
-        for(int iy = minY-1; iy <= maxY; iy++) {
+        int relativey = 0;
+        for(int iy = minY; iy <= maxY; iy++) {
             int minX = snake.getPosX() - this.fovsizeX;
             int maxX = snake.getPosX() + this.fovsizeX;
 
@@ -194,13 +194,13 @@ public class GameSession {
                 maxX = this.borderX;
             }
 
-            int relativex = -1;
-            for(int ix = minX-1; ix <= maxX; ix++) {
-                if(ix == -1) {
+            int relativex = 0;
+            for(int ix = minX; ix <= maxX; ix++) {
+                if(ix == 0) {
                     fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
                 } else if(ix == this.borderX) {
                     fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
-                } else if(iy == -1) {
+                } else if(iy == 0) {
                     fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
                 } else if(iy == this.borderY) {
                     fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
@@ -274,14 +274,14 @@ public class GameSession {
     // FIELD MANAGEMENT
 
     /**
-     * Returns true if the specified field is free
-     *
+     * Returns true if the specified field is free.
+     * This also includes outside fields and the worldborder.
      * @param posX Position X
      * @param posY Position Y
      * @return boolean
      */
     public boolean isFree(int posX, int posY) {
-        return this.getField(posX, posY) == null;
+        return (this.getField(posX, posY) == null) && (!this.isOutside(posX, posY));
     }
 
     /**
@@ -420,6 +420,34 @@ public class GameSession {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks if a field is on the world border
+     * @param posX X Coordinates
+     * @param posY Y Coordinates
+     * @return true if the field is on the worldborder
+     */
+    public boolean isBorder(int posX, int posY) {
+        if(posX == 0 || posX == this.borderX || posY == 0 || posY == this.borderY) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a field is outside (world border included) of the world border
+     * @param posX X Coordinates
+     * @param posY Y Coordinates
+     * @return true (if outside)
+     */
+    public boolean isOutside(int posX, int posY) {
+        if(posX <= 0 || posX >= this.borderX || posY <= 0 || posY >= this.borderY) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
