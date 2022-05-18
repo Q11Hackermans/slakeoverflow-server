@@ -4,6 +4,7 @@ import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
@@ -579,7 +580,7 @@ public class ConsoleCommands {
             } else if(cmd[1].equalsIgnoreCase("info")) {
                 if(SlakeoverflowServer.getServer().isGameAvail()) {
                     String returnString = "GAME INFORMATION:\n" +
-                            "Game state: " + SlakeoverflowServer.getServer().getGameState() + "\n";
+                            "Game state: " + GameState.getString(SlakeoverflowServer.getServer().getGameState()) + "(" + SlakeoverflowServer.getServer().getGameState() + ")" + "\n";
                     try {
                         returnString = returnString + "Players: " + SlakeoverflowServer.getServer().getGameSession().getSnakeList().size() + "\n" +
                                 "Items: " + SlakeoverflowServer.getServer().getGameSession().getItemList().size() + "\n" +
