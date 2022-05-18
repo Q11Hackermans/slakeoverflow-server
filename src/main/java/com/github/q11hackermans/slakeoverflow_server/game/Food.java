@@ -11,4 +11,9 @@ public class Food extends Item {
     public int getFoodValue() {
         return this.foodValue;
     }
+
+    @Override
+    public String getDescription() {
+        return "FOOD";
+    }
 }

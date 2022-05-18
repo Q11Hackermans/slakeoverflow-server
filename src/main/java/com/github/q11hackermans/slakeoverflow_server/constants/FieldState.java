@@ -4,6 +4,9 @@ public final class FieldState {
     // EMPTY
     public static final int EMPTY = 0;
 
+    // BORDER
+    public static final int BORDER = 1;
+
     // OWN PLAYER
     public static final int PLAYER_HEAD_OWN = 101;
     public static final int PLAYER_BODY_OWN = 102;

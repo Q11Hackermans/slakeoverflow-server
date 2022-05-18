@@ -10,14 +10,16 @@ public class ConfigManager {
     private final File configFile;
     private final ServerConfig config;
 
-    public ConfigManager(boolean advancedOptionsEnabled) {
+    public ConfigManager(boolean advancedOptionsEnabled, boolean loadConfigFile) {
         this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
-        if(!this.configFile.exists()) {
-            this.recreateConfig();
-        } else {
-            this.reloadConfig();
+        if(loadConfigFile) {
+            if(!this.configFile.exists()) {
+                this.recreateConfig();
+            } else {
+                this.reloadConfig();
+            }
         }
     }
 
@@ -49,6 +51,9 @@ public class ConfigManager {
                     this.config.setSnakeSpeedBase(jsonConfig.getInt("snake_speed_base"));
                     this.config.setSnakeSpeedModifierValue(jsonConfig.getInt("snake_speed_modifier_value"));
                     this.config.setSnakeSpeedModifierBodycount(jsonConfig.getInt("snake_speed_modifier_bodycount"));
+                    this.config.setDefaultGameFieldSizeX(jsonConfig.getInt("default_gamefield_size_x"));
+                    this.config.setDefaultGameFieldSizeY(jsonConfig.getInt("default_gamefield_size_y"));
+                    this.config.setUnauthenticatePlayerOnDeath(jsonConfig.getBoolean("unauthenticate_player_on_death"));
 
                     this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
                     this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
@@ -82,6 +87,9 @@ public class ConfigManager {
                 config.put("snake_speed_base", 20);
                 config.put("snake_speed_modifier_value", 1);
                 config.put("snake_speed_modifier_bodycount", 2);
+                config.put("default_gamefield_size_x", 100);
+                config.put("default_gamefield_size_y", 100);
+                config.put("unauthenticate_player_on_death", true);
                 config.put("advanced_override_server_tickrate", false);
                 config.put("advanced_custom_server_tickrate", 50);
                 config.put("advanced_custom_server_tickrate_idle", 950);

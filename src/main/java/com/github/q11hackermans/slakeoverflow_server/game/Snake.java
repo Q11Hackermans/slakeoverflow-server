@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
@@ -16,24 +17,25 @@ public class Snake implements GameObject {
     private int speed;
     private int posx;
     private int posy;
-    @Deprecated
-    private int length;
     private int growthBalance; // The internal "apple balance" the snake can grow
     private int facing;
     private int newFacing;
+    private boolean newFacingUpdated;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
+    private int moveIn;
 
     public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
         this.connection = connection;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
         this.posy = y;
-        this.length = 0;
         this.facing = facing;
         this.newFacing = facing;
+        this.newFacingUpdated = false;
         this.gameSession = session;
         this.alive = true;
+        this.moveIn = 0;
 
         // set start length body positions
         if(this.facing == Direction.NORTH) {
@@ -92,12 +94,74 @@ public class Snake implements GameObject {
         }
     }
 
+    /**
+     * Set the position manually
+     * @param x X Coordinates
+     * @param y Y Coordinates
+     * @deprecated It takes time until all bodies of the snake are updated to the new position
+     * @throws IllegalArgumentException If value is lower/higher than the world border
+     */
+    @Deprecated
+    public void setPosition(int x, int y) {
+        if(x >= 0 && x < this.gameSession.getBorder()[0] && y >= 0 && y < this.gameSession.getBorder()[1]) {
+            this.posx = x;
+            this.posy = y;
+        } else {
+            throw new IllegalArgumentException("Value out of range");
+        }
+    }
+
     public List<int[]> getBodyPositions() {
         if(this.alive) {
             return List.copyOf(bodyPositions);
         } else {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Returns the facing
+     * @return facing
+     */
+    public int getFacing() {
+        return this.facing;
+    }
+
+    /**
+     * Returns the length
+     * @return length
+     */
+    public int getLength() {
+        return this.bodyPositions.size() + 1;
+    }
+
+    /**
+     * Add bodies to the snake
+     * @param length the length to add
+     */
+    public void addBody(int length) {
+        for(int i = 0; i < length; i++) {
+            this.addTale();
+        }
+    }
+
+    /**
+     * Remove bodies from the snake
+     * @param length the length to remove
+     */
+    public void removeBody(int length) {
+        for(int i = 0; i < length; i++) {
+            if(!this.bodyPositions.isEmpty()) {
+                this.bodyPositions.remove(this.bodyPositions.size() - 1);
+            }
+        }
+    }
+
+    /**
+     * Clears the snake bodies
+     */
+    public void clearBodies() {
+        this.bodyPositions.clear();
     }
 
     /**
@@ -130,11 +194,17 @@ public class Snake implements GameObject {
             return;
         }
 
-        if(this.facing != this.newFacing) {
-            this.move(this.newFacing);
-            return;
+        if(this.moveIn <= 0) {
+            if(this.facing != this.newFacing) {
+                this.move(this.newFacing);
+                return;
+            } else {
+                this.move();
+            }
+            this.moveIn = this.calcMoveIn();
+        } else {
+            this.moveIn--;
         }
-        this.move();
     }
 
     /**
@@ -142,8 +212,11 @@ public class Snake implements GameObject {
      *
      * @param newFacing The direction the snake will move during the next tick
      */
-    public void setNewFacing(int newFacing) {
-        this.newFacing = newFacing;
+    public void setNewFacing(int newFacing, boolean forced) {
+        if(forced || !this.newFacingUpdated) {
+            this.newFacing = newFacing;
+            this.newFacingUpdated = true;
+        }
     }
 
     // MOVEMENT
@@ -152,7 +225,6 @@ public class Snake implements GameObject {
      * Add one element to the tale of the snake
      */
     private void addTale() {
-        this.length++;
         this.bodyPositions.add(this.bodyPositions.size(), new int[]{0, 0});
     }
 
@@ -181,7 +253,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posy--;
 
-            this.setNewFacing(Direction.NORTH);
+            this.setNewFacing(Direction.NORTH, true);
 
         } else if(dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
 
@@ -198,7 +270,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posx ++;
 
-            this.setNewFacing(Direction.EAST);
+            this.setNewFacing(Direction.EAST, true);
 
         } else if(dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
 
@@ -215,7 +287,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posy ++;
 
-            this.setNewFacing(Direction.SOUTH);
+            this.setNewFacing(Direction.SOUTH, true);
 
         } else if(dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
 
@@ -232,7 +304,7 @@ public class Snake implements GameObject {
             this.moveBodies();
             this.posx --;
 
-            this.setNewFacing(Direction.WEST);
+            this.setNewFacing(Direction.WEST, true);
 
         } else {
             this.killSnake();
@@ -265,6 +337,17 @@ public class Snake implements GameObject {
         }
     }
 
+    private int calcMoveIn() {
+        int speedModifierValue = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
+        int speedModifierBodycount = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+
+        int value = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+        for(int i = 0; i < (this.bodyPositions.size() / speedModifierBodycount); i++) {
+            value = value + speedModifierValue;
+        }
+        return value;
+    }
+
     /**
      * This method will kill the snake.
      * After killing the snake, it cant be used anymore.
@@ -272,6 +355,10 @@ public class Snake implements GameObject {
     public void killSnake() {
         this.alive = false;
         this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
+
+        if(this.connection.getConnectionType() == ConnectionType.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
+            this.connection.unauthenticate();
+        }
     }
 
     public boolean isAlive() {
