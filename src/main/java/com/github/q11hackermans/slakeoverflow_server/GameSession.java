@@ -75,7 +75,7 @@ public class GameSession {
             int posX = rPos[0];
             int posY = rPos[1];
 
-            if (isFree(posX, posY)) {
+            if (posX > -1 && posY > -1 && isFree(posX, posY)) {
                 this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
             }
         }
