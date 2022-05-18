@@ -12,7 +12,11 @@ import com.github.q11hackermans.slakeoverflow_server.game.SuperFood;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -22,30 +26,31 @@ import java.util.UUID;
 public class ConsoleCommands {
     public static String run(String[] cmd) {
         try {
-
+            if(cmd.length >= 1) {
+                switch(cmd[0]) {
+                    case "stop":
+                        SlakeoverflowServer.getServer().stop();
+                        return "Shutting down";
+                    case "help":
+                        return helpCommand();
+                    case "config":
+                        return configCommand(cmd);
+                    case "connection":
+                        return connectionCommand(cmd);
+                    case "user":
+                        return userCommand(cmd);
+                    case "blacklist":
+                        blacklistCommand(cmd);
+                    case "game":
+                        return gameCommand(cmd);
+                    case "logger":
+                        return loggerCommand(cmd);
+                    default:
+                        return "Unknown command";
+                }
+            }
         } catch(Exception e) {
             return "Command error: " + e.getMessage();
-        }
-        if(cmd.length >= 1) {
-            switch(cmd[0]) {
-                case "stop":
-                    SlakeoverflowServer.getServer().stop();
-                    return "Shutting down";
-                case "help":
-                    return helpCommand();
-                case "config":
-                    return configCommand(cmd);
-                case "connection":
-                    return connectionCommand(cmd);
-                case "user":
-                    return userCommand(cmd);
-                case "blacklist":
-                    blacklistCommand(cmd);
-                case "game":
-                    return gameCommand(cmd);
-                default:
-                    return "Unknown command";
-            }
         }
         return "";
     }
@@ -810,6 +815,65 @@ public class ConsoleCommands {
                     "game info\n" +
                     "game getvalue <...>\n" +
                     "game modify <...>\n";
+        }
+    }
+
+    public static String loggerCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            if(cmd[1].equalsIgnoreCase("list")) {
+                String returnString = "LOG:\n";
+
+                int index = 0;
+                for(Object logEntryObject : SlakeoverflowServer.getServer().getLogger().getLog()) {
+                    JSONObject logEntry = (JSONObject) logEntryObject;
+
+                    returnString = returnString + index + " " + logEntry.getString("time") + " " + logEntry.getString("type") + " " + logEntry.getString("module") + "\n";
+                    index++;
+                }
+                return returnString;
+            } else if(cmd[1].equalsIgnoreCase("get")) {
+                try {
+                    if(cmd.length == 3) {
+                        int index = Integer.parseInt(cmd[2]);
+                        JSONObject logEntry = SlakeoverflowServer.getServer().getLogger().getLog().getJSONObject(index);
+                        return "LOG ENTRY:\n" +
+                                "ID: " + index + "\n" +
+                                "Time: " + logEntry.getString("time") + "\n" +
+                                "Type: " + logEntry.getString("type") + "\n" +
+                                "Module: " + logEntry.getString("module") + "\n" +
+                                "Content: " + logEntry.getString("text").replace("\n", "%20") + "\n";
+                    } else {
+                        return "Please specify a log id";
+                    }
+                } catch(JSONException e) {
+                    return "Log error";
+                } catch(IllegalArgumentException e) {
+                    return "Please specify a valid int value";
+                }
+            } else if(cmd[1].equalsIgnoreCase("save")) {
+                if(cmd.length == 3) {
+                    try {
+                        File file = new File(System.getProperty("user.dir"), cmd[2]);
+                        if(!file.exists()) {
+                            SlakeoverflowServer.getServer().getLogger().saveLog(file, false);
+                            return "File was written";
+                        } else {
+                            return "File does already exist";
+                        }
+                    } catch(IOException e) {
+                        return "IOException. Please check your file";
+                    }
+                } else {
+                    return "Please specify a valid file name";
+                }
+            } else {
+                return "Run command without arguments for help";
+            }
+        } else {
+            return "LOGGER COMMAND USAGE:\n" +
+                    "logger list\n" +
+                    "logger get <ID>\n" +
+                    "logger save\n";
         }
     }
 }
