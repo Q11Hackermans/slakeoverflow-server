@@ -231,12 +231,14 @@ public class SlakeoverflowServer {
      * @return boolean
      */
     public boolean containsConnection(UUID uuid) {
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getClientId().equals(uuid)) {
-                return true;
+        synchronized(this.connectionList) {
+            for(ServerConnection connection : this.connectionList) {
+                if(connection.getClientId().equals(uuid)) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     /**
@@ -245,22 +247,26 @@ public class SlakeoverflowServer {
      * @return ServerConnection (if exists), null (if not exists)
      */
     public ServerConnection getConnectionByUUID(UUID uuid) {
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getClientId().equals(uuid)) {
-                return connection;
+        synchronized(this.connectionList) {
+            for(ServerConnection connection : this.connectionList) {
+                if(connection.getClientId().equals(uuid)) {
+                    return connection;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     public int getPlayerCount() {
-        int connectionCount = 0;
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getConnectionType() == ConnectionType.PLAYER) {
-                connectionCount++;
+        synchronized(this.connectionList) {
+            int connectionCount = 0;
+            for(ServerConnection connection : this.connectionList) {
+                if(connection.getConnectionType() == ConnectionType.PLAYER) {
+                    connectionCount++;
+                }
             }
+            return connectionCount;
         }
-        return connectionCount;
     }
 
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
@@ -296,14 +302,16 @@ public class SlakeoverflowServer {
     }
 
     private void checkConnections() {
-        this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
-        this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
-        this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
-        this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
+        synchronized(this.connectionList) {
+            this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
+            this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
+            this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
+            this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
 
-        for(CMSClient cmsClient : this.connectionhandler.getClientList()) {
-            if(!this.containsConnection(cmsClient.getUniqueId())) {
-                this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
+            for(CMSClient cmsClient : this.connectionhandler.getClientList()) {
+                if(!this.containsConnection(cmsClient.getUniqueId())) {
+                    this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
+                }
             }
         }
     }
@@ -320,17 +328,19 @@ public class SlakeoverflowServer {
     }
 
     private void sendStatusMessage() {
-        for(ServerConnection connection : this.connectionList) {
-            JSONObject statusMessage = new JSONObject();
-            statusMessage.put("cmd", "status");
-            statusMessage.put("status", this.gameState);
-            statusMessage.put("auth", connection.getConnectionType());
+        synchronized(this.connectionList) {
+            for(ServerConnection connection : this.connectionList) {
+                JSONObject statusMessage = new JSONObject();
+                statusMessage.put("cmd", "status");
+                statusMessage.put("status", this.gameState);
+                statusMessage.put("auth", connection.getConnectionType());
 
-            try {
-                connection.getDataIOStreamHandler().writeUTF(statusMessage.toString());
-            } catch (IOException e) {
-                this.logger.warning("CONNECTION", "Error while sending data to " + connection.getClientId());
-                connection.getClient().close();
+                try {
+                    connection.getDataIOStreamHandler().writeUTF(statusMessage.toString());
+                } catch (IOException e) {
+                    this.logger.warning("CONNECTION", "Error while sending data to " + connection.getClientId());
+                    connection.getClient().close();
+                }
             }
         }
     }
@@ -377,7 +387,9 @@ public class SlakeoverflowServer {
     }
 
     public List<ServerConnection> getConnectionList() {
-        return List.copyOf(this.connectionList);
+        synchronized(this.connectionList) {
+            return List.copyOf(this.connectionList);
+        }
     }
 
     public int getGameState() {
