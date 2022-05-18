@@ -813,7 +813,7 @@ public class ConsoleCommands {
                     "game pause\n" +
                     "game resume\n" +
                     "game info\n" +
-                    "game getvalue <...>\n" +
+                    "game get <...>\n" +
                     "game modify <...>\n";
         }
     }
