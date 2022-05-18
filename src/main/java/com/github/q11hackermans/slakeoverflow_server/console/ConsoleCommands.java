@@ -65,14 +65,7 @@ public class ConsoleCommands {
                 "blacklist: IP blacklist management\n" +
                 "game: Game management\n" +
                 "logger: Logging management\n" +
-                "Run the specific commands without arguments to show their help page.\n" +
-                "COMMAND SHORTCUTS:\n" +
-                "startgame --> game start default\n" +
-                "stopgame --> game stop\n" +
-                "list --> user list\n" +
-                "kick <UUID> --> connection close <UUID>\n" +
-                "ban <IP> --> blacklist add <IP>\n" +
-                "accept <UUID> --> connection accept <UUID>\n";
+                "Run the specific commands without arguments to show their help page.\n";
     }
 
     private static String configCommand(String[] cmd) {
