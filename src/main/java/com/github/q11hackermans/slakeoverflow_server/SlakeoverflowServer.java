@@ -132,21 +132,30 @@ public class SlakeoverflowServer {
      * This will stop the server.
      */
     public void stop() {
-        try {
-            this.alreadyStopping = true;
-            this.managerThread.interrupt();
-            if(this.tickThread != null) {
-                this.tickThread.interrupt();
+        new Thread(() -> {
+            try {
+                this.alreadyStopping = true;
+                this.managerThread.interrupt();
+                if(this.tickThread != null) {
+                    this.tickThread.interrupt();
+                }
+                this.dataIOManager.close();
+                this.connectionhandler.close();
+                this.console.stop();
+                this.logger.info("STOP", "Server shutdown.");
+                this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
+            } catch(Exception ignored) {
+                ignored.printStackTrace();
             }
-            this.dataIOManager.close();
-            this.connectionhandler.close();
-            this.console.stop();
-            this.logger.info("STOP", "Server shutdown.");
-            this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
-        } catch(Exception ignored) {
-            ignored.printStackTrace();
-        }
-        System.exit(0);
+        }).start();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch(Exception ignored) {}
+
+            System.exit(0);
+        }).start();
     }
 
     // GAME MANAGEMENT
@@ -304,8 +313,8 @@ public class SlakeoverflowServer {
 
     private void checkConnections() {
         synchronized(this.connectionList) {
-            this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
-            this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
+            //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
+            //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
             this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
             this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
 
