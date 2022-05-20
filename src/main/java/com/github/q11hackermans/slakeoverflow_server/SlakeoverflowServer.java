@@ -419,8 +419,8 @@ public class SlakeoverflowServer {
                     Thread.sleep(this.tickSpeed);
                 } catch(Exception e) {
                     Thread.currentThread().interrupt();
-                    this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
                     if(!(e instanceof InterruptedException)) {
+                        this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
                         e.printStackTrace();
                     }
                 }

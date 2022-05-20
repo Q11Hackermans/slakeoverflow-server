@@ -40,7 +40,7 @@ public class ConsoleCommands {
                     case "user":
                         return userCommand(cmd);
                     case "blacklist":
-                        blacklistCommand(cmd);
+                        return blacklistCommand(cmd);
                     case "game":
                         return gameCommand(cmd);
                     case "logger":
