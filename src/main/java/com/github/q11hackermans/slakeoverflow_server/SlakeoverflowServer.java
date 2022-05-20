@@ -456,7 +456,7 @@ public class SlakeoverflowServer {
         Thread thread = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
                 try {
-                    if(this.tickCounter > -20) {
+                    if(this.tickCounter > -80) {
                         this.tickCounter--;
                     } else {
                         this.tickThread.stop();
