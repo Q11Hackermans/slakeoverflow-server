@@ -5,6 +5,7 @@ import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class ServerConnection {
@@ -76,5 +77,25 @@ public class ServerConnection {
      */
     public DataIOStreamHandler getDataIOStreamHandler() {
         return SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(this.clientId);
+    }
+
+    /**
+     * A null safe way to send data to a connection
+     * @param text The text to send
+     * @return if sending was successful
+     */
+    public boolean sendUTF(String text) {
+        if(this.getDataIOStreamHandler() != null) {
+            try {
+                this.getDataIOStreamHandler().writeUTF(text);
+                return true;
+            } catch (IOException e) {
+                SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Error while sending data to " + this.getClientId());
+                this.getClient().close();
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

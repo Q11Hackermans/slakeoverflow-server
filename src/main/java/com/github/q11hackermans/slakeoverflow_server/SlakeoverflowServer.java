@@ -336,12 +336,7 @@ public class SlakeoverflowServer {
                 statusMessage.put("status", this.gameState);
                 statusMessage.put("auth", connection.getConnectionType());
 
-                try {
-                    connection.getDataIOStreamHandler().writeUTF(statusMessage.toString());
-                } catch (IOException e) {
-                    this.logger.warning("CONNECTION", "Error while sending data to " + connection.getClientId());
-                    connection.getClient().close();
-                }
+                connection.sendUTF(statusMessage.toString());
             }
         }
     }
