@@ -36,8 +36,10 @@ public class SlakeoverflowServer {
     // THREADS
     private Thread managerThread;
     private Thread tickThread;
+    private Thread timesThread;
     private final int tickSpeed;
     private final int idleTickSpeed;
+    private int tickCounter;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -93,6 +95,8 @@ public class SlakeoverflowServer {
         this.alreadyStopping = false;
 
         // THREADS
+        this.tickCounter = 20;
+
         this.managerThread = new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -122,6 +126,10 @@ public class SlakeoverflowServer {
         this.tickThread = this.getTickThreadTemplate();
         this.tickThread.start();
         this.logger.debug("INIT", "Started Thread TICK");
+
+        this.timesThread = this.getTimesThreadTemplate();
+        this.timesThread.start();
+        this.logger.debug("INIT", "Started Thread TIMES");
 
         // FINISHED (RUN ALWAYS LAST)
         this.logger.info("INIT", "Setup complete");
@@ -309,6 +317,11 @@ public class SlakeoverflowServer {
             this.tickThread.start();
             this.logger.warning("MANAGER", "Restarting Thread TICK");
         }
+        if(this.timesThread == null || !this.timesThread.isAlive()) {
+            this.timesThread = this.getTimesThreadTemplate();
+            this.timesThread.start();
+            this.logger.warning("MANAGER", "Restarting Thread TIMES");
+        }
     }
 
     private void checkConnections() {
@@ -431,6 +444,34 @@ public class SlakeoverflowServer {
             }
         });
         thread.setName("SLAKEOVERFLOW-TICK-" + this.toString());
+        return thread;
+    }
+
+    private Thread getTimesThreadTemplate() {
+        Thread thread = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
+                try {
+                    if(this.tickCounter > -20) {
+                        this.tickCounter--;
+                    } else {
+                        this.tickThread.stop();
+                        this.logger.warning("TIMES", "TICK Thread not responding. Killing...");
+                        this.tickCounter = 20;
+                    }
+
+                    Thread.sleep(this.tickSpeed);
+                    if(!(this.game != null && gameState == GameState.RUNNING)) {
+                        Thread.sleep(this.idleTickSpeed);
+                    }
+                } catch(Exception e) {
+                    Thread.currentThread().interrupt();
+                    if(!(e instanceof InterruptedException)) {
+                        this.logger.warning("TIMES", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
+                    }
+                }
+            }
+        });
+        thread.setName("SLAKEOVERFLOW-TIMES-" + thread.toString());
         return thread;
     }
 
