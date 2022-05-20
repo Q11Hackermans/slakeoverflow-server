@@ -461,7 +461,7 @@ public class GameSession {
         if (lowerBound >= upperBound) {
             IllegalArgumentException e = new IllegalArgumentException("The upper bound is smaller than the lower bound");
             SlakeoverflowServer.getServer().getLogger().warning("RANDOM-INT-GENERATOR", "Exception: " + e);
-            throw e;
+            upperBound = lowerBound;
         }
         return new Random().nextInt((upperBound - lowerBound) + 1) + lowerBound;
     }
