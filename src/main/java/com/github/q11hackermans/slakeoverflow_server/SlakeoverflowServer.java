@@ -422,6 +422,10 @@ public class SlakeoverflowServer {
         return (this.gameState == GameState.RUNNING || this.gameState == GameState.PAUSED);
     }
 
+    public int getTickCounter() {
+        return this.tickCounter;
+    }
+
     // THREAD TEMPLATES
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
@@ -434,6 +438,7 @@ public class SlakeoverflowServer {
                         Thread.sleep(this.idleTickSpeed);
                     }
                     Thread.sleep(this.tickSpeed);
+                    this.tickCounter = 20;
                 } catch(Exception e) {
                     Thread.currentThread().interrupt();
                     if(!(e instanceof InterruptedException)) {

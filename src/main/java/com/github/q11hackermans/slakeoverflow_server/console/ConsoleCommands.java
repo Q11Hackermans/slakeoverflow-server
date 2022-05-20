@@ -45,6 +45,8 @@ public class ConsoleCommands {
                         return gameCommand(cmd);
                     case "logger":
                         return loggerCommand(cmd);
+                    case "info":
+                        return infoCommand();
                     default:
                         return "Unknown command";
                 }
@@ -65,6 +67,7 @@ public class ConsoleCommands {
                 "blacklist: IP blacklist management\n" +
                 "game: Game management\n" +
                 "logger: Logging management\n" +
+                "info: Information" +
                 "Run the specific commands without arguments to show their help page.\n";
     }
 
@@ -868,5 +871,11 @@ public class ConsoleCommands {
                     "logger get <ID>\n" +
                     "logger save\n";
         }
+    }
+
+    private static String infoCommand() {
+        return "SERVER INFO:\n" +
+                "Tick counter: " + SlakeoverflowServer.getServer().getTickCounter() + " (should be 20)\n" +
+                "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n";
     }
 }
