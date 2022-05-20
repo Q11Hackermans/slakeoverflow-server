@@ -209,13 +209,13 @@ public class GameSession {
                     if(field instanceof Snake) {
                         if(field == snake) {
                             if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_HEAD_OWN));
+                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.getPlayerHeadOwnValue(snake.getFacing())));
                             } else {
                                 fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_BODY_OWN));
                             }
                         } else {
                             if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_HEAD_OTHER));
+                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.getPlayerHeadOtherValue(snake.getFacing())));
                             } else {
                                 fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_BODY_OTHER));
                             }
