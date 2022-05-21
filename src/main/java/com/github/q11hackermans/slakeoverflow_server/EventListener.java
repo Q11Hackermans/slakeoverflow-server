@@ -113,11 +113,12 @@ public class EventListener extends CMListenerAdapter {
                 switch(data.getString("cmd")) {
                     case "auth":
                         if(data.has("type")) {
-                            if(data.getString("type").equalsIgnoreCase(String.valueOf(ConnectionType.PLAYER))) {
+                            if(data.getInt("type") == ConnectionType.PLAYER) {
                                 if(data.has("username")) {
-                                    SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
+                                    // CURRENTLY NOT WORKING
                                 }
-                            } else if(data.getString("type").equalsIgnoreCase(String.valueOf(ConnectionType.SPECTATOR))) {
+                                SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
+                            } else if(data.getInt("type") == ConnectionType.SPECTATOR) {
                                 // SPECTATOR AUTHENTICATION IS CURRENTLY NOT SUPPORTED
                                 cmsClient.close();
                             } else {
@@ -159,7 +160,6 @@ public class EventListener extends CMListenerAdapter {
             }
         } catch(JSONException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Received wrong package format from " + cmsClient.getUniqueId());
-            e.printStackTrace();
             cmsClient.close();
         }
     }
