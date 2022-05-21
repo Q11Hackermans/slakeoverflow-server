@@ -159,6 +159,7 @@ public class EventListener extends CMListenerAdapter {
             }
         } catch(JSONException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Received wrong package format from " + cmsClient.getUniqueId());
+            e.printStackTrace();
             cmsClient.close();
         }
     }
