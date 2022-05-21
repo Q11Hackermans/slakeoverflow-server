@@ -82,6 +82,7 @@ public class ConfigManager {
                 config.put("port", 26677);
                 config.put("whitelist", true);
                 config.put("user_authentication", false);
+                config.put("slots", 10);
                 config.put("min_food_value", 1);
                 config.put("max_food_value", 2);
                 config.put("snake_speed_base", 20);
