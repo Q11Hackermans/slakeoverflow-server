@@ -43,12 +43,7 @@ public class GameSession {
 
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
-            try {
-                snake.getConnection().getDataIOStreamHandler().writeUTF(this.getSendablePlayerData(snake));
-            } catch(Exception e) {
-                SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Error while sending data to " + snake.getConnection().getClientId());
-                snake.getConnection().getClient().close();
-            }
+            snake.getConnection().sendUTF(this.getSendablePlayerData(snake));
         }
 
         // ADD NEW SNAKES

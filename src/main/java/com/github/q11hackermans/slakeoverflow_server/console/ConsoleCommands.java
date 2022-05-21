@@ -1,6 +1,5 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
-import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
@@ -876,6 +875,9 @@ public class ConsoleCommands {
     private static String infoCommand() {
         return "SERVER INFO:\n" +
                 "Tick counter: " + SlakeoverflowServer.getServer().getTickCounter() + " (should be 20)\n" +
-                "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n";
+                "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n" +
+                "Manager Thread: " + SlakeoverflowServer.getServer().isManagerThreadAlive() + " " + SlakeoverflowServer.getServer().getManagerThreadState() + "\n" +
+                "Tick Thread: " + SlakeoverflowServer.getServer().isTickThreadAlive() + " " + SlakeoverflowServer.getServer().getTickThreadState() + "\n" +
+                "Times Thread: " + SlakeoverflowServer.getServer().isTimesThreadAlive() + " " + SlakeoverflowServer.getServer().getTimesThreadState() + "\n";
     }
 }
