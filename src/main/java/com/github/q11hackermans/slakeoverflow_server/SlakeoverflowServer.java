@@ -489,7 +489,7 @@ public class SlakeoverflowServer {
                 try {
                     if(this.tickThread.isAlive()) {
                         int waittime = -40;
-                        if(!(this.game != null && gameState == GameState.RUNNING)) {
+                        if(this.game != null && gameState == GameState.RUNNING) {
                             waittime = waittime - 840;
                         }
                         if(this.tickCounter > waittime) {

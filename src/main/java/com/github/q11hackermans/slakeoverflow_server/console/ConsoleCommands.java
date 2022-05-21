@@ -605,11 +605,16 @@ public class ConsoleCommands {
                             try {
                                 Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
                                 if(snake != null) {
+                                    String bodyPositionString = "";
+                                    for(int[] bodies : snake.getBodyPositions()) {
+                                        bodyPositionString = bodyPositionString + Arrays.toString(bodies) + " ";
+                                    }
                                     return "SNAKE INFORMATION:\n" +
                                             "UUID: " + snake.getConnection().getClientId() + "\n" +
                                             "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
                                             "Length: " + snake.getLength() + "\n" +
                                             "Facing: " + snake.getFacing() + "\n" +
+                                            "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
                                             "Body positions: " + snake.getBodyPositions().toString() + "\n";
                                 } else {
                                     return "This snake does not exist";

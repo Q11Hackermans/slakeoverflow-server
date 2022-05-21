@@ -183,6 +183,10 @@ public class Snake implements GameObject {
         return this.connection;
     }
 
+    public int getMoveIn() {
+        return this.moveIn;
+    }
+
     // TICK
 
     /**
@@ -337,15 +341,19 @@ public class Snake implements GameObject {
         }
     }
 
-    private int calcMoveIn() {
+    public int calcMoveIn() {
         int speedModifierValue = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
         int speedModifierBodycount = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
 
-        int value = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
-        for(int i = 0; i < (this.bodyPositions.size() / speedModifierBodycount); i++) {
-            value = value + speedModifierValue;
+        if(speedModifierBodycount <= 0) {
+            speedModifierBodycount = 1;
         }
-        return value;
+
+        int value = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+        //for(int i = 0; i < (this.bodyPositions.size() / speedModifierBodycount); i++) {
+        //    value = value + speedModifierValue;
+        //}
+        return value + (this.bodyPositions.size() / speedModifierBodycount) * speedModifierValue;
     }
 
     /**
