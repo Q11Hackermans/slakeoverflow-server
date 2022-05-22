@@ -85,7 +85,7 @@ public class ServerConnection {
      * @return if sending was successful
      */
     public boolean sendUTF(String text) {
-        if(this.getDataIOStreamHandler() != null) {
+        if(this.getDataIOStreamHandler() != null && !this.getDataIOStreamHandler().isClosed() && this.getClient() != null && !this.getClient().isClosed()) {
             try {
                 this.getDataIOStreamHandler().writeUTF(text);
                 return true;
