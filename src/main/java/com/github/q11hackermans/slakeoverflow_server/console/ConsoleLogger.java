@@ -1,8 +1,10 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
+import com.github.q11hackermans.slakeoverflow_server.constants.Colors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -80,8 +82,12 @@ public class ConsoleLogger {
         this.log.put(logEntry);
 
         if(print) {
-            System.out.println("[" + logEntry.getString("time") + "] [" + logEntry.getString("type") + "] [" + logEntry.getString("module") + "] " + logEntry.getString("text"));
+            this.print("[" + logEntry.getString("time") + "] [" + logEntry.getString("type") + "] [" + logEntry.getString("module") + "] " + logEntry.getString("text"), Colors.CONSOLE_INFO);
         }
+    }
+
+    private void print(String text, String color) {
+        System.out.println(color + text + Colors.CONSOLE_RESET);
     }
 
     private String getTimeString() {
