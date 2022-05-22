@@ -26,8 +26,8 @@ public class GameSession {
         this.itemList = new ArrayList<>();
         this.borderX = x;
         this.borderY = y;
-        this.fovsizeX = 50;
-        this.fovsizeY = 50;
+        this.fovsizeX = 60;
+        this.fovsizeY = 40;
     }
 
     // TICK
