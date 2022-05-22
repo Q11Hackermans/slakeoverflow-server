@@ -49,6 +49,8 @@ public class SlakeoverflowServer {
     // LISTS
     private final List<InetAddress> ipBlacklist;
     private boolean alreadyStopping;
+    // STATS
+    private int tickRate;
 
 
     public SlakeoverflowServer(boolean advancedConfigOptions, boolean defaultConfigValues) throws IOException {
@@ -94,6 +96,7 @@ public class SlakeoverflowServer {
 
         // MISC
         this.alreadyStopping = false;
+        this.tickRate = 0;
 
         // THREADS
         this.tickCounter = 20;
@@ -457,11 +460,16 @@ public class SlakeoverflowServer {
         return this.timesThread.getState();
     }
 
+    public int getTickRate() {
+        return this.tickRate;
+    }
+
     // THREAD TEMPLATES
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
                 try {
+                    this.tickRate = this.tickCounter;
                     this.tickCounter = 20;
                     this.sendStatusMessage();
                     if(this.game != null && gameState == GameState.RUNNING) {
@@ -497,6 +505,7 @@ public class SlakeoverflowServer {
                         } else {
                             this.tickThread.interrupt();
                             this.tickThread.stop();
+                            this.tickRate = this.tickCounter;
                             this.tickCounter = 20;
                             this.logger.warning("TIMES", "TICK Thread not responding. Killing... " + tickCounter);
                         }

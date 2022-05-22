@@ -598,7 +598,7 @@ public class ConsoleCommands {
                         if(cmd[2].equalsIgnoreCase("snakes")) {
                             String returnString = "SNAKES:\n";
                             for(Snake snake : SlakeoverflowServer.getServer().getGameSession().getSnakeList()) {
-                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + " " + snake.getLength() + " " + snake.isAlive();
+                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + " " + snake.getLength() + " " + snake.isAlive() + "\n";
                             }
                             return returnString;
                         } else if(cmd[2].equalsIgnoreCase("snake") && cmd.length == 4) {
@@ -879,7 +879,7 @@ public class ConsoleCommands {
 
     private static String infoCommand() {
         return "SERVER INFO:\n" +
-                "Tick counter: " + SlakeoverflowServer.getServer().getTickCounter() + " (should be 20)\n" +
+                "Tick rate: " + SlakeoverflowServer.getServer().getTickRate() + " (counter=" + SlakeoverflowServer.getServer().getTickCounter() + ", should be 20)" + "\n" +
                 "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n" +
                 "Manager Thread: " + SlakeoverflowServer.getServer().isManagerThreadAlive() + " " + SlakeoverflowServer.getServer().getManagerThreadState() + "\n" +
                 "Tick Thread: " + SlakeoverflowServer.getServer().isTickThreadAlive() + " " + SlakeoverflowServer.getServer().getTickThreadState() + "\n" +
