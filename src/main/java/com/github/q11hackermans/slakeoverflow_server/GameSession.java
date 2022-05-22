@@ -43,7 +43,7 @@ public class GameSession {
 
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
-            snake.getConnection().sendUTF(this.getSendablePlayerData(snake));
+            snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
         }
 
         // ADD NEW SNAKES
@@ -159,7 +159,7 @@ public class GameSession {
      * @param snake The snake
      * @return String (in JSONObject format)
      */
-    private String getSendablePlayerData(Snake snake) {
+    private String getSendablePlayerData(Snake snake, boolean relative) {
         JSONObject playerData = new JSONObject();
         playerData.put("cmd", "playerdata");
         playerData.put("fovx", this.fovsizeX);
@@ -179,6 +179,13 @@ public class GameSession {
 
         int relativey = 0;
         for(int iy = minY; iy <= maxY; iy++) {
+            int yvalue;
+            if(relative) {
+                yvalue = relativey;
+            } else {
+                yvalue = iy;
+            }
+
             int minX = snake.getPosX() - this.fovsizeX;
             int maxX = snake.getPosX() + this.fovsizeX;
 
@@ -191,42 +198,49 @@ public class GameSession {
 
             int relativex = 0;
             for(int ix = minX; ix <= maxX; ix++) {
+                int xvalue;
+                if(relative) {
+                    xvalue = relativex;
+                } else {
+                    xvalue = ix;
+                }
+
                 if(ix == 0) {
-                    fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
+                    fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.BORDER));
                 } else if(ix == this.borderX) {
-                    fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
+                    fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.BORDER));
                 } else if(iy == 0) {
-                    fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
+                    fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.BORDER));
                 } else if(iy == this.borderY) {
-                    fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.BORDER));
+                    fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.BORDER));
                 } else {
                     GameObject field = this.getField(ix, iy);
                     if(field instanceof Snake) {
                         if(field == snake) {
                             if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.getPlayerHeadOwnValue(snake.getFacing())));
+                                fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.getPlayerHeadOwnValue(snake.getFacing())));
                             } else {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_BODY_OWN));
+                                fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.PLAYER_BODY_OWN));
                             }
                         } else {
                             if(Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.getPlayerHeadOtherValue(snake.getFacing())));
+                                fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.getPlayerHeadOtherValue(snake.getFacing())));
                             } else {
-                                fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.PLAYER_BODY_OTHER));
+                                fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.PLAYER_BODY_OTHER));
                             }
                         }
                     } else if(field instanceof Item) {
                         if(field instanceof Food) {
-                            fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.ITEM_FOOD));
+                            fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.ITEM_FOOD));
                         } else if(field instanceof SuperFood) {
-                            fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.ITEM_SUPER_FOOD));
+                            fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.ITEM_SUPER_FOOD));
                         } else {
                             // DO NOTHING
-                            //fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.ITEM_UNKNOWN));
+                            //fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.ITEM_UNKNOWN));
                         }
                     } else {
                         // DO NOTHING
-                        //fields.put(this.createCoordsJSONArray(false, ix, iy, FieldState.EMPTY));
+                        //fields.put(this.createCoordsJSONArray(relative, xvalue, yvalue, FieldState.EMPTY));
                     }
                 }
 
