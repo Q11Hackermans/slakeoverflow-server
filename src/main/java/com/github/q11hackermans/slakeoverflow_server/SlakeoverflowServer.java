@@ -41,6 +41,7 @@ public class SlakeoverflowServer {
     private final int tickSpeed;
     private final int idleTickSpeed;
     private int tickCounter;
+    private int tickState;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -100,6 +101,7 @@ public class SlakeoverflowServer {
 
         // THREADS
         this.tickCounter = 20;
+        this.tickState = 0;
 
         this.managerThread = new Thread(() -> {
             try {
@@ -315,13 +317,13 @@ public class SlakeoverflowServer {
                 return;
             }
             this.managerUtilsThread = new Thread(() -> {
-                this.logger.warning("MANAGER", "TICK Thread interrupt\n" +
-                        "-------------------- TICK THREAD INTERRUPT --------------------\n" +
+                this.logger.warning("MANAGER", "TICK Thread stopped\n" +
+                        "-------------------- TICK THREAD STOPPED --------------------\n" +
                         "TICK Thread was stopped during operation.\n" +
                         "This could have happened due to an exception.\n" +
                         "If this happens more often, please shut down the server.\n" +
                         "The TICK Thread will be restarted in 30 seconds...\n" +
-                        "---------------------------------------------------------------\n");
+                        "-------------------------------------------------------------\n");
 
                 try {
                     Thread.sleep(30000);
@@ -471,6 +473,7 @@ public class SlakeoverflowServer {
                 try {
                     this.tickRate = this.tickCounter;
                     this.tickCounter = 20;
+                    this.tickState = 0;
                     this.sendStatusMessage();
                     if(this.game != null && gameState == GameState.RUNNING) {
                         this.game.tick();
@@ -503,11 +506,30 @@ public class SlakeoverflowServer {
                         if(this.tickCounter > waittime) {
                             this.tickCounter--;
                         } else {
-                            this.tickThread.interrupt();
-                            this.tickThread.stop();
-                            this.tickRate = this.tickCounter;
-                            this.tickCounter = 20;
-                            this.logger.warning("TIMES", "TICK Thread not responding. Killing... " + tickCounter);
+                            if(this.tickState == 0) {
+                                this.tickThread.interrupt();
+                                this.tickRate = this.tickCounter;
+                                this.tickCounter = 20;
+                                this.tickState = 1;
+                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState) + "/3). Interrupting...");
+                            } else if(this.tickState == 1) {
+                                this.tickThread.interrupt();
+                                this.tickThread.stop();
+                                this.tickRate = this.tickCounter;
+                                this.tickCounter = 20;
+                                this.tickState = 2;
+                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState) + "/3). Killing...");
+                            } else {
+                                try {
+                                    this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState + 1) + "/3). Server shutdown...\n" +
+                                            "-------------------- TICK THREAD NOT RESPONDING --------------------\n" +
+                                            "The tick thread does not respond.\n" +
+                                            "All attempts to stop and restart it have failed.\n" +
+                                            "The server is now shutting down.\n" +
+                                            "--------------------------------------------------------------------");
+                                } catch(Exception ignored) {}
+                                stop();
+                            }
                         }
                     }
 
