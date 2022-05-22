@@ -79,7 +79,7 @@ public class SlakeoverflowServer {
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
         this.connectionhandler.addListener(new EventListener());
         this.connectionhandler.addGlobalListener(new EventListener());
-        this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.DEFAULT_TIMED);
+        this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.MULTI_STREAM_HANDLER_CONSUMING);
         this.dataIOManager.addEventListener(new EventListener());
 
         // GAME SESSION
