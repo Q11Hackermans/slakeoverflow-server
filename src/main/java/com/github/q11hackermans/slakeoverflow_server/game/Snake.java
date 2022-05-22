@@ -193,7 +193,7 @@ public class Snake implements GameObject {
      * TICK
      */
     public void tick() {
-        if(!this.connection.isConnected() && this.connection.getConnectionType() != ConnectionType.PLAYER) {
+        if(!this.connection.isConnected() || this.connection.getConnectionType() != ConnectionType.PLAYER) {
             this.killSnake();
             return;
         }
