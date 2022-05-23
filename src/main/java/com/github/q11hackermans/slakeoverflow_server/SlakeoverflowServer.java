@@ -113,6 +113,10 @@ public class SlakeoverflowServer {
                     checkConnectionManager();
                     checkConnections();
                     checkGameSession();
+
+                    try {
+                        Thread.sleep(1);
+                    } catch(InterruptedException ignored) {}
                 } catch(Exception e) {
                     try {
                         this.logger.warning("MANAGER", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
