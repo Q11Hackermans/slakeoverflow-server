@@ -14,6 +14,7 @@ public class ServerConfig {
     private int defaultGameFieldSizeX;
     private int defaultGameFieldSizeY;
     private boolean unauthenticatePlayerOnDeath;
+    private boolean printDebugMessages;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -35,6 +36,7 @@ public class ServerConfig {
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
+        this.printDebugMessages = false;
 
         this.advancedOptionsEnabled = advancedOptionsEnabled;
         this.overrideServerTickrate = false;
@@ -201,6 +203,14 @@ public class ServerConfig {
 
     public void setUnauthenticatePlayerOnDeath(boolean unauthenticatePlayerOnDeath) {
         this.unauthenticatePlayerOnDeath = unauthenticatePlayerOnDeath;
+    }
+
+    public boolean isPrintDebugMessages() {
+        return printDebugMessages;
+    }
+
+    public void setPrintDebugMessages(boolean printDebugMessages) {
+        this.printDebugMessages = printDebugMessages;
     }
 
     // ADVANCED

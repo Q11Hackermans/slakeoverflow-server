@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.constants.Colors;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 
 public class ConsoleLogger {
     private JSONArray log;
@@ -43,7 +45,7 @@ public class ConsoleLogger {
      * @param text Logging text
      */
     public void debug(String module, String text) {
-        this.createLogEntry("DEBUG", module, text, false);
+        this.createLogEntry("DEBUG", module, text, SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages());
     }
 
     // GET AND SAVE LOG
@@ -82,7 +84,15 @@ public class ConsoleLogger {
         this.log.put(logEntry);
 
         if(print) {
-            this.print("[" + logEntry.getString("time") + "] [" + logEntry.getString("type") + "] [" + logEntry.getString("module") + "] " + logEntry.getString("text"), Colors.CONSOLE_INFO);
+            String color = Colors.CONSOLE_INFO;
+
+            if(type.equalsIgnoreCase("WARNING")) {
+                color = Colors.CONSOLE_ERROR;
+            } else if(type.equalsIgnoreCase("DEBUG")) {
+                color = Colors.CONSOLE_DEBUG;
+            }
+
+            this.print("[" + logEntry.getString("time") + "] [" + logEntry.getString("type") + "] [" + logEntry.getString("module") + "] " + logEntry.getString("text"), color);
         }
     }
 

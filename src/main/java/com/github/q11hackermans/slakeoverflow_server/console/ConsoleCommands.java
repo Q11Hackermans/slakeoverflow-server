@@ -193,6 +193,9 @@ public class ConsoleCommands {
                     } else if(cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
                         return "Updated value unauthenticate_player_on_death to " + cmd[3];
+                    } else if(cmd[2].equalsIgnoreCase("print_debug_messages")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setPrintDebugMessages(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value print_debug_messages to " + cmd[3];
                     } else {
                         return "Unknown config option";
                     }
@@ -239,6 +242,8 @@ public class ConsoleCommands {
                         return "Value default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY();
                     } else if(cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
                         return "Value unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath();
+                    } else if(cmd[2].equalsIgnoreCase("print_debug_messages")) {
+                        return "Value print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages();
                     } else {
                         return "Unknown config option";
                     }
@@ -260,6 +265,7 @@ public class ConsoleCommands {
                         "default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX() + "\n" +
                         "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
                         "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
+                        "print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
                         "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +

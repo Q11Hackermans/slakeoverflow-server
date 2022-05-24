@@ -54,6 +54,7 @@ public class ConfigManager {
                     this.config.setDefaultGameFieldSizeX(jsonConfig.getInt("default_gamefield_size_x"));
                     this.config.setDefaultGameFieldSizeY(jsonConfig.getInt("default_gamefield_size_y"));
                     this.config.setUnauthenticatePlayerOnDeath(jsonConfig.getBoolean("unauthenticate_player_on_death"));
+                    this.config.setPrintDebugMessages(jsonConfig.getBoolean("print_debug_messages"));
 
                     this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
                     this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
@@ -91,6 +92,8 @@ public class ConfigManager {
                 config.put("default_gamefield_size_x", 100);
                 config.put("default_gamefield_size_y", 100);
                 config.put("unauthenticate_player_on_death", true);
+                config.put("print_debug_messages", false);
+
                 config.put("advanced_override_server_tickrate", false);
                 config.put("advanced_custom_server_tickrate", 50);
                 config.put("advanced_custom_server_tickrate_idle", 950);
