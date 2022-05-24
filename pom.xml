@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.github.jandie1505</groupId>
             <artifactId>ConnectionManager</artifactId>
-            <version>764faba789</version>
+            <version>7e63ad4761</version>
         </dependency>
     </dependencies>
 </project>
