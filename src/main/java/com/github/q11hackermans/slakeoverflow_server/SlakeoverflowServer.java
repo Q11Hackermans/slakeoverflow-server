@@ -374,6 +374,12 @@ public class SlakeoverflowServer {
                 this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
             }
         }
+
+        for(ServerConnection connection : this.connectionList) {
+            if((connection.getConnectionType() == ConnectionType.PLAYER || connection.getConnectionType() == ConnectionType.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
+                connection.unauthenticate();
+            }
+        }
     }
 
     private void checkGameSession() {
