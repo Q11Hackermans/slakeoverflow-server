@@ -1,7 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
@@ -15,7 +15,6 @@ import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAccepte
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionAttemptEvent;
 import net.jandie1505.connectionmanager.server.events.CMSServerConnectionRefusedEvent;
 import net.jandie1505.connectionmanager.streams.CMConsumingInputStream;
-import net.jandie1505.connectionmanager.streams.CMInputStream;
 import net.jandie1505.connectionmanager.streams.CMTimedInputStream;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.events.DataIOUTFReceivedEvent;
@@ -113,12 +112,12 @@ public class EventListener extends CMListenerAdapter {
                 switch(data.getString("cmd")) {
                     case "auth":
                         if(data.has("type")) {
-                            if(data.getInt("type") == ConnectionType.PLAYER) {
+                            if(data.getInt("type") == AuthenticationState.PLAYER) {
                                 if(data.has("username")) {
                                     // CURRENTLY NOT WORKING
                                 }
                                 SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
-                            } else if(data.getInt("type") == ConnectionType.SPECTATOR) {
+                            } else if(data.getInt("type") == AuthenticationState.SPECTATOR) {
                                 // SPECTATOR AUTHENTICATION IS CURRENTLY NOT SUPPORTED
                                 cmsClient.close();
                             } else {
@@ -134,7 +133,7 @@ public class EventListener extends CMListenerAdapter {
 
                                     ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
 
-                                    if(connection != null && connection.getConnectionType() == ConnectionType.PLAYER) {
+                                    if(connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
                                         Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
 
                                         if(snake != null) {

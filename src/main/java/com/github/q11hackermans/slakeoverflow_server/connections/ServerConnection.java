@@ -1,7 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.connections;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 
@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public class ServerConnection {
     private UUID clientId;
-    private int connectionType;
+    private int authenticationState;
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
-        this.connectionType = ConnectionType.UNAUTHENTICATED;
+        this.authenticationState = AuthenticationState.UNAUTHENTICATED;
     }
 
     // AUTHORISATION
@@ -22,7 +22,7 @@ public class ServerConnection {
      * This method authenticates this connection as player
      */
     public void authenticateAsPlayer() {
-        this.connectionType = ConnectionType.PLAYER;
+        this.authenticationState = AuthenticationState.PLAYER;
         SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as player");
     }
 
@@ -30,7 +30,7 @@ public class ServerConnection {
      * This method authenticates this connection as spectator
      */
     public void authenticateAsSpectator() {
-        this.connectionType = ConnectionType.SPECTATOR;
+        this.authenticationState = AuthenticationState.SPECTATOR;
         SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as spectator");
     }
 
@@ -38,7 +38,7 @@ public class ServerConnection {
      * This method unauthenticate the connection
      */
     public void unauthenticate() {
-        this.connectionType = ConnectionType.UNAUTHENTICATED;
+        this.authenticationState = AuthenticationState.UNAUTHENTICATED;
         SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " unauthenticated");
     }
 
@@ -52,8 +52,8 @@ public class ServerConnection {
      * Get the connection type
      * @return ConnectionType
      */
-    public int getConnectionType() {
-        return this.connectionType;
+    public int getAuthenticationState() {
+        return this.authenticationState;
     }
 
     /**

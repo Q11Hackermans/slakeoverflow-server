@@ -4,7 +4,7 @@ import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
@@ -301,7 +301,7 @@ public class SlakeoverflowServer {
     public int getPlayerCount() {
         int connectionCount = 0;
         for(ServerConnection connection : this.connectionList) {
-            if(connection.getConnectionType() == ConnectionType.PLAYER) {
+            if(connection.getAuthenticationState() == AuthenticationState.PLAYER) {
                 connectionCount++;
             }
         }
@@ -376,7 +376,7 @@ public class SlakeoverflowServer {
         }
 
         for(ServerConnection connection : this.connectionList) {
-            if((connection.getConnectionType() == ConnectionType.PLAYER || connection.getConnectionType() == ConnectionType.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
+            if((connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
                 connection.unauthenticate();
             }
         }
@@ -398,7 +398,7 @@ public class SlakeoverflowServer {
             JSONObject statusMessage = new JSONObject();
             statusMessage.put("cmd", "status");
             statusMessage.put("status", this.gameState);
-            statusMessage.put("auth", connection.getConnectionType());
+            statusMessage.put("auth", connection.getAuthenticationState());
 
             connection.sendUTF(statusMessage.toString());
         }

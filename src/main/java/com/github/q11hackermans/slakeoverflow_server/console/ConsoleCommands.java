@@ -2,7 +2,7 @@ package com.github.q11hackermans.slakeoverflow_server.console;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
@@ -298,7 +298,7 @@ public class ConsoleCommands {
                                 returnString = returnString + "IP: " + client.getIP() + "\n";
                                 ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(uuid);
                                 if(connection != null) {
-                                    returnString = returnString + "SERVERCONNECTION: AVAIL (" + ConnectionType.toString(connection.getConnectionType()) + ")\n";
+                                    returnString = returnString + "SERVERCONNECTION: AVAIL (" + AuthenticationState.toString(connection.getAuthenticationState()) + ")\n";
                                 } else {
                                     returnString = returnString + "SERVERCONNECTION: N/A\n";
                                 }
@@ -406,7 +406,7 @@ public class ConsoleCommands {
                 {
                     String returnString = "USER LIST:\n";
                     for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
-                        returnString = returnString + connection.getClientId() + " " + ConnectionType.toString(connection.getConnectionType()) + "\n";
+                        returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n";
                     }
                     return returnString;
                 }
@@ -417,7 +417,7 @@ public class ConsoleCommands {
                             if(connection != null) {
                                 return "USER INFO:\n" +
                                         "UUID: " + connection.getClientId() + "\n" +
-                                        "Auth state: " + ConnectionType.toString(connection.getConnectionType()) + "\n";
+                                        "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n";
                             } else {
                                 return "This user does not exist";
                             }

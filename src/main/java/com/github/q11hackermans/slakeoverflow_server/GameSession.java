@@ -1,7 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
 import com.github.q11hackermans.slakeoverflow_server.game.*;
@@ -149,7 +149,7 @@ public class GameSession {
 
     private void addNewSnakes() {
         for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
-            if(connection.isConnected() && connection.getConnectionType() == ConnectionType.PLAYER && this.getSnakeOfConnection(connection) == null) {
+            if(connection.isConnected() && connection.getAuthenticationState() == AuthenticationState.PLAYER && this.getSnakeOfConnection(connection) == null) {
                 int posX = this.randomPosX();
                 int posY = this.randomPosY();
 

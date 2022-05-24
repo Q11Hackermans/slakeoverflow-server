@@ -3,7 +3,7 @@ package com.github.q11hackermans.slakeoverflow_server.game;
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
-import com.github.q11hackermans.slakeoverflow_server.constants.ConnectionType;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 
 import java.util.ArrayList;
@@ -193,7 +193,7 @@ public class Snake implements GameObject {
      * TICK
      */
     public void tick() {
-        if(!this.connection.isConnected() || this.connection.getConnectionType() != ConnectionType.PLAYER) {
+        if(!this.connection.isConnected() || this.connection.getAuthenticationState() != AuthenticationState.PLAYER) {
             this.killSnake();
             return;
         }
@@ -364,7 +364,7 @@ public class Snake implements GameObject {
         this.alive = false;
         this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
 
-        if(this.connection.getConnectionType() == ConnectionType.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
+        if(this.connection.getAuthenticationState() == AuthenticationState.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
             this.connection.unauthenticate();
         }
     }
