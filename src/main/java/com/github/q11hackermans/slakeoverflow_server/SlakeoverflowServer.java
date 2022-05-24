@@ -119,7 +119,9 @@ public class SlakeoverflowServer {
                             Thread.sleep(1);
                         } catch(InterruptedException ignored) {}
                     } else {
-                        Thread.sleep(3000);
+                        try {
+                            Thread.sleep(3000);
+                        } catch(Exception ignored) {}
                         stop();
                     }
                 } catch(Exception e) {
