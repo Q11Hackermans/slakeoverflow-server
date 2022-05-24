@@ -109,14 +109,19 @@ public class SlakeoverflowServer {
             } catch(Exception ignored) {}
             while(!Thread.currentThread().isInterrupted() && this.managerThread == Thread.currentThread()) {
                 try {
-                    checkThreads();
-                    checkConnectionManager();
-                    checkConnections();
-                    checkGameSession();
+                    if(!alreadyStopping) {
+                        checkThreads();
+                        checkConnectionManager();
+                        checkConnections();
+                        checkGameSession();
 
-                    try {
-                        Thread.sleep(1);
-                    } catch(InterruptedException ignored) {}
+                        try {
+                            Thread.sleep(1);
+                        } catch(InterruptedException ignored) {}
+                    } else {
+                        Thread.sleep(3000);
+                        stop();
+                    }
                 } catch(Exception e) {
                     try {
                         this.logger.warning("MANAGER", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
@@ -154,15 +159,25 @@ public class SlakeoverflowServer {
             new Thread(() -> {
                 try {
                     this.alreadyStopping = true;
-                    this.managerThread.interrupt();
-                    if(this.tickThread != null) {
+                    if(!this.managerThread.isInterrupted()) {
+                        this.managerThread.interrupt();
+                    }
+                    if(this.tickThread != null && !this.tickThread.isInterrupted()) {
                         this.tickThread.interrupt();
                     }
-                    this.dataIOManager.close();
-                    this.connectionhandler.close();
-                    this.console.stop();
-                    this.logger.info("STOP", "Server shutdown.");
-                    this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
+                    if(!this.dataIOManager.isClosed()) {
+                        this.dataIOManager.close();
+                    }
+                    if(!this.connectionhandler.isClosed()) {
+                        this.connectionhandler.close();
+                    }
+                    if(this.console.isRunning()) {
+                        this.console.stop();
+                    }
+                    if(!this.alreadyStopping) {
+                        this.logger.info("STOP", "Server shutdown.");
+                        this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
+                    }
                 } catch(Exception ignored) {
                     ignored.printStackTrace();
                 }
