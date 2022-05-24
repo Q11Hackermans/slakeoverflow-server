@@ -20,6 +20,7 @@ public class GameSession {
     private final int borderY;
     private final int fovsizeX;
     private final int fovsizeY;
+    private int nextItemDespawn;
 
     public GameSession(int x, int y) {
         this.snakeList = new ArrayList<>();
@@ -28,6 +29,7 @@ public class GameSession {
         this.borderY = y;
         this.fovsizeX = 30;
         this.fovsizeY = 20;
+        this.nextItemDespawn = 20;
     }
 
     // TICK
@@ -44,6 +46,19 @@ public class GameSession {
         // SENDING PLAYERDATA TO SNAKES
         for(Snake snake : this.snakeList) {
             snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+        }
+
+        if(this.nextItemDespawn > 0) {
+            this.nextItemDespawn--;
+        } else {
+            List<Item> itemListCopy = List.copyOf(this.itemList);
+            for(Item item : itemListCopy) {
+                if(item.getDespawnTime() > 0) {
+                    item.despawnCount();
+                } else {
+                    this.killItem(this.itemList.indexOf(item));
+                }
+            }
         }
 
         // ADD NEW SNAKES

@@ -6,10 +6,16 @@ import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 public abstract class Item implements GameObject {
     private int posx;
     private int posy;
+    private int despawnTime; // IN SECONDS
 
     public Item(int posx, int posy) {
+        this(posx, posy, 30);
+    }
+
+    public Item(int posx, int posy, int despawnTime) {
         this.posx = posx;
         this.posy = posy;
+        this.despawnTime = despawnTime;
     }
 
     @Override
@@ -42,6 +48,16 @@ public abstract class Item implements GameObject {
             } else {
                 throw new IllegalArgumentException("Value out of range");
             }
+        }
+    }
+
+    public int getDespawnTime() {
+        return this.despawnTime;
+    }
+
+    public void despawnCount() {
+        if(this.despawnTime > 0) {
+            this.despawnTime--;
         }
     }
 

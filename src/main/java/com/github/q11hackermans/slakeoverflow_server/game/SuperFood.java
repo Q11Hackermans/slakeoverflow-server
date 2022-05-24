@@ -8,7 +8,7 @@ public class SuperFood extends Item {
     private final int value;
 
     public SuperFood(int posx, int posy, int value) {
-        super(posx, posy);
+        super(posx, posy, 60);
         this.value = value;
     }
 
