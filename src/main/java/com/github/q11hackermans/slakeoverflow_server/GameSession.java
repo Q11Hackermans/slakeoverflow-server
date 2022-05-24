@@ -156,14 +156,20 @@ public class GameSession {
                 int length = SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
 
                 int count = 3;
+                boolean success = false;
                 while(count > 0) {
                     if(this.isAreaFree(posX, posY, length*2)) {
                         this.snakeList.add(new Snake(connection, posX, posY, Direction.NORTH, length, this));
                         count = 0;
+                        success = true;
                         break;
                     } else {
                         count --;
                     }
+                }
+
+                if(!success) {
+                    connection.unauthenticate();
                 }
             }
         }
