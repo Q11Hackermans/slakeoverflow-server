@@ -150,22 +150,24 @@ public class SlakeoverflowServer {
      * This will stop the server.
      */
     public void stop() {
-        new Thread(() -> {
-            try {
-                this.alreadyStopping = true;
-                this.managerThread.interrupt();
-                if(this.tickThread != null) {
-                    this.tickThread.interrupt();
+        try {
+            new Thread(() -> {
+                try {
+                    this.alreadyStopping = true;
+                    this.managerThread.interrupt();
+                    if(this.tickThread != null) {
+                        this.tickThread.interrupt();
+                    }
+                    this.dataIOManager.close();
+                    this.connectionhandler.close();
+                    this.console.stop();
+                    this.logger.info("STOP", "Server shutdown.");
+                    this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
+                } catch(Exception ignored) {
+                    ignored.printStackTrace();
                 }
-                this.dataIOManager.close();
-                this.connectionhandler.close();
-                this.console.stop();
-                this.logger.info("STOP", "Server shutdown.");
-                this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
-            } catch(Exception ignored) {
-                ignored.printStackTrace();
-            }
-        }).start();
+            }).start();
+        } catch(Exception ignored) {}
 
         new Thread(() -> {
             try {
