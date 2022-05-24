@@ -604,7 +604,7 @@ public class ConsoleCommands {
                         if(cmd[2].equalsIgnoreCase("snakes")) {
                             String returnString = "SNAKES:\n";
                             for(Snake snake : SlakeoverflowServer.getServer().getGameSession().getSnakeList()) {
-                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
                             }
                             return returnString;
                         } else if(cmd[2].equalsIgnoreCase("snake") && cmd.length == 4) {
