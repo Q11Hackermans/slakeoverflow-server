@@ -586,7 +586,7 @@ public class ConsoleCommands {
             } else if(cmd[1].equalsIgnoreCase("info")) {
                 if(SlakeoverflowServer.getServer().isGameAvail()) {
                     String returnString = "GAME INFORMATION:\n" +
-                            "Game state: " + GameState.getString(SlakeoverflowServer.getServer().getGameState()) + "(" + SlakeoverflowServer.getServer().getGameState() + ")" + "\n";
+                            "Game state: " + GameState.getString(SlakeoverflowServer.getServer().getGameState()) + " (" + SlakeoverflowServer.getServer().getGameState() + "), MTICKS: " + SlakeoverflowServer.getServer().getManualTicks() + "\n";
                     try {
                         returnString = returnString + "Players: " + SlakeoverflowServer.getServer().getGameSession().getSnakeList().size() + "\n" +
                                 "Items: " + SlakeoverflowServer.getServer().getGameSession().getItemList().size() + "\n" +
@@ -595,6 +595,38 @@ public class ConsoleCommands {
                         returnString = returnString + "ERROR: " + Arrays.toString(e.getStackTrace());
                     }
                     return returnString;
+                } else {
+                    return "Currently is no game running";
+                }
+            } else if(cmd[1].equalsIgnoreCase("mcontrol")) {
+                if(SlakeoverflowServer.getServer().isGameAvail()) {
+                    if(cmd.length >= 3) {
+                        if(cmd[2].equalsIgnoreCase("runtick")) {
+                            SlakeoverflowServer.getServer().addManualTicks(1);
+                            return "Running 1 tick";
+                        } else if(cmd[2].equalsIgnoreCase("runticks")) {
+                            if(cmd.length == 4) {
+                                try {
+                                    SlakeoverflowServer.getServer().addManualTicks(Integer.parseInt(cmd[3]));
+                                    return "Running " + cmd[3] + " ticks";
+                                } catch(NumberFormatException e) {
+                                    return "Please specify a valid int value";
+                                }
+                            } else {
+                                return "Usage: mcontrol runticks <count> - Run a specific amount of ticks";
+                            }
+                        } else if(cmd[2].equalsIgnoreCase("stop") || cmd[2].equalsIgnoreCase("clear") || cmd[2].equalsIgnoreCase("remove")) {
+                            SlakeoverflowServer.getServer().resetManualTicks();
+                            return "Cleared manual ticks";
+                        } else {
+                            return "Run command without arguments for help";
+                        }
+                    } else {
+                        return "MANUAL GAME CONTROL (MCONTROL) COMMAND USAGE:\n" +
+                                "game mcontrol runtick\n" +
+                                "game mcontrol runticks <count>\n" +
+                                "game mcontrol stop/clear/remove\n";
+                    }
                 } else {
                     return "Currently is no game running";
                 }
@@ -819,6 +851,7 @@ public class ConsoleCommands {
                     "game pause\n" +
                     "game resume\n" +
                     "game info\n" +
+                    "game mcontrol\n" +
                     "game get <...>\n" +
                     "game modify <...>\n";
         }

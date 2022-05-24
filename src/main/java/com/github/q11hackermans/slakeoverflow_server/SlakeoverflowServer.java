@@ -45,6 +45,7 @@ public class SlakeoverflowServer {
     // GAME SESSION
     private int gameState;
     private GameSession game;
+    private int manualTicks;
     // PLAYER MANAGEMENT
     private final List<ServerConnection> connectionList;
     // LISTS
@@ -88,6 +89,7 @@ public class SlakeoverflowServer {
         // GAME SESSION
         this.gameState = GameState.STOPPED;
         this.game = null;
+        this.manualTicks = 0;
 
         // PLAYER MANAGEMENT
         this.connectionList = Collections.synchronizedList(new ArrayList<>());
@@ -268,6 +270,16 @@ public class SlakeoverflowServer {
         } else {
             return false;
         }
+    }
+
+    public void addManualTicks(int ticks) {
+        if(ticks > 0 && ticks <= 120) {
+            this.manualTicks += ticks;
+        }
+    }
+
+    public void resetManualTicks() {
+        this.manualTicks = 0;
     }
 
     // CONNECTION MANAGEMENT
@@ -495,6 +507,10 @@ public class SlakeoverflowServer {
         return this.tickRate;
     }
 
+    public int getManualTicks() {
+        return this.manualTicks;
+    }
+
     // THREAD TEMPLATES
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
@@ -504,9 +520,17 @@ public class SlakeoverflowServer {
                     this.tickCounter = 20;
                     this.tickState = 0;
                     this.sendStatusMessage();
-                    if(this.game != null && gameState == GameState.RUNNING) {
+                    if(this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
                         this.game.tick();
+
+                        if(manualTicks > 0) {
+                            manualTicks--;
+                        }
                     } else {
+                        if(gameState != GameState.RUNNING && gameState != GameState.PAUSED) {
+                            manualTicks = 0;
+                        }
+
                         Thread.sleep(this.idleTickSpeed);
                     }
                     Thread.sleep(this.tickSpeed);
