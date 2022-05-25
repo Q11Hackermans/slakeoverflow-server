@@ -949,7 +949,7 @@ public class ConsoleCommands {
 
     private static String infoCommand() {
         return "SERVER INFO:\n" +
-                "Tick rate: " + SlakeoverflowServer.getServer().getTickRate() + " (counter=" + SlakeoverflowServer.getServer().getTickCounter() + ", should be 20)" + "\n" +
+                "Tick rate: " + SlakeoverflowServer.getServer().getTickRate() + " (counter=" + SlakeoverflowServer.getServer().getTickThreadCounter() + ", should be 20)" + "\n" +
                 "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n" +
                 "Manager Thread: " + SlakeoverflowServer.getServer().isManagerThreadAlive() + " " + SlakeoverflowServer.getServer().getManagerThreadState() + "\n" +
                 "Tick Thread: " + SlakeoverflowServer.getServer().isTickThreadAlive() + " " + SlakeoverflowServer.getServer().getTickThreadState() + "\n" +

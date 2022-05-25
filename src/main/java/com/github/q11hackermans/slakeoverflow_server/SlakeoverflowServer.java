@@ -33,15 +33,16 @@ public class SlakeoverflowServer {
     // CONNECTION MANAGER
     private final CMSServer connectionhandler;
     private final DataIOManager dataIOManager;
-    // THREADS
+    // MANAGER THREADS
     private Thread managerThread;
     private Thread managerUtilsThread;
-    private Thread tickThread;
     private Thread timesThread;
+    // TICK THREAD
+    private Thread tickThread;
     private final int tickSpeed;
     private final int idleTickSpeed;
-    private int tickCounter;
-    private int tickState;
+    private int tickThreadCounter;
+    private int tickThreadState;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -102,8 +103,8 @@ public class SlakeoverflowServer {
         this.tickRate = 0;
 
         // THREADS
-        this.tickCounter = 20;
-        this.tickState = 0;
+        this.tickThreadCounter = 20;
+        this.tickThreadState = 0;
 
         this.managerThread = new Thread(() -> {
             try {
@@ -475,8 +476,8 @@ public class SlakeoverflowServer {
         return (this.gameState == GameState.RUNNING || this.gameState == GameState.PAUSED);
     }
 
-    public int getTickCounter() {
-        return this.tickCounter;
+    public int getTickThreadCounter() {
+        return this.tickThreadCounter;
     }
 
     public boolean isManagerThreadAlive() {
@@ -516,9 +517,9 @@ public class SlakeoverflowServer {
         Thread thread = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
                 try {
-                    this.tickRate = this.tickCounter;
-                    this.tickCounter = 20;
-                    this.tickState = 0;
+                    this.tickRate = this.tickThreadCounter;
+                    this.tickThreadCounter = 20;
+                    this.tickThreadState = 0;
                     this.sendStatusMessage();
                     if(this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
                         this.game.tick();
@@ -556,25 +557,25 @@ public class SlakeoverflowServer {
                         if(this.game != null && gameState == GameState.RUNNING) {
                             waittime = waittime - 840;
                         }
-                        if(this.tickCounter > waittime) {
-                            this.tickCounter--;
+                        if(this.tickThreadCounter > waittime) {
+                            this.tickThreadCounter--;
                         } else {
-                            if(this.tickState == 0) {
+                            if(this.tickThreadState == 0) {
                                 this.tickThread.interrupt();
-                                this.tickRate = this.tickCounter;
-                                this.tickCounter = 20;
-                                this.tickState = 1;
-                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState) + "/3). Interrupting...");
-                            } else if(this.tickState == 1) {
+                                this.tickRate = this.tickThreadCounter;
+                                this.tickThreadCounter = 20;
+                                this.tickThreadState = 1;
+                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState) + "/3). Interrupting...");
+                            } else if(this.tickThreadState == 1) {
                                 this.tickThread.interrupt();
                                 this.tickThread.stop();
-                                this.tickRate = this.tickCounter;
-                                this.tickCounter = 20;
-                                this.tickState = 2;
-                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState) + "/3). Killing...");
+                                this.tickRate = this.tickThreadCounter;
+                                this.tickThreadCounter = 20;
+                                this.tickThreadState = 2;
+                                this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState) + "/3). Killing...");
                             } else {
                                 try {
-                                    this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickState + 1) + "/3). Server shutdown...\n" +
+                                    this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState + 1) + "/3). Server shutdown...\n" +
                                             "-------------------- TICK THREAD NOT RESPONDING --------------------\n" +
                                             "The tick thread does not respond.\n" +
                                             "All attempts to stop and restart it have failed.\n" +
