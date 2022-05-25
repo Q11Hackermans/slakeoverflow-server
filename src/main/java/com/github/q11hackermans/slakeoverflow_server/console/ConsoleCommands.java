@@ -654,34 +654,46 @@ public class ConsoleCommands {
                 if(SlakeoverflowServer.getServer().isGameAvail()) {
                     if(cmd.length >= 3) {
                         if(cmd[2].equalsIgnoreCase("snakes")) {
-                            String returnString = "SNAKES:\n";
-                            for(Snake snake : SlakeoverflowServer.getServer().getGameSession().getSnakeList()) {
-                                returnString = returnString + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                            String returnString = "SNAKES (ID UUID X Y LENGTH ALIVE):\n";
+                            List<Snake> snakeList = SlakeoverflowServer.getServer().getGameSession().getSnakeList();
+                            for(int i = 0; i < snakeList.size(); i++) {
+                                Snake snake = snakeList.get(i);
+                                if(snake.getConnection() != null) {
+                                    returnString = returnString + i + " " + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                                } else {
+                                    returnString = returnString + i + " " + "NULL" + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                                }
                             }
                             return returnString;
                         } else if(cmd[2].equalsIgnoreCase("snake") && cmd.length == 4) {
+                            Snake snake;
                             try {
-                                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
-                                if(snake != null) {
-                                    String bodyPositionString = "";
-                                    for(int[] bodies : snake.getBodyPositions()) {
-                                        bodyPositionString = bodyPositionString + Arrays.toString(bodies) + " ";
-                                    }
-                                    return "SNAKE INFORMATION:\n" +
-                                            "UUID: " + snake.getConnection().getClientId() + "\n" +
-                                            "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
-                                            "Length: " + snake.getLength() + "\n" +
-                                            "Facing: " + snake.getFacing() + "\n" +
-                                            "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
-                                            "Body positions: " + snake.getBodyPositions().toString() + "\n";
-                                } else {
-                                    return "This snake does not exist";
-                                }
+                                snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
                             } catch(IllegalArgumentException e) {
-                                return "Please specify a valid UUID";
+                                try {
+                                    snake = SlakeoverflowServer.getServer().getGameSession().getSnake(Integer.parseInt(cmd[3]));
+                                } catch(IllegalArgumentException e2) {
+                                    return "Please specify a valid connection UUID or snake id";
+                                }
+                            }
+                            if(snake != null) {
+                                String bodyPositionString = "";
+                                for(int[] bodies : snake.getBodyPositions()) {
+                                    bodyPositionString = bodyPositionString + Arrays.toString(bodies) + " ";
+                                }
+                                return "SNAKE INFORMATION:\n" +
+                                        "ID:" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(snake) + "\n" +
+                                        "UUID: " + snake.getConnection().getClientId() + "\n" +
+                                        "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
+                                        "Length: " + snake.getLength() + "\n" +
+                                        "Facing: " + snake.getFacing() + "\n" +
+                                        "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
+                                        "Body positions: " + snake.getBodyPositions().toString() + "\n";
+                            } else {
+                                return "This snake does not exist";
                             }
                         } else if(cmd[2].equalsIgnoreCase("items")) {
-                            String returnString = "ITEMS:\n";
+                            String returnString = "ITEMS (ID X Y DESPAWN OTHER):\n";
                             List<Item> itemList = SlakeoverflowServer.getServer().getGameSession().getItemList();
                             for(int i = 0; i < itemList.size(); i++) {
                                 Item item = itemList.get(i);
@@ -717,79 +729,104 @@ public class ConsoleCommands {
                     if(cmd.length >= 3) {
                         if(cmd[2].equalsIgnoreCase("snake")) {
                             if(cmd.length >= 4) {
+                                Snake snake;
+
                                 try {
-                                    Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
+                                    snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
+                                } catch(IllegalArgumentException e) {
+                                    try {
+                                        snake = SlakeoverflowServer.getServer().getGameSession().getSnake(Integer.parseInt(cmd[3]));
+                                    } catch(IllegalArgumentException e2) {
+                                        return "Please specify a valid connection UUID or snake id";
+                                    }
+                                }
 
-                                    if(snake != null) {
+                                if(snake != null) {
 
-                                        if(cmd.length >= 5) {
-                                            if(cmd[4].equalsIgnoreCase("kill")) {
-                                                snake.killSnake();
-                                                return "Killed snake";
-                                            } else if(cmd[4].equalsIgnoreCase("position")) {
-                                                if(cmd.length == 7) {
-                                                    try {
-                                                        snake.setPosition(Integer.parseInt(cmd[5]), Integer.parseInt(cmd[6]));
-                                                        return "Updated snake position";
-                                                    } catch(IllegalArgumentException e) {
-                                                        return "Please specify a valid value";
-                                                    }
-                                                } else {
-                                                    return "USAGE: game modify snake <UUID> position <X> <Y>";
-                                                }
-                                            } else if(cmd[4].equalsIgnoreCase("bodies")) {
-                                                if(cmd.length >= 6) {
-                                                    if(cmd[5].equalsIgnoreCase("add")) {
-                                                        if(cmd.length == 7) {
-                                                            snake.addBody(Integer.parseInt(cmd[6]));
-                                                            return "Updated snake length";
-                                                        } else {
-                                                            return "Value required";
-                                                        }
-                                                    } else if(cmd[5].equalsIgnoreCase("remove")) {
-                                                        if(cmd.length == 7) {
-                                                            snake.removeBody(Integer.parseInt(cmd[6]));
-                                                            return "Updated snake length";
-                                                        } else {
-                                                            return "Value required";
-                                                        }
-                                                    } else if(cmd[5].equalsIgnoreCase("clear")) {
-                                                        snake.clearBodies();
-                                                        return "Cleared snake length";
-                                                    } else {
-                                                        return "USAGE: game modify snake <UUID> bodies add/remove/clear <Value for add/remove>";
-                                                    }
-                                                } else {
-                                                    return "USAGE: game modify snake <UUID> bodies add/remove/clear <Value for add/remove>";
-                                                }
-                                            } else if(cmd[4].equalsIgnoreCase("facing")) {
-                                                if(cmd.length == 6) {
-                                                    try {
-                                                        int value = Integer.parseInt(cmd[5]);
-                                                        if(value >= 0 && value <= 3) {
-                                                            snake.setNewFacing(value, true);
-                                                            return "Updated snake facing";
-                                                        } else {
-                                                            return "Wrong facing value (0-3)";
-                                                        }
-                                                    } catch(IllegalArgumentException e) {
-                                                        return "Please specify a valid value";
-                                                    }
-                                                } else {
-                                                    return "USAGE: game modify snake <UUID> facing <newFacing>";
+                                    if(cmd.length >= 5) {
+                                        if(cmd[4].equalsIgnoreCase("kill")) {
+                                            snake.killSnake();
+                                            return "Killed snake";
+                                        } else if(cmd[4].equalsIgnoreCase("position")) {
+                                            if(cmd.length == 7) {
+                                                try {
+                                                    snake.setPosition(Integer.parseInt(cmd[5]), Integer.parseInt(cmd[6]));
+                                                    return "Updated snake position";
+                                                } catch(IllegalArgumentException e) {
+                                                    return "Please specify a valid value";
                                                 }
                                             } else {
-                                                return "Unknown action";
+                                                return "USAGE: game modify snake <UUID/ID> position <X> <Y>";
+                                            }
+                                        } else if(cmd[4].equalsIgnoreCase("bodies")) {
+                                            if(cmd.length >= 6) {
+                                                if(cmd[5].equalsIgnoreCase("add")) {
+                                                    if(cmd.length == 7) {
+                                                        snake.addBody(Integer.parseInt(cmd[6]));
+                                                        return "Updated snake length";
+                                                    } else {
+                                                        return "Value required";
+                                                    }
+                                                } else if(cmd[5].equalsIgnoreCase("remove")) {
+                                                    if(cmd.length == 7) {
+                                                        snake.removeBody(Integer.parseInt(cmd[6]));
+                                                        return "Updated snake length";
+                                                    } else {
+                                                        return "Value required";
+                                                    }
+                                                } else if(cmd[5].equalsIgnoreCase("clear")) {
+                                                    snake.clearBodies();
+                                                    return "Cleared snake length";
+                                                } else {
+                                                    return "USAGE: game modify snake <UUID/ID> bodies add/remove/clear <Value for add/remove>";
+                                                }
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> bodies add/remove/clear <Value for add/remove>";
+                                            }
+                                        } else if(cmd[4].equalsIgnoreCase("facing")) {
+                                            if(cmd.length == 6) {
+                                                try {
+                                                    int value = Integer.parseInt(cmd[5]);
+                                                    if(value >= 0 && value <= 3) {
+                                                        snake.setNewFacing(value, true);
+                                                        return "Updated snake facing";
+                                                    } else {
+                                                        return "Wrong facing value (0-3)";
+                                                    }
+                                                } catch(IllegalArgumentException e) {
+                                                    return "Please specify a valid value";
+                                                }
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> facing <newFacing>";
+                                            }
+                                        } else if(cmd[4].equalsIgnoreCase("connection")) {
+                                            if(cmd.length == 6) {
+                                                ServerConnection connection = null;
+
+                                                try {
+                                                    connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[5]));
+                                                } catch(IllegalArgumentException ignored) {}
+
+                                                snake.setNewServerConnection(connection);
+
+                                                if(connection != null) {
+                                                    return "Updated connection to " + connection.getClientId();
+                                                } else {
+                                                    return "Set connection to null";
+                                                }
+
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> connection <newConnectionUUID>";
                                             }
                                         } else {
-                                            return "This snake does exist (you need to specify what you want to do with it)";
+                                            return "Unknown action";
                                         }
-
                                     } else {
-                                        return "This snake does not exist";
+                                        return "This snake does exist (you need to specify what you want to do with it)";
                                     }
-                                } catch(IllegalArgumentException e) {
-                                    return "Please specify a valid UUID";
+
+                                } else {
+                                    return "This snake does not exist";
                                 }
                             } else {
                                 return "UUID required";
@@ -858,14 +895,15 @@ public class ConsoleCommands {
                         }
                     } else {
                         return "GAME MODIFY COMMAND USAGE\n" +
-                                "game modify snake <UUID> kill\n" +
-                                "game modify snake <UUID> position <X> <Y>\n" +
-                                "game modify snake <UUID> bodies add <length>\n" +
-                                "game modify snake <UUID> bodies remove <length>\n" +
-                                "game modify snake <UUID> bodies clear\n" +
-                                "game modify snake <UUID> facing <N=0,E=1,S=2,W=3>\n" +
-                                "game modify item <INDEX> kill\n" +
-                                "game modify item <INDEX> position <X> <Y>\n" +
+                                "game modify snake <UUID/ID> kill\n" +
+                                "game modify snake <UUID/ID> position <X> <Y>\n" +
+                                "game modify snake <UUID/ID> bodies add <length>\n" +
+                                "game modify snake <UUID/ID> bodies remove <length>\n" +
+                                "game modify snake <UUID/ID> bodies clear\n" +
+                                "game modify snake <UUID/ID> facing <N=0,E=1,S=2,W=3>\n" +
+                                "game modify snake <UUID/ID> connection <newConnectionUUID>" +
+                                "game modify item <ID> kill\n" +
+                                "game modify item <ID> position <X> <Y>\n" +
                                 "game modify items kill\n";
                     }
                 } else {
@@ -876,8 +914,8 @@ public class ConsoleCommands {
             }
         } else {
             return "GAME COMMAND USAGE:\n" +
-                    "game start default/automatic\n" +
-                    "game start custom <sizex> <sizey>\n" +
+                    "game start default/automatic (paused)\n" +
+                    "game start custom <sizex> <sizey> (paused)\n" +
                     "game stop\n" +
                     "game pause\n" +
                     "game resume\n" +

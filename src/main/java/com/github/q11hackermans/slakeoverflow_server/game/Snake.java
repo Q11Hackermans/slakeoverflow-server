@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Snake implements GameObject {
     // MANAGEMENT
-    private final ServerConnection connection;
+    private ServerConnection connection;
     private GameSession gameSession;
     // MOVEMENT
     private int speed;
@@ -183,6 +183,17 @@ public class Snake implements GameObject {
         return this.connection;
     }
 
+    /**
+     * With this method, the ServerConnection of the snake can be updated.
+     * If you set the ServerConnection to null or to a disconnected connection, the snake gets killed automatically and will be removed from the game session.
+     * @param connection new connection
+     * @deprecated ONLY USE IF THE GAME IS PAUSED!
+     */
+    @Deprecated
+    public void setNewServerConnection(ServerConnection connection) {
+        this.connection = connection;
+    }
+
     public int getMoveIn() {
         return this.moveIn;
     }
@@ -193,7 +204,7 @@ public class Snake implements GameObject {
      * TICK
      */
     public void tick() {
-        if(!this.connection.isConnected() || this.connection.getAuthenticationState() != AuthenticationState.PLAYER) {
+        if(this.connection == null || !this.connection.isConnected() || this.connection.getAuthenticationState() != AuthenticationState.PLAYER) {
             this.killSnake();
             return;
         }
@@ -364,7 +375,7 @@ public class Snake implements GameObject {
         this.alive = false;
         this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
 
-        if(this.connection.getAuthenticationState() == AuthenticationState.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
+        if(this.connection != null && this.connection.getAuthenticationState() == AuthenticationState.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
             this.connection.unauthenticate();
         }
     }

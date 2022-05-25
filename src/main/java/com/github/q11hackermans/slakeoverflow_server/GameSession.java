@@ -521,6 +521,25 @@ public class GameSession {
     }
 
     /**
+     * Returns the snake with a specific list index
+     * @param index List index (snake id)
+     * @return Snake (if it is available, else null)
+     */
+    public Snake getSnake(int index) {
+        try {
+            return this.snakeList.get(index);
+        } catch(IndexOutOfBoundsException ignored) {}
+        return null;
+    }
+
+    public int getSnakeId(Snake snake) {
+        if(this.snakeList.contains(snake)) {
+            return this.snakeList.indexOf(snake);
+        }
+        return -1;
+    }
+
+    /**
      * Get a copy of the snake list.
      * @return copy of snake list
      */
