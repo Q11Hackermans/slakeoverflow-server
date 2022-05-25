@@ -6,6 +6,8 @@ import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import com.github.q11hackermans.slakeoverflow_server.game.Item;
+import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
@@ -199,23 +201,51 @@ public class SlakeoverflowServer {
     }
 
     // GAME MANAGEMENT
+
     /**
-     * This will create a new game with a specific size
+     * This will setup a fully custom game
+     * @param paused If the game should be started paused or running
+     * @param sizeX game field size X
+     * @param sizeY game field size Y
+     * @param fovsizeX fov size X
+     * @param fovsizeY fov size Y
+     * @param nextItemDespawn next item despawn (useless because the despawn count will be set to 20 after it reaches 0, so it's only for savegames)
+     * @param snakeList list of snakes
+     * @param itemList list of items
+     * @return
      */
-    public boolean setupGame(int sizeX, int sizeY, boolean paused) {
-        if(this.gameState == GameState.STOPPED && sizeX > 0 && sizeY > 0) {
+    public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<Snake> snakeList, List<Item> itemList) {
+        if(this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
             this.gameState = GameState.PREPARING;
-            this.game = new GameSession(sizeX,sizeY);
+            this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeList, itemList);
+
             if(paused) {
                 this.gameState = GameState.PAUSED;
             } else {
                 this.gameState = GameState.RUNNING;
             }
-            this.logger.info("GAME", "Game with size " + sizeX + " " + sizeY + " was set up (start_paused=" + paused + ")");
+
+            int snakeCount = 0;
+            int itemCount = 0;
+            if(snakeList != null) {
+                snakeCount = snakeList.size();
+            }
+            if(itemList != null) {
+                itemCount = itemList.size();
+            }
+
+            this.logger.info("GAME", "Started game (PAUSED=" + paused + "SIZEX=" + sizeX + " SIZEY=" + sizeY + " FOVX=" + fovsizeX + " FOVY=" + fovsizeY + " NEXTITEMDESPAWN=" + nextItemDespawn + " SNAKES=" + snakeCount + " ITEMS=" + itemCount + ")");
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * This will create a new game with a specific size
+     */
+    public boolean setupGame(int sizeX, int sizeY, boolean paused) {
+        return this.setupGame(paused, sizeX, sizeY, 30, 20, 20, null, null);
     }
 
     /**
