@@ -4,6 +4,7 @@ import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnectio
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.FieldState;
+import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +27,7 @@ public class GameSession {
         this(x, y, 30, 20, 20, null, null);
     }
 
-    public GameSession(int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<Snake> snakeList, List<Item> itemList) {
+    public GameSession(int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
         this.snakeList = new ArrayList<>();
         this.itemList = new ArrayList<>();
 
@@ -38,8 +39,10 @@ public class GameSession {
 
         this.nextItemDespawn = nextItemDespawn;
 
-        if(snakeList != null) {
-            this.snakeList.addAll(snakeList);
+        if(snakeDataList != null) {
+            for(SnakeData snakeData : snakeDataList) {
+                this.snakeList.add(new Snake(snakeData.getConnection(), snakeData.getPosx(), snakeData.getPosy(), snakeData.getFacing(), snakeData.getBodyPositions(), this));
+            }
         }
         if(itemList != null) {
             this.itemList.addAll(itemList);
@@ -48,35 +51,37 @@ public class GameSession {
 
     // TICK
     public void tick() {
-        // CHECK IF SNAKE IS ALIVE
-        this.checkSnakes();
+        if(SlakeoverflowServer.getServer().getGameSession() == this) {
+            // CHECK IF SNAKE IS ALIVE
+            this.checkSnakes();
 
-        // RUNNING TICK ON SNAKES
-        for(Snake snake : this.snakeList) {
-            snake.tick();
-        }
-        this.spawnFood(this.calcFoodSpawnTries());
+            // RUNNING TICK ON SNAKES
+            for(Snake snake : this.snakeList) {
+                snake.tick();
+            }
+            this.spawnFood(this.calcFoodSpawnTries());
 
-        // SENDING PLAYERDATA TO SNAKES
-        for(Snake snake : this.snakeList) {
-            snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
-        }
+            // SENDING PLAYERDATA TO SNAKES
+            for(Snake snake : this.snakeList) {
+                snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+            }
 
-        if(this.nextItemDespawn > 0) {
-            this.nextItemDespawn--;
-        } else {
-            List<Item> itemListCopy = List.copyOf(this.itemList);
-            for(Item item : itemListCopy) {
-                if(item.getDespawnTime() > 0) {
-                    item.despawnCount();
-                } else {
-                    this.killItem(this.itemList.indexOf(item));
+            if(this.nextItemDespawn > 0) {
+                this.nextItemDespawn--;
+            } else {
+                List<Item> itemListCopy = List.copyOf(this.itemList);
+                for(Item item : itemListCopy) {
+                    if(item.getDespawnTime() > 0) {
+                        item.despawnCount();
+                    } else {
+                        this.killItem(this.itemList.indexOf(item));
+                    }
                 }
             }
-        }
 
-        // ADD NEW SNAKES
-        this.addNewSnakes();
+            // ADD NEW SNAKES
+            this.addNewSnakes();
+        }
     }
 
     // ITEM MANAGEMENT

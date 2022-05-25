@@ -5,6 +5,8 @@ import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
+import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class Snake implements GameObject {
     private boolean alive;
     private int moveIn;
 
-    public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
+    public Snake(ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions, GameSession gameSession) {
         this.connection = connection;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
@@ -33,9 +35,17 @@ public class Snake implements GameObject {
         this.facing = facing;
         this.newFacing = facing;
         this.newFacingUpdated = false;
-        this.gameSession = session;
+        this.gameSession = gameSession;
         this.alive = true;
         this.moveIn = 0;
+
+        if(bodyPositions != null) {
+            this.bodyPositions.addAll(bodyPositions);
+        }
+    }
+
+    public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
+        this(connection, x, y, facing, null, session);
 
         // set start length body positions
         if(this.facing == Direction.NORTH) {

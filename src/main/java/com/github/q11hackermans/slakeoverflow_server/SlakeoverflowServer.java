@@ -6,6 +6,7 @@ import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import net.jandie1505.connectionmanager.server.CMSClient;
@@ -210,14 +211,14 @@ public class SlakeoverflowServer {
      * @param fovsizeX fov size X
      * @param fovsizeY fov size Y
      * @param nextItemDespawn next item despawn (useless because the despawn count will be set to 20 after it reaches 0, so it's only for savegames)
-     * @param snakeList list of snakes
+     * @param snakeDataList list of snake data
      * @param itemList list of items
      * @return returns true if the game was successfully set up
      */
-    public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<Snake> snakeList, List<Item> itemList) {
+    public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
         if(this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
             this.gameState = GameState.PREPARING;
-            this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeList, itemList);
+            this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
 
             if(paused) {
                 this.gameState = GameState.PAUSED;
@@ -227,8 +228,8 @@ public class SlakeoverflowServer {
 
             int snakeCount = 0;
             int itemCount = 0;
-            if(snakeList != null) {
-                snakeCount = snakeList.size();
+            if(snakeDataList != null) {
+                snakeCount = snakeDataList.size();
             }
             if(itemList != null) {
                 itemCount = itemList.size();
