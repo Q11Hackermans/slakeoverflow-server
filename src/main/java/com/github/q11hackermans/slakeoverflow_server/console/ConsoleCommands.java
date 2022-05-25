@@ -4,6 +4,7 @@ import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
+import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
@@ -11,6 +12,7 @@ import com.github.q11hackermans.slakeoverflow_server.game.SuperFood;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -591,7 +594,51 @@ public class ConsoleCommands {
 
                         JSONObject savegame = new JSONObject(savegameString);
 
-                        return "Currently not supported";
+                        try {
+                            JSONObject settings = savegame.getJSONObject("settings");
+                            JSONArray snakes = savegame.getJSONArray("snakes");
+                            JSONArray items = savegame.getJSONArray("items");
+
+                            List<SnakeData> snakeDataList = new ArrayList<>();
+                            List<Item> itemList = new ArrayList<>();
+
+                            for(Object snakeObject : snakes) {
+                                JSONObject snakeJSON = (JSONObject) snakeObject;
+                                List<int[]> bodyPositions = new ArrayList<>();
+
+                                for(Object bodyPositionJSONArrayObject : snakeJSON.getJSONArray("bodies")) {
+                                    JSONArray bodyPosition = (JSONArray) bodyPositionJSONArrayObject;
+                                    bodyPositions.add(new int[]{bodyPosition.getInt(0), bodyPosition.getInt(1)});
+                                }
+
+                                snakeDataList.add(new SnakeData(null, snakeJSON.getInt("x"), snakeJSON.getInt("y"), snakeJSON.getInt("facing"), bodyPositions, snakeJSON.getInt("movein")));
+                            }
+
+                            for(Object itemObject : items) {
+                                JSONObject item = (JSONObject) itemObject;
+
+                                if(item.getString("description").equalsIgnoreCase("FOOD")) {
+                                    itemList.add(new Food(item.getInt("x"), item.getInt("y"), item.getInt("food_value")));
+                                } else if(item.getString("description").equalsIgnoreCase("SUPERFOOD")) {
+                                    itemList.add(new Food(item.getInt("x"), item.getInt("y"), item.getInt("superfood_value")));
+                                } else {
+                                    itemList.add(new Item(item.getInt("x"), item.getInt("y")) {
+                                        @Override
+                                        public String getDescription() {
+                                            return "UNKNOWN_ITEM_FROM_SAVEGAME";
+                                        }
+                                    });
+                                }
+                            }
+
+                            if(SlakeoverflowServer.getServer().setupGame(true, settings.getInt("border_x"), settings.getInt("border_y"), settings.getInt("fovsize_x"), settings.getInt("fovsize_y"), settings.getInt("next_item_despawn"), snakeDataList, itemList)) {
+                                return "Game was setup from savegame data. You can resume it with game resume (you need to assign new connections to the snakes before to prevent them to be deleted before you start).";
+                            } else {
+                                return "Game was not setup";
+                            }
+                        } catch(JSONException | ClassCastException | IndexOutOfBoundsException e) {
+                            return "JSON string corrupt";
+                        }
                     } else {
                         return "Run command without arguments for help";
                     }
@@ -632,6 +679,12 @@ public class ConsoleCommands {
                         returnString = returnString + "ERROR: " + Arrays.toString(e.getStackTrace());
                     }
                     return returnString;
+                } else {
+                    return "Currently is no game running";
+                }
+            } else if(cmd[1].equalsIgnoreCase("getsave")) {
+                if(SlakeoverflowServer.getServer().isGameAvail()) {
+                    return "SAVE STRING: " + SlakeoverflowServer.getServer().getGameSession().getSaveString().toString() + "\n";
                 } else {
                     return "Currently is no game running";
                 }
@@ -938,6 +991,7 @@ public class ConsoleCommands {
                     "game pause\n" +
                     "game resume\n" +
                     "game info\n" +
+                    "game getsave\n" +
                     "game mcontrol\n" +
                     "game get <...>\n" +
                     "game modify <...>\n";

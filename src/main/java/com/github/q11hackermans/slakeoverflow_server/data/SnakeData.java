@@ -8,16 +8,14 @@ public class SnakeData {
     private final ServerConnection connection;
     private final int posx;
     private final int posy;
-    private final int growthBalance; // The internal "apple balance" the snake can grow
     private final int facing;
     private final List<int[]> bodyPositions;
     private final int moveIn;
 
-    public SnakeData(ServerConnection connection, int posx, int posy, int growthBalance, int facing, List<int[]> bodyPositions, int moveIn) {
+    public SnakeData(ServerConnection connection, int posx, int posy, int facing, List<int[]> bodyPositions, int moveIn) {
         this.connection = connection;
         this.posx = posx;
         this.posy = posy;
-        this.growthBalance = growthBalance;
         this.facing = facing;
         this.bodyPositions = bodyPositions;
         this.moveIn = moveIn;
@@ -33,10 +31,6 @@ public class SnakeData {
 
     public int getPosy() {
         return posy;
-    }
-
-    public int getGrowthBalance() {
-        return growthBalance;
     }
 
     public int getFacing() {
