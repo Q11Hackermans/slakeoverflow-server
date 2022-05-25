@@ -554,4 +554,68 @@ public class GameSession {
     public List<Item> getItemList() {
         return List.copyOf(this.itemList);
     }
+
+    /**
+     * Return the entire game as a JSONObject with all game data in it
+     * @return JSONObject (savegame)
+     */
+    public JSONObject getSaveString() {
+        JSONObject savegame = new JSONObject();
+
+        // SAVE GAME SETTINGS
+        JSONObject settings = new JSONObject();
+        settings.put("border_x", this.borderX);
+        settings.put("border_y", this.borderY);
+        settings.put("fovsize_x", this.fovsizeX);
+        settings.put("fovsize_y", this.fovsizeY);
+        settings.put("next_item_despawn", this.nextItemDespawn);
+        savegame.put("settings", settings);
+
+        // SAVE SNAKES
+        JSONArray snakes = new JSONArray();
+        for(Snake snake : this.snakeList) {
+            JSONObject snakeData = new JSONObject();
+            snakeData.put("id", this.getSnakeId(snake));
+            snakeData.put("x", snake.getPosX());
+            snakeData.put("y" , snake.getPosY());
+            snakeData.put("facing", snake.getFacing());
+            snakeData.put("movein", snake.getMoveIn());
+
+            JSONArray bodyPositions = new JSONArray();
+            for(int[] body : snake.getBodyPositions()) {
+                JSONArray bodyArray = new JSONArray();
+                bodyArray.put(body[0]);
+                bodyArray.put(body[1]);
+
+                bodyPositions.put(bodyArray);
+            }
+
+            snakeData.put("bodies", bodyPositions);
+
+            snakes.put(snakeData);
+        }
+        savegame.put("snakes", snakes);
+
+        // SAVE ITEMS
+        JSONArray items = new JSONArray();
+        for(Item item : this.itemList) {
+            JSONObject itemData = new JSONObject();
+
+            itemData.put("x", item.getPosX());
+            itemData.put("y", item.getPosY());
+            itemData.put("description", item.getDescription());
+            itemData.put("despawnTime", item.getDespawnTime());
+
+            if(item instanceof Food) {
+                itemData.put("food_value", ((Food) item).getFoodValue());
+            } else if(item instanceof SuperFood) {
+                itemData.put("superfood_value", ((SuperFood) item).getValue());
+            }
+
+            items.put(itemData);
+        }
+        savegame.put("items", items);
+
+        return savegame;
+    }
 }
