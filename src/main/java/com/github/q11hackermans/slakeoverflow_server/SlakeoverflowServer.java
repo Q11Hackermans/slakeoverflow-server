@@ -212,7 +212,7 @@ public class SlakeoverflowServer {
      * @param nextItemDespawn next item despawn (useless because the despawn count will be set to 20 after it reaches 0, so it's only for savegames)
      * @param snakeList list of snakes
      * @param itemList list of items
-     * @return
+     * @return returns true if the game was successfully set up
      */
     public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<Snake> snakeList, List<Item> itemList) {
         if(this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
