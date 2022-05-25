@@ -23,13 +23,27 @@ public class GameSession {
     private int nextItemDespawn;
 
     public GameSession(int x, int y) {
+        this(x, y, 30, 20, 20, null, null);
+    }
+
+    public GameSession(int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<Snake> snakeList, List<Item> itemList) {
         this.snakeList = new ArrayList<>();
         this.itemList = new ArrayList<>();
+
         this.borderX = x;
         this.borderY = y;
-        this.fovsizeX = 30;
-        this.fovsizeY = 20;
-        this.nextItemDespawn = 20;
+
+        this.fovsizeX = fovsizeX;
+        this.fovsizeY = fovsizeY;
+
+        this.nextItemDespawn = nextItemDespawn;
+
+        if(snakeList != null) {
+            this.snakeList.addAll(snakeList);
+        }
+        if(itemList != null) {
+            this.itemList.addAll(itemList);
+        }
     }
 
     // TICK
