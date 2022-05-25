@@ -18,6 +18,7 @@ public class ServerConnection {
     }
 
     // AUTHORISATION
+
     /**
      * This method authenticates this connection as player
      */
@@ -48,8 +49,10 @@ public class ServerConnection {
     }
 
     // GETTER METHODS
+
     /**
      * Get the connection type
+     *
      * @return ConnectionType
      */
     public int getAuthenticationState() {
@@ -65,6 +68,7 @@ public class ServerConnection {
 
     /**
      * Get the CMSClient from the server's CMSServer
+     *
      * @return CMSClient (if available) or null (if not available or an error occurs
      */
     public CMSClient getClient() {
@@ -73,6 +77,7 @@ public class ServerConnection {
 
     /**
      * Get the CMSClient from the server's CMSServer
+     *
      * @return DataIOStreamHandler (if available) or null (if not available or an error occurs
      */
     public DataIOStreamHandler getDataIOStreamHandler() {
@@ -81,11 +86,12 @@ public class ServerConnection {
 
     /**
      * A null safe way to send data to a connection
+     *
      * @param text The text to send
      * @return if sending was successful
      */
     public boolean sendUTF(String text) {
-        if(this.getDataIOStreamHandler() != null && !this.getDataIOStreamHandler().isClosed() && this.getClient() != null && !this.getClient().isClosed()) {
+        if (this.getDataIOStreamHandler() != null && !this.getDataIOStreamHandler().isClosed() && this.getClient() != null && !this.getClient().isClosed()) {
             try {
                 this.getDataIOStreamHandler().writeUTF(text);
                 return true;

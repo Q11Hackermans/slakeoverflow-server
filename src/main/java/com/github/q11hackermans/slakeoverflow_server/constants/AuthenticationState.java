@@ -5,14 +5,15 @@ public final class AuthenticationState {
     public static final int PLAYER = 1;
     public static final int SPECTATOR = 2;
 
-    private AuthenticationState() {}
+    private AuthenticationState() {
+    }
 
     public static String toString(int connectionType) {
-        if(connectionType == AuthenticationState.UNAUTHENTICATED) {
+        if (connectionType == AuthenticationState.UNAUTHENTICATED) {
             return "UNAUTHENTICATED";
-        } else if(connectionType == AuthenticationState.PLAYER) {
+        } else if (connectionType == AuthenticationState.PLAYER) {
             return "PLAYER";
-        } else if(connectionType == AuthenticationState.SPECTATOR) {
+        } else if (connectionType == AuthenticationState.SPECTATOR) {
             return "SPECTATOR";
         } else {
             return "";

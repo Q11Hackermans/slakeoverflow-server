@@ -28,16 +28,17 @@ public final class FieldState {
     public static final int ITEM_FOOD = 502; // The default food item
     public static final int ITEM_SUPER_FOOD = 503; // This item will be dropped when a player dies
 
-    private FieldState() {}
+    private FieldState() {
+    }
 
     public static int getPlayerHeadOwnValue(int facing) {
-        if(facing == Direction.NORTH) {
+        if (facing == Direction.NORTH) {
             return PLAYER_HEAD_OWN_NORTH;
-        } else if(facing == Direction.SOUTH) {
+        } else if (facing == Direction.SOUTH) {
             return PLAYER_HEAD_OWN_SOUTH;
-        } else if(facing == Direction.EAST) {
+        } else if (facing == Direction.EAST) {
             return PLAYER_HEAD_OWN_EAST;
-        } else if(facing == Direction.WEST) {
+        } else if (facing == Direction.WEST) {
             return PLAYER_HEAD_OWN_WEST;
         } else {
             return 0;
@@ -45,13 +46,13 @@ public final class FieldState {
     }
 
     public static int getPlayerHeadOtherValue(int facing) {
-        if(facing == Direction.NORTH) {
+        if (facing == Direction.NORTH) {
             return PLAYER_HEAD_OTHER_NORTH;
-        } else if(facing == Direction.SOUTH) {
+        } else if (facing == Direction.SOUTH) {
             return PLAYER_HEAD_OTHER_SOUTH;
-        } else if(facing == Direction.EAST) {
+        } else if (facing == Direction.EAST) {
             return PLAYER_HEAD_OTHER_EAST;
-        } else if(facing == Direction.WEST) {
+        } else if (facing == Direction.WEST) {
             return PLAYER_HEAD_OTHER_WEST;
         } else {
             return 0;

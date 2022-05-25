@@ -29,8 +29,8 @@ public class EventListener extends CMListenerAdapter {
     // SERVER EVENTS
     @Override
     public void onServerConnectionAttempt(CMSServerConnectionAttemptEvent event) {
-        if(!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress())) {
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
+        if (!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress())) {
+            if (SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
                 event.getClient().setState(PendingClientState.ACCEPTED);
             } else {
                 event.getClient().setTime(10000);
@@ -59,12 +59,13 @@ public class EventListener extends CMListenerAdapter {
         cmsClient.getInputStream().setStreamByteLimit(10000000);
 
         int count = 3;
-        while((SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
+        while ((SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
             try {
                 TimeUnit.SECONDS.sleep(1000);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
             count--;
-            if(count <= 0) {
+            if (count <= 0) {
                 event.getClient().close();
                 return;
             }
@@ -93,9 +94,9 @@ public class EventListener extends CMListenerAdapter {
     public void onClientInputStreamByteLimitReached(CMClientInputStreamByteLimitReachedEvent event) {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
-        if(event.getStream() instanceof CMTimedInputStream) {
+        if (event.getStream() instanceof CMTimedInputStream) {
             SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
-        } else if(event.getStream() instanceof CMConsumingInputStream) {
+        } else if (event.getStream() instanceof CMConsumingInputStream) {
             SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
         }
     }
@@ -108,16 +109,16 @@ public class EventListener extends CMListenerAdapter {
         try {
             JSONObject data = new JSONObject(event.getData());
 
-            if(data.has("cmd")) {
-                switch(data.getString("cmd")) {
+            if (data.has("cmd")) {
+                switch (data.getString("cmd")) {
                     case "auth":
-                        if(data.has("type")) {
-                            if(data.getInt("type") == AuthenticationState.PLAYER) {
-                                if(data.has("username")) {
+                        if (data.has("type")) {
+                            if (data.getInt("type") == AuthenticationState.PLAYER) {
+                                if (data.has("username")) {
                                     // CURRENTLY NOT WORKING
                                 }
                                 SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
-                            } else if(data.getInt("type") == AuthenticationState.SPECTATOR) {
+                            } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
                                 // SPECTATOR AUTHENTICATION IS CURRENTLY NOT SUPPORTED
                                 cmsClient.close();
                             } else {
@@ -126,38 +127,39 @@ public class EventListener extends CMListenerAdapter {
                         }
                         break;
                     case "game_direction_change":
-                        if(SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
-                            if(data.has("direction")) {
+                        if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                            if (data.has("direction")) {
                                 try {
                                     int button = data.getInt("direction");
 
                                     ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
 
-                                    if(connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                                    if (connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
                                         Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
 
-                                        if(snake != null) {
+                                        if (snake != null) {
                                             int facing = 0;
 
-                                            if(button == 0) {
+                                            if (button == 0) {
                                                 facing = Direction.NORTH;
-                                            } else if(button == 3) {
+                                            } else if (button == 3) {
                                                 facing = Direction.SOUTH;
-                                            } else if(button == 1) {
+                                            } else if (button == 1) {
                                                 facing = Direction.WEST;
-                                            } else if(button == 2) {
+                                            } else if (button == 2) {
                                                 facing = Direction.EAST;
                                             }
 
                                             snake.setNewFacing(facing, false);
                                         }
                                     }
-                                } catch(JSONException ignored) {}
+                                } catch (JSONException ignored) {
+                                }
                             }
                         }
                 }
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Received wrong package format from " + cmsClient.getUniqueId());
             cmsClient.close();
         }

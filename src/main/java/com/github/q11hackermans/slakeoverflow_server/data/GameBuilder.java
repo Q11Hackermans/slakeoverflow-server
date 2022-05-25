@@ -27,28 +27,28 @@ public class GameBuilder {
 
     // CREATE
     public GameBuilder setBorderX(int borderX) {
-        if(borderX > 10) {
+        if (borderX > 10) {
             this.borderX = borderX;
         }
         return this;
     }
 
     public GameBuilder setBorderY(int borderY) {
-        if(borderY > 10) {
+        if (borderY > 10) {
             this.borderY = borderY;
         }
         return this;
     }
 
     public GameBuilder setFovX(int fovsizeX) {
-        if(fovsizeX > 10) {
+        if (fovsizeX > 10) {
             this.fovsizeX = fovsizeX;
         }
         return this;
     }
 
     public GameBuilder setFovY(int fovsizeY) {
-        if(fovsizeY > 10) {
+        if (fovsizeY > 10) {
             this.fovsizeY = fovsizeY;
         }
         return this;

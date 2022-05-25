@@ -14,8 +14,8 @@ public class ConfigManager {
         this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
-        if(loadConfigFile) {
-            if(!this.configFile.exists()) {
+        if (loadConfigFile) {
+            if (!this.configFile.exists()) {
                 this.recreateConfig();
             } else {
                 this.reloadConfig();
@@ -25,7 +25,7 @@ public class ConfigManager {
 
     public void reloadConfig() {
         try {
-            synchronized(this.configFile) {
+            synchronized (this.configFile) {
                 BufferedReader br = new BufferedReader(new FileReader(this.configFile));
 
                 StringBuilder sb = new StringBuilder();
@@ -63,23 +63,23 @@ public class ConfigManager {
                     this.config.setCustomServerTickrateIdle(jsonConfig.getInt("advanced_custom_server_tickrate_idle"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
-                } catch(JSONException e) {
+                } catch (JSONException e) {
                     SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file structure corrupt");
                     this.recreateConfig();
-                } catch(IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file values corrupt");
                     this.recreateConfig();
                 }
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
         }
     }
 
     public void recreateConfig() {
         try {
-            synchronized(this.configFile) {
-                if(this.configFile.exists()) {
+            synchronized (this.configFile) {
+                if (this.configFile.exists()) {
                     this.configFile.delete();
                 }
                 this.configFile.createNewFile();
@@ -112,7 +112,7 @@ public class ConfigManager {
 
                 SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config created");
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
         }
     }

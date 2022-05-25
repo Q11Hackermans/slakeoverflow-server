@@ -35,14 +35,15 @@ public abstract class Item implements GameObject {
 
     /**
      * Update item position
+     *
      * @param x X Coordinates
      * @param y Y Coordinates
      * @throws IllegalArgumentException if the position is outside of the worldborder
      */
     public void setPosition(int x, int y) {
         GameSession gameSession = SlakeoverflowServer.getServer().getGameSession();
-        if(gameSession != null) {
-            if(x >= 0 && x < gameSession.getBorder()[0] && y >= 0 && y < gameSession.getBorder()[1]) {
+        if (gameSession != null) {
+            if (x >= 0 && x < gameSession.getBorder()[0] && y >= 0 && y < gameSession.getBorder()[1]) {
                 this.posx = x;
                 this.posy = y;
             } else {
@@ -56,13 +57,13 @@ public abstract class Item implements GameObject {
     }
 
     public void despawnCount() {
-        if(this.despawnTime > 0) {
+        if (this.despawnTime > 0) {
             this.despawnTime--;
         }
     }
 
     public void setDespawnTime(int despawnTime) {
-        if(despawnTime >= 0) {
+        if (despawnTime >= 0) {
             this.despawnTime = despawnTime;
         } else {
             throw new IllegalArgumentException("The value must be higher or equal than 0");

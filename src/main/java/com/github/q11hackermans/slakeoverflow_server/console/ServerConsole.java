@@ -20,7 +20,7 @@ public class ServerConsole implements Runnable {
      * Start the console
      */
     public void start() {
-        if(this.thread != null) {
+        if (this.thread != null) {
             this.thread.stop();
             this.thread = null;
         }
@@ -34,14 +34,15 @@ public class ServerConsole implements Runnable {
      */
     public void stop() {
         this.thread.interrupt();
-        new Thread(() ->{
+        new Thread(() -> {
             int stopcount = 10;
-            while(this.thread.isAlive()) {
-                if(stopcount > 1) {
+            while (this.thread.isAlive()) {
+                if (stopcount > 1) {
                     stopcount--;
                     try {
                         Thread.sleep(1000);
-                    } catch(Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 } else {
                     this.thread.stop();
                 }
@@ -51,10 +52,11 @@ public class ServerConsole implements Runnable {
 
     /**
      * Returns true if the console is running.
+     *
      * @return boolean (true = console is running)
      */
     public boolean isRunning() {
-        if(this.thread != null) {
+        if (this.thread != null) {
             return this.thread.isAlive();
         } else {
             return false;
@@ -63,7 +65,7 @@ public class ServerConsole implements Runnable {
 
     @Override
     public void run() {
-        while(!Thread.currentThread().isInterrupted() && thread != null) {
+        while (!Thread.currentThread().isInterrupted() && thread != null) {
             Scanner scanner = new Scanner(System.in);
             this.logger.info("CONSOLE", ConsoleCommands.run(scanner.nextLine().split(" ")));
         }

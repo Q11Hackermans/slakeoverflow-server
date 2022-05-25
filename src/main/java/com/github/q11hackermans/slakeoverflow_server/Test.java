@@ -242,12 +242,12 @@ public class Test {
         String[] bytes = text.split(" ");
 
         List<Character> characters = new ArrayList<>();
-        for(String byteString : bytes) {
+        for (String byteString : bytes) {
             characters.add((char) Integer.parseInt(byteString));
         }
 
         System.out.println();
-        for(char c : characters) {
+        for (char c : characters) {
             System.out.print(c);
         }
     }

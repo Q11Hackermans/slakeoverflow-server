@@ -74,7 +74,7 @@ public class SlakeoverflowServer {
 
         // CONFIG
         this.configManager = new ConfigManager(advancedConfigOptions, !defaultConfigValues);
-        if(!defaultConfigValues) {
+        if (!defaultConfigValues) {
             this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
             this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
         } else {
@@ -112,10 +112,11 @@ public class SlakeoverflowServer {
         this.managerThread = new Thread(() -> {
             try {
                 Thread.sleep(1000);
-            } catch(Exception ignored) {}
-            while(!Thread.currentThread().isInterrupted() && this.managerThread == Thread.currentThread()) {
+            } catch (Exception ignored) {
+            }
+            while (!Thread.currentThread().isInterrupted() && this.managerThread == Thread.currentThread()) {
                 try {
-                    if(!alreadyStopping) {
+                    if (!alreadyStopping) {
                         checkThreads();
                         checkConnectionManager();
                         checkConnections();
@@ -123,22 +124,25 @@ public class SlakeoverflowServer {
 
                         try {
                             Thread.sleep(1);
-                        } catch(InterruptedException ignored) {}
+                        } catch (InterruptedException ignored) {
+                        }
                     } else {
                         try {
                             Thread.sleep(3000);
-                        } catch(Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                         stop();
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     try {
                         this.logger.warning("MANAGER", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()) + " (THIS EXCEPTION IS THE CAUSE FOR STOPPING THE SERVER)");
                         e.printStackTrace();
-                    } catch(Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                     stop();
                 }
             }
-            if(!alreadyStopping) {
+            if (!alreadyStopping) {
                 stop();
             }
         });
@@ -159,6 +163,7 @@ public class SlakeoverflowServer {
     }
 
     // SERVER MANAGEMENT
+
     /**
      * This will stop the server.
      */
@@ -167,35 +172,37 @@ public class SlakeoverflowServer {
             new Thread(() -> {
                 try {
                     this.alreadyStopping = true;
-                    if(!this.managerThread.isInterrupted()) {
+                    if (!this.managerThread.isInterrupted()) {
                         this.managerThread.interrupt();
                     }
-                    if(this.tickThread != null && !this.tickThread.isInterrupted()) {
+                    if (this.tickThread != null && !this.tickThread.isInterrupted()) {
                         this.tickThread.interrupt();
                     }
-                    if(!this.dataIOManager.isClosed()) {
+                    if (!this.dataIOManager.isClosed()) {
                         this.dataIOManager.close();
                     }
-                    if(!this.connectionhandler.isClosed()) {
+                    if (!this.connectionhandler.isClosed()) {
                         this.connectionhandler.close();
                     }
-                    if(this.console.isRunning()) {
+                    if (this.console.isRunning()) {
                         this.console.stop();
                     }
-                    if(!this.alreadyStopping) {
+                    if (!this.alreadyStopping) {
                         this.logger.info("STOP", "Server shutdown.");
                         this.logger.saveLog(new File(System.getProperty("user.dir"), "log.json"), true);
                     }
-                } catch(Exception ignored) {
+                } catch (Exception ignored) {
                     ignored.printStackTrace();
                 }
             }).start();
-        } catch(Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         new Thread(() -> {
             try {
                 Thread.sleep(3000);
-            } catch(Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             System.exit(0);
         }).start();
@@ -205,22 +212,23 @@ public class SlakeoverflowServer {
 
     /**
      * This will setup a fully custom game
-     * @param paused If the game should be started paused or running
-     * @param sizeX game field size X
-     * @param sizeY game field size Y
-     * @param fovsizeX fov size X
-     * @param fovsizeY fov size Y
+     *
+     * @param paused          If the game should be started paused or running
+     * @param sizeX           game field size X
+     * @param sizeY           game field size Y
+     * @param fovsizeX        fov size X
+     * @param fovsizeY        fov size Y
      * @param nextItemDespawn next item despawn (useless because the despawn count will be set to 20 after it reaches 0, so it's only for savegames)
-     * @param snakeDataList list of snake data
-     * @param itemList list of items
+     * @param snakeDataList   list of snake data
+     * @param itemList        list of items
      * @return returns true if the game was successfully set up
      */
     public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
-        if(this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
+        if (this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
             this.gameState = GameState.PREPARING;
             this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
 
-            if(paused) {
+            if (paused) {
                 this.gameState = GameState.PAUSED;
             } else {
                 this.gameState = GameState.RUNNING;
@@ -228,10 +236,10 @@ public class SlakeoverflowServer {
 
             int snakeCount = 0;
             int itemCount = 0;
-            if(snakeDataList != null) {
+            if (snakeDataList != null) {
                 snakeCount = snakeDataList.size();
             }
-            if(itemList != null) {
+            if (itemList != null) {
                 itemCount = itemList.size();
             }
 
@@ -254,7 +262,7 @@ public class SlakeoverflowServer {
      */
     public boolean setupGameAutomatically() {
         double x = 3;
-        return this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3, false);
+        return this.setupGame((int) Math.round(50 + (sqrt(((pow(x, 2) * 10) / ((3 * x) + (4 * (x / 6))))) * x * 9)), (int) ((Math.round(50 + (sqrt(((pow(x, 2) * 10) / ((3 * x) + (4 * (x / 6))))) * x * 9)))) / 3, false);
     }
 
     /**
@@ -270,7 +278,7 @@ public class SlakeoverflowServer {
     public boolean stopGame() {
         boolean success = false;
 
-        if(this.isGameAvail()) {
+        if (this.isGameAvail()) {
             success = true;
         }
 
@@ -284,10 +292,11 @@ public class SlakeoverflowServer {
 
     /**
      * Pause a currently running game
+     *
      * @return true if the game could be paused
      */
     public boolean pauseGame() {
-        if(this.gameState == GameState.RUNNING) {
+        if (this.gameState == GameState.RUNNING) {
             this.gameState = GameState.PAUSED;
             return true;
         } else {
@@ -297,10 +306,11 @@ public class SlakeoverflowServer {
 
     /**
      * Resumes a paused game
+     *
      * @return true if the game could be resumed
      */
     public boolean resumeGame() {
-        if(this.gameState == GameState.PAUSED) {
+        if (this.gameState == GameState.PAUSED) {
             this.gameState = GameState.RUNNING;
             return true;
         } else {
@@ -309,7 +319,7 @@ public class SlakeoverflowServer {
     }
 
     public void addManualTicks(int ticks) {
-        if(ticks > 0 && ticks <= 120) {
+        if (ticks > 0 && ticks <= 120) {
             this.manualTicks += ticks;
         }
     }
@@ -322,12 +332,13 @@ public class SlakeoverflowServer {
 
     /**
      * Check if a connection with a specific ConnectionManager UUID exists
+     *
      * @param uuid Unique Connection ID
      * @return boolean
      */
     public boolean containsConnection(UUID uuid) {
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getClientId().equals(uuid)) {
+        for (ServerConnection connection : this.connectionList) {
+            if (connection.getClientId().equals(uuid)) {
                 return true;
             }
         }
@@ -336,12 +347,13 @@ public class SlakeoverflowServer {
 
     /**
      * Get a connection with a specific ConnectionManager UUID.
+     *
      * @param uuid ConnectionManager UUID
      * @return ServerConnection (if exists), null (if not exists)
      */
     public ServerConnection getConnectionByUUID(UUID uuid) {
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getClientId().equals(uuid)) {
+        for (ServerConnection connection : this.connectionList) {
+            if (connection.getClientId().equals(uuid)) {
                 return connection;
             }
         }
@@ -350,8 +362,8 @@ public class SlakeoverflowServer {
 
     public int getPlayerCount() {
         int connectionCount = 0;
-        for(ServerConnection connection : this.connectionList) {
-            if(connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+        for (ServerConnection connection : this.connectionList) {
+            if (connection.getAuthenticationState() == AuthenticationState.PLAYER) {
                 connectionCount++;
             }
         }
@@ -360,8 +372,8 @@ public class SlakeoverflowServer {
 
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
-        if(connection != null) {
-            if(ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getSlots())) {
+        if (connection != null) {
+            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getSlots())) {
                 connection.authenticateAsPlayer();
             }
         }
@@ -369,22 +381,22 @@ public class SlakeoverflowServer {
 
     public void unauthenticateConnection(UUID connectionUUID) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
-        if(connection != null) {
+        if (connection != null) {
             connection.unauthenticate();
         }
     }
 
     // PRIVATE METHODS
     private void checkConnectionManager() {
-        if(this.connectionhandler == null || this.connectionhandler.isClosed()) {
+        if (this.connectionhandler == null || this.connectionhandler.isClosed()) {
             this.getLogger().warning("MANAGER", "Connection manager is closed. Stopping server.");
             this.stop();
         }
     }
 
     private void checkThreads() {
-        if(this.tickThread == null || !this.tickThread.isAlive()) {
-            if(this.managerUtilsThread != null && this.managerUtilsThread.isAlive()) {
+        if (this.tickThread == null || !this.tickThread.isAlive()) {
+            if (this.managerUtilsThread != null && this.managerUtilsThread.isAlive()) {
                 return;
             }
             this.managerUtilsThread = new Thread(() -> {
@@ -398,7 +410,8 @@ public class SlakeoverflowServer {
 
                 try {
                     Thread.sleep(30000);
-                } catch(Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
                 this.tickThread = this.getTickThreadTemplate();
                 this.tickThread.start();
@@ -406,7 +419,7 @@ public class SlakeoverflowServer {
             });
             this.managerUtilsThread.start();
         }
-        if(this.timesThread == null || !this.timesThread.isAlive()) {
+        if (this.timesThread == null || !this.timesThread.isAlive()) {
             this.timesThread = this.getTimesThreadTemplate();
             this.timesThread.start();
             this.logger.warning("MANAGER", "Restarting Thread TIMES");
@@ -419,32 +432,32 @@ public class SlakeoverflowServer {
         this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
         this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
 
-        for(CMSClient cmsClient : this.connectionhandler.getClientList()) {
-            if(!this.containsConnection(cmsClient.getUniqueId())) {
+        for (CMSClient cmsClient : this.connectionhandler.getClientList()) {
+            if (!this.containsConnection(cmsClient.getUniqueId())) {
                 this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
             }
         }
 
-        for(ServerConnection connection : this.connectionList) {
-            if((connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
+        for (ServerConnection connection : this.connectionList) {
+            if ((connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
                 connection.unauthenticate();
             }
         }
     }
 
     private void checkGameSession() {
-        if((this.game == null) || (this.gameState == GameState.STOPPED)) {
-            if(this.game == null && this.gameState != GameState.STOPPED && this.gameState != GameState.PREPARING) {
+        if ((this.game == null) || (this.gameState == GameState.STOPPED)) {
+            if (this.game == null && this.gameState != GameState.STOPPED && this.gameState != GameState.PREPARING) {
                 this.gameState = GameState.STOPPED;
             }
-            if(this.gameState == GameState.STOPPED && this.game != null) {
+            if (this.gameState == GameState.STOPPED && this.game != null) {
                 this.game = null;
             }
         }
     }
 
     private void sendStatusMessage() {
-        for(ServerConnection connection : this.connectionList) {
+        for (ServerConnection connection : this.connectionList) {
             JSONObject statusMessage = new JSONObject();
             statusMessage.put("cmd", "status");
             statusMessage.put("status", this.gameState);
@@ -550,29 +563,29 @@ public class SlakeoverflowServer {
     // THREAD TEMPLATES
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
-            while(!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
+            while (!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
                 try {
                     this.tickRate = this.tickThreadCounter;
                     this.tickThreadCounter = 20;
                     this.tickThreadState = 0;
                     this.sendStatusMessage();
-                    if(this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
+                    if (this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
                         this.game.tick();
 
-                        if(manualTicks > 0) {
+                        if (manualTicks > 0) {
                             manualTicks--;
                         }
                     } else {
-                        if(gameState != GameState.RUNNING && gameState != GameState.PAUSED) {
+                        if (gameState != GameState.RUNNING && gameState != GameState.PAUSED) {
                             manualTicks = 0;
                         }
 
                         Thread.sleep(this.idleTickSpeed);
                     }
                     Thread.sleep(this.tickSpeed);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Thread.currentThread().interrupt();
-                    if(!(e instanceof InterruptedException)) {
+                    if (!(e instanceof InterruptedException)) {
                         this.logger.warning("TICK", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
                         e.printStackTrace();
                     }
@@ -585,23 +598,23 @@ public class SlakeoverflowServer {
 
     private Thread getTimesThreadTemplate() {
         Thread thread = new Thread(() -> {
-            while(!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
+            while (!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
                 try {
-                    if(this.tickThread.isAlive()) {
+                    if (this.tickThread.isAlive()) {
                         int waittime = -40;
-                        if(this.game != null && gameState == GameState.RUNNING) {
+                        if (this.game != null && gameState == GameState.RUNNING) {
                             waittime = waittime - 840;
                         }
-                        if(this.tickThreadCounter > waittime) {
+                        if (this.tickThreadCounter > waittime) {
                             this.tickThreadCounter--;
                         } else {
-                            if(this.tickThreadState == 0) {
+                            if (this.tickThreadState == 0) {
                                 this.tickThread.interrupt();
                                 this.tickRate = this.tickThreadCounter;
                                 this.tickThreadCounter = 20;
                                 this.tickThreadState = 1;
                                 this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState) + "/3). Interrupting...");
-                            } else if(this.tickThreadState == 1) {
+                            } else if (this.tickThreadState == 1) {
                                 this.tickThread.interrupt();
                                 this.tickThread.stop();
                                 this.tickRate = this.tickThreadCounter;
@@ -616,19 +629,20 @@ public class SlakeoverflowServer {
                                             "All attempts to stop and restart it have failed.\n" +
                                             "The server is now shutting down.\n" +
                                             "--------------------------------------------------------------------");
-                                } catch(Exception ignored) {}
+                                } catch (Exception ignored) {
+                                }
                                 stop();
                             }
                         }
                     }
 
                     Thread.sleep(this.tickSpeed);
-                    if(!(this.game != null && gameState == GameState.RUNNING)) {
+                    if (!(this.game != null && gameState == GameState.RUNNING)) {
                         Thread.sleep(this.idleTickSpeed);
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Thread.currentThread().interrupt();
-                    if(!(e instanceof InterruptedException)) {
+                    if (!(e instanceof InterruptedException)) {
                         this.logger.warning("TIMES", "EXCEPTION: " + e.toString() + ": " + Arrays.toString(e.getStackTrace()));
                     }
                 }
@@ -650,13 +664,13 @@ public class SlakeoverflowServer {
         int waitTime = 3;
         Map<String, String> startArguments = new HashMap<>();
         try {
-            for(String arg : args) {
-                if(arg.startsWith("-")) {
+            for (String arg : args) {
+                if (arg.startsWith("-")) {
                     arg = arg.replace("-", "");
                     try {
                         String[] argument = arg.split("=");
                         startArguments.put(argument[0], argument[1]);
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         System.out.println("Incorrect start argument: " + arg);
                         waitTime = 10;
                     }
@@ -672,28 +686,29 @@ public class SlakeoverflowServer {
 
         boolean advancedOptions = false;
         advancedOptions = Boolean.parseBoolean(startArguments.get("enableAdvancedConfigOptions"));
-        if(advancedOptions) {
+        if (advancedOptions) {
             System.out.println("\n" +
                     "-------------------- WARNING --------------------\n" +
                     "ADVANCED CONFIG OPTIONS ARE ENABLED.\n" +
                     "THIS ALLOWS TO MODIFY THE SERVER TICKRATE.\n" +
                     "THIS IS NOT SUPPORTED AND MAY LEAD TO ERRORS.\n" +
                     "-------------------------------------------------\n");
-            if(waitTime < 10) {
+            if (waitTime < 10) {
                 waitTime = 10;
             }
         }
 
         boolean defaultConfigValues = false;
         defaultConfigValues = Boolean.parseBoolean(startArguments.get("defaultConfigValues"));
-        if(defaultConfigValues) {
+        if (defaultConfigValues) {
             System.out.println("Starting with default config values");
         }
 
         System.out.println("Starting server in " + waitTime + " seconds...");
         try {
             TimeUnit.SECONDS.sleep(waitTime);
-        } catch(Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         new SlakeoverflowServer(advancedOptions, defaultConfigValues);
     }

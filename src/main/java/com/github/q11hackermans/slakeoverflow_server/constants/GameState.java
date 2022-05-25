@@ -6,10 +6,11 @@ public final class GameState {
     public static final int RUNNING = 2;
     public static final int PAUSED = 3;
 
-    private GameState() {}
+    private GameState() {
+    }
 
     public static String getString(int gameState) {
-        switch(gameState) {
+        switch (gameState) {
             case GameState.STOPPED:
                 return "STOPPED";
             case GameState.PREPARING:

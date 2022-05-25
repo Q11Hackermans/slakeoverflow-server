@@ -19,10 +19,12 @@ public class ConsoleLogger {
     }
 
     // LOGGING
+
     /**
      * Log info message and print it to console.
+     *
      * @param module Module that creates the log (e.g. console)
-     * @param text Logging text
+     * @param text   Logging text
      */
     public void info(String module, String text) {
         this.createLogEntry("INFO", module, text, true);
@@ -30,8 +32,9 @@ public class ConsoleLogger {
 
     /**
      * Log warning and print it to console.
+     *
      * @param module Module that creates the log (e.g. console)
-     * @param text Logging text
+     * @param text   Logging text
      */
     public void warning(String module, String text) {
         this.createLogEntry("WARNING", module, text, true);
@@ -39,16 +42,19 @@ public class ConsoleLogger {
 
     /**
      * Log debug message and print it NOT to console.
+     *
      * @param module Module that creates the log (e.g. console)
-     * @param text Logging text
+     * @param text   Logging text
      */
     public void debug(String module, String text) {
         this.createLogEntry("DEBUG", module, text, SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages());
     }
 
     // GET AND SAVE LOG
+
     /**
      * Get the log as JSONArray
+     *
      * @return Log (as JSONArray)
      */
     public JSONArray getLog() {
@@ -57,13 +63,14 @@ public class ConsoleLogger {
 
     /**
      * Save the log as a json (text) file
+     *
      * @param file The file the log should be written in
      * @throws IOException IOException
      */
     public void saveLog(File file, boolean overwriteExistingFile) throws IOException {
-        if(!file.exists()) {
+        if (!file.exists()) {
             file.createNewFile();
-        } else if(!overwriteExistingFile) {
+        } else if (!overwriteExistingFile) {
             return;
         }
         FileWriter fileWriter = new FileWriter(file);
@@ -81,12 +88,12 @@ public class ConsoleLogger {
         logEntry.put("text", text);
         this.log.put(logEntry);
 
-        if(print) {
+        if (print) {
             String color = Colors.CONSOLE_INFO;
 
-            if(type.equalsIgnoreCase("WARNING")) {
+            if (type.equalsIgnoreCase("WARNING")) {
                 color = Colors.CONSOLE_ERROR;
-            } else if(type.equalsIgnoreCase("DEBUG")) {
+            } else if (type.equalsIgnoreCase("DEBUG")) {
                 color = Colors.CONSOLE_DEBUG;
             }
 
