@@ -202,12 +202,16 @@ public class SlakeoverflowServer {
     /**
      * This will create a new game with a specific size
      */
-    public boolean setupGame(int sizeX, int sizeY) {
+    public boolean setupGame(int sizeX, int sizeY, boolean paused) {
         if(this.gameState == GameState.STOPPED && sizeX > 0 && sizeY > 0) {
             this.gameState = GameState.PREPARING;
             this.game = new GameSession(sizeX,sizeY);
-            this.gameState = GameState.RUNNING;
-            this.logger.info("GAME", "Game with size " + sizeX + " " + sizeY + " was set up");
+            if(paused) {
+                this.gameState = GameState.PAUSED;
+            } else {
+                this.gameState = GameState.RUNNING;
+            }
+            this.logger.info("GAME", "Game with size " + sizeX + " " + sizeY + " was set up (start_paused=" + paused + ")");
             return true;
         } else {
             return false;
@@ -219,14 +223,14 @@ public class SlakeoverflowServer {
      */
     public boolean setupGameAutomatically() {
         double x = 3;
-        return this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3);
+        return this.setupGame((int) Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9)),(int)((Math.round(50+(sqrt(((pow(x,2)*10)/((3*x)+(4*(x/6)))))*x*9))))/3, false);
     }
 
     /**
      * Setup game with default config values
      */
     public boolean setupGameDefault() {
-        return this.setupGame(this.configManager.getConfig().getDefaultGameFieldSizeX(), this.configManager.getConfig().getDefaultGameFieldSizeY());
+        return this.setupGame(this.configManager.getConfig().getDefaultGameFieldSizeX(), this.configManager.getConfig().getDefaultGameFieldSizeY(), false);
     }
 
     /**

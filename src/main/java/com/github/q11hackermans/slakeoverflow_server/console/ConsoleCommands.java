@@ -562,13 +562,20 @@ public class ConsoleCommands {
                     } else if(cmd[2].equalsIgnoreCase("automatic") && cmd.length == 3) {
                         SlakeoverflowServer.getServer().setupGameAutomatically();
                         return "Set up game with player count based settings";
-                    } else if(cmd[2].equalsIgnoreCase("custom") && cmd.length == 5) {
+                    } else if(cmd[2].equalsIgnoreCase("custom") && (cmd.length == 5 || cmd.length == 6)) {
+                        boolean paused;
+                        if(cmd.length == 6 && cmd[5].equalsIgnoreCase("paused")) {
+                            paused = true;
+                        } else {
+                            paused = false;
+                        }
+
                         try {
                             int sizex = Integer.parseInt(cmd[3]);
                             int sizey = Integer.parseInt(cmd[3]);
 
                             if(sizex > 10 && sizey > 10) {
-                                SlakeoverflowServer.getServer().setupGame(sizex, sizey);
+                                SlakeoverflowServer.getServer().setupGame(sizex, sizey, paused);
                                 return "Set up game with custom settings";
                             } else {
                                 return "Both values have to be 10 or more";
@@ -576,6 +583,15 @@ public class ConsoleCommands {
                         } catch(NumberFormatException e) {
                             return "Please specify an int value";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("savegame") && cmd.length > 3) {
+                        String savegameString = "";
+                        for(int i = 4; i < cmd.length; i++) {
+                            savegameString = savegameString + cmd[i];
+                        }
+
+                        JSONObject savegame = new JSONObject(savegameString);
+
+                        return "Currently not supported";
                     } else {
                         return "Run command without arguments for help";
                     }
@@ -583,7 +599,8 @@ public class ConsoleCommands {
                     return "GAME START COMMAND USAGE\n" +
                             "game start default\n" +
                             "game start automatic\n" +
-                            "game start custom <sizex> <sizey>\n";
+                            "game start custom <sizex> <sizey>\n" +
+                            "game start savegame <SAVEGAME DATA>\n";
                 }
             } else if(cmd[1].equalsIgnoreCase("stop")) {
                 if(SlakeoverflowServer.getServer().stopGame()) {
@@ -914,8 +931,9 @@ public class ConsoleCommands {
             }
         } else {
             return "GAME COMMAND USAGE:\n" +
-                    "game start default/automatic (paused)\n" +
+                    "game start default/automatic\n" +
                     "game start custom <sizex> <sizey> (paused)\n" +
+                    "game start savegame <SAVEGAME DATA>\n" +
                     "game stop\n" +
                     "game pause\n" +
                     "game resume\n" +
