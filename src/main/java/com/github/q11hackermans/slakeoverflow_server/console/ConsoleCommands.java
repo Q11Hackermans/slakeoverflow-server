@@ -665,7 +665,7 @@ public class ConsoleCommands {
                             List<Item> itemList = SlakeoverflowServer.getServer().getGameSession().getItemList();
                             for(int i = 0; i < itemList.size(); i++) {
                                 Item item = itemList.get(i);
-                                returnString = returnString + i + " " + item.getDescription() + " " + item.getPosX() + " " + item.getPosY() + " ";
+                                returnString = returnString + i + " " + item.getDescription() + " X" + item.getPosX() + " Y" + item.getPosY() + " D" + item.getDespawnTime() + " ";
                                 if(item instanceof Food) {
                                     returnString = returnString + ((Food) item).getFoodValue() + " ";
                                 } else if(item instanceof SuperFood) {
@@ -795,7 +795,18 @@ public class ConsoleCommands {
                                                         return "Please specify a valid position";
                                                     }
                                                 } else {
-                                                    return "game modify item <ID> position <X> <Y>";
+                                                    return "Usage: game modify item <ID> position <X> <Y>";
+                                                }
+                                            } else if(cmd[4].equalsIgnoreCase("despawn")) {
+                                                if(cmd.length == 6) {
+                                                    try {
+                                                        item.setDespawnTime(Integer.parseInt(cmd[5]));
+                                                        return "Updated item despawn time";
+                                                    } catch(IllegalArgumentException e) {
+                                                        return "Please specify a valid int value";
+                                                    }
+                                                } else {
+                                                    return "Usage: game modify item <ID> despawn <despawnTime>";
                                                 }
                                             } else {
                                                 return "Unknown action";

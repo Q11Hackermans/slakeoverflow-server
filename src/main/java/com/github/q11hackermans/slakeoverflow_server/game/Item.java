@@ -61,5 +61,13 @@ public abstract class Item implements GameObject {
         }
     }
 
+    public void setDespawnTime(int despawnTime) {
+        if(despawnTime >= 0) {
+            this.despawnTime = despawnTime;
+        } else {
+            throw new IllegalArgumentException("The value must be higher or equal than 0");
+        }
+    }
+
     public abstract String getDescription();
 }
