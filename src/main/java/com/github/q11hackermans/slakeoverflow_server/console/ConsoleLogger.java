@@ -5,13 +5,11 @@ import com.github.q11hackermans.slakeoverflow_server.constants.Colors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 public class ConsoleLogger {
     private JSONArray log;
