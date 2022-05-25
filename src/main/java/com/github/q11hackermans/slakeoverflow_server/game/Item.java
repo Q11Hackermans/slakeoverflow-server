@@ -9,7 +9,7 @@ public abstract class Item implements GameObject {
     private int despawnTime; // IN SECONDS
 
     public Item(int posx, int posy) {
-        this(posx, posy, 30);
+        this(posx, posy, SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultItemDespawnTime());
     }
 
     public Item(int posx, int posy, int despawnTime) {

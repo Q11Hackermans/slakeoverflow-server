@@ -190,6 +190,20 @@ public class ConsoleCommands {
                         } catch(NumberFormatException e) {
                             return "You can only set a positive int value (50 or higher)";
                         }
+                    } else if(cmd[2].equalsIgnoreCase("default_item_despawn_time")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setDefaultItemDespawnTime(Integer.parseInt(cmd[3]));
+                            return "Updated value default_item_despawn_time";
+                        } catch(IllegalArgumentException e) {
+                            return "You can only set a positive int value (50 or higher)";
+                        }
+                    } else if(cmd[2].equalsIgnoreCase("item_superfood_despawn_time")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setItemSuperFoodDespawnTime(Integer.parseInt(cmd[3]));
+                            return "Updated value item_superfood_despawn_time";
+                        } catch(IllegalArgumentException e) {
+                            return "You can only set a positive int value (50 or higher)";
+                        }
                     } else if(cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
                         return "Updated value unauthenticate_player_on_death to " + cmd[3];
@@ -244,6 +258,10 @@ public class ConsoleCommands {
                         return "Value unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath();
                     } else if(cmd[2].equalsIgnoreCase("print_debug_messages")) {
                         return "Value print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages();
+                    } else if(cmd[2].equalsIgnoreCase("default_item_despawn_time")) {
+                        return "Value default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultItemDespawnTime();
+                    } else if(cmd[2].equalsIgnoreCase("item_superfood_despawn_time")) {
+                        return "Value item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime();
                     } else {
                         return "Unknown config option";
                     }
@@ -266,6 +284,8 @@ public class ConsoleCommands {
                         "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
                         "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
                         "print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
+                        "default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultItemDespawnTime() + "\n" +
+                        "item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime() + "\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
                         "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +

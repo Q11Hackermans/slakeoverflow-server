@@ -15,6 +15,8 @@ public class ServerConfig {
     private int defaultGameFieldSizeY;
     private boolean unauthenticatePlayerOnDeath;
     private boolean printDebugMessages;
+    private int defaultItemDespawnTime;
+    private int ItemSuperFoodDespawnTime;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -37,6 +39,8 @@ public class ServerConfig {
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
         this.printDebugMessages = false;
+        this.defaultItemDespawnTime = 60;
+        this.ItemSuperFoodDespawnTime = 120;
 
         this.advancedOptionsEnabled = advancedOptionsEnabled;
         this.overrideServerTickrate = false;
@@ -211,6 +215,30 @@ public class ServerConfig {
 
     public void setPrintDebugMessages(boolean printDebugMessages) {
         this.printDebugMessages = printDebugMessages;
+    }
+
+    public int getDefaultItemDespawnTime() {
+        return defaultItemDespawnTime;
+    }
+
+    public void setDefaultItemDespawnTime(int defaultItemDespawnTime) {
+        if(defaultItemDespawnTime > 0) {
+            this.defaultItemDespawnTime = defaultItemDespawnTime;
+        } else {
+            throw new IllegalArgumentException("The time must be higher than 0");
+        }
+    }
+
+    public int getItemSuperFoodDespawnTime() {
+        return ItemSuperFoodDespawnTime;
+    }
+
+    public void setItemSuperFoodDespawnTime(int itemSuperFoodDespawnTime) {
+        if(itemSuperFoodDespawnTime > 0) {
+            this.ItemSuperFoodDespawnTime = itemSuperFoodDespawnTime;
+        } else {
+            throw new IllegalArgumentException("The time must be higher than 0");
+        }
     }
 
     // ADVANCED

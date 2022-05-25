@@ -55,6 +55,8 @@ public class ConfigManager {
                     this.config.setDefaultGameFieldSizeY(jsonConfig.getInt("default_gamefield_size_y"));
                     this.config.setUnauthenticatePlayerOnDeath(jsonConfig.getBoolean("unauthenticate_player_on_death"));
                     this.config.setPrintDebugMessages(jsonConfig.getBoolean("print_debug_messages"));
+                    this.config.setDefaultItemDespawnTime(jsonConfig.getInt("default_item_despawn_time"));
+                    this.config.setItemSuperFoodDespawnTime(jsonConfig.getInt("item_superfood_despawn_time"));
 
                     this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
                     this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
@@ -62,7 +64,10 @@ public class ConfigManager {
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch(JSONException e) {
-                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file corrupt");
+                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file structure corrupt");
+                    this.recreateConfig();
+                } catch(IllegalArgumentException e) {
+                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file values corrupt");
                     this.recreateConfig();
                 }
             }
@@ -93,6 +98,8 @@ public class ConfigManager {
                 config.put("default_gamefield_size_y", 100);
                 config.put("unauthenticate_player_on_death", true);
                 config.put("print_debug_messages", false);
+                config.put("default_item_despawn_time", 60);
+                config.put("item_superfood_despawn_time", 120);
 
                 config.put("advanced_override_server_tickrate", false);
                 config.put("advanced_custom_server_tickrate", 50);
