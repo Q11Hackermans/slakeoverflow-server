@@ -63,7 +63,9 @@ public class GameSession {
 
             // SENDING PLAYERDATA TO SNAKES
             for(Snake snake : this.snakeList) {
-                snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                if(snake.getConnection() != null) {
+                    snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                }
             }
 
             if(this.nextItemDespawn > 0) {

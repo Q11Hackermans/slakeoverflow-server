@@ -235,7 +235,7 @@ public class SlakeoverflowServer {
                 itemCount = itemList.size();
             }
 
-            this.logger.info("GAME", "Started game (PAUSED=" + paused + "SIZEX=" + sizeX + " SIZEY=" + sizeY + " FOVX=" + fovsizeX + " FOVY=" + fovsizeY + " NEXTITEMDESPAWN=" + nextItemDespawn + " SNAKES=" + snakeCount + " ITEMS=" + itemCount + ")");
+            this.logger.info("GAME", "Started game (PAUSED=" + paused + " SIZEX=" + sizeX + " SIZEY=" + sizeY + " FOVX=" + fovsizeX + " FOVY=" + fovsizeY + " NEXTITEMDESPAWN=" + nextItemDespawn + " SNAKES=" + snakeCount + " ITEMS=" + itemCount + ")");
             return true;
         } else {
             return false;

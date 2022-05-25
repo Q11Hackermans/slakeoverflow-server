@@ -197,9 +197,8 @@ public class Snake implements GameObject {
      * With this method, the ServerConnection of the snake can be updated.
      * If you set the ServerConnection to null or to a disconnected connection, the snake gets killed automatically and will be removed from the game session.
      * @param connection new connection
-     * @deprecated ONLY USE IF THE GAME IS PAUSED!
+     * a@deprecated ONLY USE IF THE GAME IS PAUSED!
      */
-    @Deprecated
     public void setNewServerConnection(ServerConnection connection) {
         this.connection = connection;
     }
@@ -382,6 +381,8 @@ public class Snake implements GameObject {
      * After killing the snake, it cant be used anymore.
      */
     public void killSnake() {
+        SlakeoverflowServer.getServer().getLogger().debug("GAME", "Killed snake " + gameSession.getSnakeId(this));
+
         this.alive = false;
         this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
 

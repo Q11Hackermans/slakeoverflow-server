@@ -54,7 +54,7 @@ public class ConsoleCommands {
                 }
             }
         } catch(Exception e) {
-            return "Command error: " + e.getMessage();
+            return "Command error: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace());
         }
         return "";
     }
@@ -588,13 +588,14 @@ public class ConsoleCommands {
                         }
                     } else if(cmd[2].equalsIgnoreCase("savegame") && cmd.length > 3) {
                         String savegameString = "";
-                        for(int i = 4; i < cmd.length; i++) {
+                        for(int i = 3; i < cmd.length; i++) {
                             savegameString = savegameString + cmd[i];
                         }
 
-                        JSONObject savegame = new JSONObject(savegameString);
+                        System.out.println(savegameString);
 
                         try {
+                            JSONObject savegame = new JSONObject(savegameString);
                             JSONObject settings = savegame.getJSONObject("settings");
                             JSONArray snakes = savegame.getJSONArray("snakes");
                             JSONArray items = savegame.getJSONArray("items");
@@ -751,14 +752,20 @@ public class ConsoleCommands {
                                 for(int[] bodies : snake.getBodyPositions()) {
                                     bodyPositionString = bodyPositionString + Arrays.toString(bodies) + " ";
                                 }
+
+                                String uuid = "NULL";
+                                if(snake.getConnection() != null) {
+                                    uuid = String.valueOf(snake.getConnection().getClientId());
+                                }
+
                                 return "SNAKE INFORMATION:\n" +
-                                        "ID:" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(snake) + "\n" +
-                                        "UUID: " + snake.getConnection().getClientId() + "\n" +
+                                        "ID: " + SlakeoverflowServer.getServer().getGameSession().getSnakeId(snake) + "\n" +
+                                        "UUID: " + uuid + "\n" +
                                         "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
                                         "Length: " + snake.getLength() + "\n" +
                                         "Facing: " + snake.getFacing() + "\n" +
                                         "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
-                                        "Body positions: " + snake.getBodyPositions().toString() + "\n";
+                                        "Body positions: " + bodyPositionString + "\n";
                             } else {
                                 return "This snake does not exist";
                             }
