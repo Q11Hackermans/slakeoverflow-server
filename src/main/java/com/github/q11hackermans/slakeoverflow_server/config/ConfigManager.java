@@ -43,7 +43,7 @@ public class ConfigManager {
                     JSONObject jsonConfig = new JSONObject(out);
 
                     this.config.setPort(jsonConfig.getInt("port"));
-                    this.config.setWhitelist(jsonConfig.getBoolean("whitelist"));
+                    this.config.setAutoConnectionAccept(jsonConfig.getBoolean("auto_connection_accept"));
                     this.config.setUserAuthentication(jsonConfig.getBoolean("user_authentication"));
                     this.config.setSlots(jsonConfig.getInt("slots"));
                     this.config.setMaxFoodValue(jsonConfig.getInt("min_food_value"));
@@ -86,7 +86,7 @@ public class ConfigManager {
 
                 JSONObject config = new JSONObject();
                 config.put("port", 26677);
-                config.put("whitelist", true);
+                config.put("auto_connection_accept", false);
                 config.put("user_authentication", false);
                 config.put("slots", 10);
                 config.put("min_food_value", 1);

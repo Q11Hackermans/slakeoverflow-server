@@ -30,11 +30,11 @@ public class EventListener extends CMListenerAdapter {
     @Override
     public void onServerConnectionAttempt(CMSServerConnectionAttemptEvent event) {
         if(!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress())) {
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist()) {
+            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
+                event.getClient().setState(PendingClientState.ACCEPTED);
+            } else {
                 event.getClient().setTime(10000);
                 SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ")");
-            } else {
-                event.getClient().setState(PendingClientState.ACCEPTED);
             }
         } else {
             event.getClient().setState(PendingClientState.DENIED);

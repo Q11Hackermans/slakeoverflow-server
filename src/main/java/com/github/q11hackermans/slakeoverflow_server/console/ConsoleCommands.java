@@ -76,9 +76,9 @@ public class ConsoleCommands {
                 if(cmd.length == 4) {
                     if (cmd[2].equalsIgnoreCase("port")) {
                         return "Cannot set port while the server is running!";
-                    } else if (cmd[2].equalsIgnoreCase("whitelist")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setWhitelist(Boolean.parseBoolean(cmd[3]));
-                        return "Updated value whitelist to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("auto_connection_accept")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setAutoConnectionAccept(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value auto_connection_accept to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setUserAuthentication(Boolean.parseBoolean(cmd[3]));
                         return "Updated value user_authentication to " + cmd[3];
@@ -226,8 +226,8 @@ public class ConsoleCommands {
                         return "Value port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort();
                     } else if(cmd[2].equalsIgnoreCase("slots")) {
                         return "Value slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSlots();
-                    } else if(cmd[2].equalsIgnoreCase("whitelist")) {
-                        return "Value whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist();
+                    } else if(cmd[2].equalsIgnoreCase("auto_connection_accept")) {
+                        return "Value auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept();
                     } else if(cmd[2].equalsIgnoreCase("user_authentication")) {
                         return "Value user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
                     } else if(cmd[2].equalsIgnoreCase("min_food_value")) {
@@ -272,7 +272,7 @@ public class ConsoleCommands {
                 return "ALL CONFIG OPTIONS:\n" +
                         "port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort() + "\n" +
                         "slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSlots() + "\n" +
-                        "whitelist: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isWhitelist() + "\n" +
+                        "auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept() + "\n" +
                         "user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication() + "\n" +
                         "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
                         "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
