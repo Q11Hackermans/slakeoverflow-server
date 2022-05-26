@@ -8,7 +8,6 @@ import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationSta
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
-import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
@@ -360,10 +359,24 @@ public class SlakeoverflowServer {
         return null;
     }
 
+    public int getConnectionCount() {
+        return this.getConnectionList().size();
+    }
+
     public int getPlayerCount() {
         int connectionCount = 0;
-        for (ServerConnection connection : this.connectionList) {
+        for (ServerConnection connection : this.getConnectionList()) {
             if (connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                connectionCount++;
+            }
+        }
+        return connectionCount;
+    }
+
+    public int getSpectatorCount() {
+        int connectionCount = 0;
+        for (ServerConnection connection : this.getConnectionList()) {
+            if (connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connectionCount++;
             }
         }
@@ -373,16 +386,27 @@ public class SlakeoverflowServer {
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
-            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getSlots())) {
+            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getMaxPlayers())) {
                 connection.authenticateAsPlayer();
             }
         }
     }
 
-    public void unauthenticateConnection(UUID connectionUUID) {
+    public void authenticateConnectionAsSpectator(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
-            connection.unauthenticate();
+            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getSpectatorCount() < this.configManager.getConfig().getMaxSpectators())) {
+                connection.authenticateAsSpectator();
+            }
+        }
+    }
+
+    public void unauthenticateConnection(UUID connectionUUID, boolean ignoreConnectionConditions) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        if (connection != null) {
+            if (ignoreConnectionConditions || this.configManager.getConfig().isUserAuthentication()) {
+                connection.unauthenticate();
+            }
         }
     }
 
@@ -439,7 +463,9 @@ public class SlakeoverflowServer {
         }
 
         for (ServerConnection connection : this.connectionList) {
-            if ((connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
+            if (!this.isGameAvail() && (connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR)) {
+                connection.unauthenticate();
+            } else if (this.isGameAvail() && !this.configManager.getConfig().isEnableSpectator() && connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connection.unauthenticate();
             }
         }

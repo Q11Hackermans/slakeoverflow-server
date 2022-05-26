@@ -22,6 +22,7 @@ public class GameSession {
     private final int fovsizeX;
     private final int fovsizeY;
     private int nextItemDespawn;
+    private int nextSpectatorUpdate;
 
     public GameSession(int x, int y) {
         this(x, y, 30, 20, 20, null, null);
@@ -38,6 +39,7 @@ public class GameSession {
         this.fovsizeY = fovsizeY;
 
         this.nextItemDespawn = nextItemDespawn;
+        this.nextSpectatorUpdate = 200;
 
         if (snakeDataList != null) {
             for (SnakeData snakeData : snakeDataList) {
@@ -71,6 +73,8 @@ public class GameSession {
             if (this.nextItemDespawn > 0) {
                 this.nextItemDespawn--;
             } else {
+                this.nextItemDespawn = 20;
+
                 List<Item> itemListCopy = List.copyOf(this.itemList);
                 for (Item item : itemListCopy) {
                     if (item.getDespawnTime() > 0) {
@@ -78,6 +82,22 @@ public class GameSession {
                     } else {
                         this.killItem(this.itemList.indexOf(item));
                     }
+                }
+            }
+
+            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator()) {
+                if(this.nextSpectatorUpdate <= 0) {
+                    this.nextSpectatorUpdate = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
+
+                    String spectatorData = this.getSendableSpectatorData();
+
+                    for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+                        if(connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
+                            connection.sendUTF(spectatorData);
+                        }
+                    }
+                } else {
+                    this.nextSpectatorUpdate--;
                 }
             }
 
@@ -592,6 +612,65 @@ public class GameSession {
         return List.copyOf(this.itemList);
     }
 
+    // SPECTATORS
+
+    private String getSendableSpectatorData() {
+        JSONObject spectatorData = new JSONObject();
+        spectatorData.put("size_x", this.borderX);
+        spectatorData.put("size_y", this.borderY);
+        spectatorData.put("snake_count", this.snakeList.size());
+        spectatorData.put("item_count", this.itemList.size());
+
+        JSONArray fields = new JSONArray();
+
+        int minY = 0;
+        int maxY = this.borderY;
+
+        for (int iy = minY; iy <= maxY; iy++) {
+            int minX = 0;
+            int maxX = this.borderX;
+
+            for (int ix = minX; ix <= maxX; ix++) {
+                if (ix == 0) {
+                    fields.put(this.createCoordsJSONArray(ix, iy, FieldState.BORDER));
+                } else if (ix == this.borderX) {
+                    fields.put(this.createCoordsJSONArray(ix, iy, FieldState.BORDER));
+                } else if (iy == 0) {
+                    fields.put(this.createCoordsJSONArray(ix, iy, FieldState.BORDER));
+                } else if (iy == this.borderY) {
+                    fields.put(this.createCoordsJSONArray(ix, iy, FieldState.BORDER));
+                } else {
+                    GameObject field = this.getField(ix, iy);
+                    if (field instanceof Snake) {
+                        Snake snake = (Snake) field;
+                        if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
+                            fields.put(this.createCoordsJSONArray(ix, iy, FieldState.getPlayerHeadOtherValue(snake.getFacing())));
+                        } else {
+                            fields.put(this.createCoordsJSONArray(ix, iy, FieldState.PLAYER_BODY_OTHER));
+                        }
+                    } else if (field instanceof Item) {
+                        if (field instanceof Food) {
+                            fields.put(this.createCoordsJSONArray(ix, iy, FieldState.ITEM_FOOD));
+                        } else if (field instanceof SuperFood) {
+                            fields.put(this.createCoordsJSONArray(ix, iy, FieldState.ITEM_SUPER_FOOD));
+                        } else {
+                            // DO NOTHING
+                            //fields.put(this.createCoordsJSONArray(ix, iy, FieldState.ITEM_UNKNOWN));
+                        }
+                    } else {
+                        // DO NOTHING
+                        //fields.put(this.createCoordsJSONArray(ix, iy, FieldState.EMPTY));
+                    }
+                }
+            }
+        }
+
+        spectatorData.put("fields", fields);
+
+        return spectatorData.toString();
+    }
+
+    // SAVEGAMES
     /**
      * Return the entire game as a JSONObject with all game data in it
      *

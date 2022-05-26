@@ -29,12 +29,17 @@ public class EventListener extends CMListenerAdapter {
     // SERVER EVENTS
     @Override
     public void onServerConnectionAttempt(CMSServerConnectionAttemptEvent event) {
-        if (!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress())) {
-            if (SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
-                event.getClient().setState(PendingClientState.ACCEPTED);
+        if ((!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress()))) {
+            if(SlakeoverflowServer.getServer().getConnectionCount() < SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections()) {
+                if (SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
+                    event.getClient().setState(PendingClientState.ACCEPTED);
+                } else {
+                    event.getClient().setTime(10000);
+                    SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (10 seconds to accept)");
+                }
             } else {
-                event.getClient().setTime(10000);
-                SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ")");
+                event.getClient().setTime(5000);
+                SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (Server full, 5 seconds to accept)");
             }
         } else {
             event.getClient().setState(PendingClientState.DENIED);
@@ -119,10 +124,9 @@ public class EventListener extends CMListenerAdapter {
                                 }
                                 SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
                             } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
-                                // SPECTATOR AUTHENTICATION IS CURRENTLY NOT SUPPORTED
-                                cmsClient.close();
+                                SlakeoverflowServer.getServer().authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
                             } else {
-                                SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId());
+                                SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId(), false);
                             }
                         }
                         break;
