@@ -13,7 +13,6 @@ public final class FieldState {
     public static final int PLAYER_HEAD_OWN_EAST = 102;
     public static final int PLAYER_HEAD_OWN_WEST = 104;
     public static final int PLAYER_BODY_OWN = 105;
-    //public static final int PLAYER_TAIL_OWN = 103;
 
     // OTHER PLAYERS
     public static final int PLAYER_HEAD_OTHER_NORTH = 201;
@@ -21,7 +20,6 @@ public final class FieldState {
     public static final int PLAYER_HEAD_OTHER_EAST = 202;
     public static final int PLAYER_HEAD_OTHER_WEST = 204;
     public static final int PLAYER_BODY_OTHER = 205;
-    //public static final int PLAYER_TAIL_OTHER = 203;
 
     // ITEMS
     public static final int ITEM_UNKNOWN = 501; // If it is an unknown item
