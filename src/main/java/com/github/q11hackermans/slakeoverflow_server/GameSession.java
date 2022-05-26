@@ -112,7 +112,7 @@ public class GameSession {
      * Return a number to use in the spawnFood function depending on the player-count
      */
     private int calcFoodSpawnTries() {
-        if (randomIntInRange(1, 3) == 1) {
+        if (randomIntInRange(1, 50) == 1) {
             return (int) (1 + Math.round(0.2 * snakeList.size()));
         }
         return 0;

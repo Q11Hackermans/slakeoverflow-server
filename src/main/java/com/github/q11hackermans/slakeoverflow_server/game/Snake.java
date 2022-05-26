@@ -19,7 +19,7 @@ public class Snake implements GameObject {
     private int speed;
     private int posx;
     private int posy;
-    private int growthBalance; // The internal "apple balance" the snake can grow
+    private int growthBalance; // The internal "food balance" the snake can grow
     private int facing;
     private int newFacing;
     private boolean newFacingUpdated;
@@ -228,7 +228,6 @@ public class Snake implements GameObject {
         if (this.moveIn <= 0) {
             if (this.facing != this.newFacing) {
                 this.move(this.newFacing);
-                return;
             } else {
                 this.move();
             }
@@ -247,6 +246,17 @@ public class Snake implements GameObject {
         if (forced || !this.newFacingUpdated) {
             this.newFacing = newFacing;
             this.newFacingUpdated = true;
+        }
+    }
+
+    /**
+     * Set the direction the snake is facing now
+     *
+     * @param facing The direction the snake is facing now
+     */
+    public void setFacing(int facing) {
+        if (Direction.isValid(facing)) {
+            this.facing = facing;
         }
     }
 
@@ -269,73 +279,77 @@ public class Snake implements GameObject {
      * @param dir Direction the snake should move
      */
     private void move(int dir) {
-        if (dir == Direction.NORTH && this.facing != Direction.SOUTH && gameSession.isOtherPlayerFree(this.posx, (this.posy - 1), this) && this.posy > 1) {
-
-            GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
-            if (newHeadField == this) {
-                int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
-                while (bodyId < bodyPositions.size()) {
-                    bodyPositions.remove(bodyId);
+        if (dir == Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy - 1), this) && this.posy > 1) {
+            if (this.facing != Direction.SOUTH) {
+                GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
+                if (newHeadField == this) {
+                    int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
+                    while (bodyId < (bodyPositions.size() - 1)) {
+                        bodyPositions.remove(bodyId);
+                    }
                 }
+                int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                growSnake(foodValue);
+
+                this.moveBodies();
+                this.posy--;
+
+                this.setFacing(Direction.NORTH);
             }
-            int appleValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
-            growSnake(appleValue);
-
-            this.moveBodies();
-            this.posy--;
-
-            this.setNewFacing(Direction.NORTH, true);
 
         } else if (dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
-
-            GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
-            if (newHeadField == this) {
-                int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
-                while (bodyId < bodyPositions.size()) {
-                    bodyPositions.remove(bodyId);
+            if (this.facing != Direction.WEST) {
+                GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
+                if (newHeadField == this) {
+                    int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
+                    while (bodyId < (bodyPositions.size() - 1)) {
+                        bodyPositions.remove(bodyId);
+                    }
                 }
+                int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
+                growSnake(foodValue);
+
+                this.moveBodies();
+                this.posx++;
+
+                this.setFacing(Direction.EAST);
             }
-            int appleValue = gameSession.getFoodValue((this.posx + 1), this.posy);
-            growSnake(appleValue);
-
-            this.moveBodies();
-            this.posx++;
-
-            this.setNewFacing(Direction.EAST, true);
 
         } else if (dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
-
-            GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
-            if (newHeadField == this) {
-                int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
-                while (bodyId < bodyPositions.size()) {
-                    bodyPositions.remove(bodyId);
+            if (this.facing != Direction.NORTH) {
+                GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
+                if (newHeadField == this) {
+                    int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
+                    while (bodyId < (bodyPositions.size() - 1)) {
+                        bodyPositions.remove(bodyId);
+                    }
                 }
+                int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
+                growSnake(foodValue);
+
+                this.moveBodies();
+                this.posy++;
+
+                this.setFacing(Direction.SOUTH);
             }
-            int appleValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
-            growSnake(appleValue);
-
-            this.moveBodies();
-            this.posy++;
-
-            this.setNewFacing(Direction.SOUTH, true);
 
         } else if (dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
-
-            GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
-            if (newHeadField == this) {
-                int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
-                while (bodyId < bodyPositions.size()) {
-                    bodyPositions.remove(bodyId);
+            if (this.facing != Direction.EAST) {
+                GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
+                if (newHeadField == this) {
+                    int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
+                    while (bodyId < (bodyPositions.size() - 1)) {
+                        bodyPositions.remove(bodyId);
+                    }
                 }
+                int foodValue = gameSession.getFoodValue((this.posx - 1), this.posy);
+                growSnake(foodValue);
+
+                this.moveBodies();
+                this.posx--;
+
+                this.setFacing(Direction.WEST);
             }
-            int appleValue = gameSession.getFoodValue((this.posx - 1), this.posy);
-            growSnake(appleValue);
-
-            this.moveBodies();
-            this.posx--;
-
-            this.setNewFacing(Direction.WEST, true);
 
         } else {
             this.killSnake();
@@ -343,18 +357,18 @@ public class Snake implements GameObject {
     }
 
     /**
-     * Adds one element to the tale if it has apples on its balance or expands the snake by the consumed amount of apples
+     * Adds one element to the tale if it has foods on its balance or expands the snake by the consumed amount of foods
      *
-     * @param appleValue The value of apples the snake has consumed
+     * @param foodValue The value of foods the snake has consumed
      */
-    private void growSnake(int appleValue) {
+    private void growSnake(int foodValue) {
         if (this.growthBalance > 0) {
             this.growthBalance--;
             this.addTale();
-            this.growthBalance += appleValue;
-        } else if (appleValue > 0) {
+            this.growthBalance += foodValue;
+        } else if (foodValue > 0) {
             this.addTale();
-            this.growthBalance += (appleValue - 1);
+            this.growthBalance += (foodValue - 1);
         }
     }
 
