@@ -8,4 +8,23 @@ public final class Direction {
 
     private Direction() {
     }
+
+    public static String toString(int direction) {
+        switch (direction) {
+            case NORTH:
+                return "NORTH";
+            case SOUTH:
+                return "SOUTH";
+            case EAST:
+                return "EAST";
+            case WEST:
+                return "WEST";
+            default:
+                return "";
+        }
+    }
+
+    public static boolean isValid(int direction) {
+        return direction >= 0 && direction < 4;
+    }
 }

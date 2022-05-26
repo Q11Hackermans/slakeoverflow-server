@@ -32,7 +32,7 @@ public class ServerConfig {
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
-        this.snakeSpeedBase = 20;
+        this.snakeSpeedBase = 8;
         this.snakeSpeedModifierValue = 1;
         this.snakeSpeedModifierBodycount = 2;
         this.defaultGameFieldSizeX = 100;

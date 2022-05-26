@@ -130,7 +130,7 @@ public class EventListener extends CMListenerAdapter {
                         if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
                             if (data.has("direction")) {
                                 try {
-                                    int button = data.getInt("direction");
+                                    int sendDirection = data.getInt("direction");
 
                                     ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
 
@@ -138,19 +138,11 @@ public class EventListener extends CMListenerAdapter {
                                         Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
 
                                         if (snake != null) {
-                                            int facing = 0;
 
-                                            if (button == 0) {
-                                                facing = Direction.NORTH;
-                                            } else if (button == 3) {
-                                                facing = Direction.SOUTH;
-                                            } else if (button == 1) {
-                                                facing = Direction.WEST;
-                                            } else if (button == 2) {
-                                                facing = Direction.EAST;
+                                            if (Direction.isValid(sendDirection)) {
+                                                SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "received snake[" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection)) + "] direction change to: " + Direction.toString(sendDirection));
+                                                snake.setNewFacing(sendDirection, true);
                                             }
-
-                                            snake.setNewFacing(facing, false);
                                         }
                                     }
                                 } catch (JSONException ignored) {
