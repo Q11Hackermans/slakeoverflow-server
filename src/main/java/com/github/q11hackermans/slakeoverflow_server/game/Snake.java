@@ -289,6 +289,9 @@ public class Snake implements GameObject {
                     }
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                if (foodValue > 0) {
+                    gameSession.killen;
+                }
                 growSnake(foodValue);
 
                 this.moveBodies();
@@ -307,6 +310,9 @@ public class Snake implements GameObject {
                     }
                 }
                 int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
+                if (foodValue > 0) {
+                    gameSession.killen;
+                }
                 growSnake(foodValue);
 
                 this.moveBodies();
@@ -325,6 +331,9 @@ public class Snake implements GameObject {
                     }
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
+                if (foodValue > 0) {
+                    gameSession.killen;
+                }
                 growSnake(foodValue);
 
                 this.moveBodies();
@@ -343,6 +352,9 @@ public class Snake implements GameObject {
                     }
                 }
                 int foodValue = gameSession.getFoodValue((this.posx - 1), this.posy);
+                if (foodValue > 0) {
+                    gameSession.killen;
+                }
                 growSnake(foodValue);
 
                 this.moveBodies();
