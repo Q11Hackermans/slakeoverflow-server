@@ -8,7 +8,6 @@ import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationSta
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
-import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
@@ -373,7 +372,7 @@ public class SlakeoverflowServer {
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
-            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getSlots())) {
+            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getMaxPlayers())) {
                 connection.authenticateAsPlayer();
             }
         }

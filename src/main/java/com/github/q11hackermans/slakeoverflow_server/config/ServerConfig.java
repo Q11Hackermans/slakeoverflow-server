@@ -4,7 +4,7 @@ public class ServerConfig {
     private int port;
     private boolean autoConnectionAccept;
     private boolean userAuthentication;
-    private int slots;
+    private int maxPlayers;
     private int minFoodValue;
     private int maxFoodValue;
     private int defaultSnakeLength;
@@ -15,7 +15,7 @@ public class ServerConfig {
     private int defaultGameFieldSizeY;
     private boolean unauthenticatePlayerOnDeath;
     private boolean printDebugMessages;
-    private int defaultItemDespawnTime;
+    private int itemDefaultDespawnTime;
     private int ItemSuperFoodDespawnTime;
 
     // ADVANCED OPTIONS
@@ -28,7 +28,7 @@ public class ServerConfig {
         this.port = 26677;
         this.autoConnectionAccept = true;
         this.userAuthentication = false;
-        this.slots = 10;
+        this.maxPlayers = 10;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
@@ -39,7 +39,7 @@ public class ServerConfig {
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
         this.printDebugMessages = false;
-        this.defaultItemDespawnTime = 60;
+        this.itemDefaultDespawnTime = 60;
         this.ItemSuperFoodDespawnTime = 120;
 
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -73,17 +73,17 @@ public class ServerConfig {
         this.userAuthentication = userAuthentication;
     }
 
-    public int getSlots() {
-        if (slots > 0) {
-            return this.slots;
+    public int getMaxPlayers() {
+        if (maxPlayers > 0) {
+            return this.maxPlayers;
         } else {
             return 1;
         }
     }
 
-    public void setSlots(int slots) {
-        if (slots > 0) {
-            this.slots = slots;
+    public void setMaxPlayers(int maxPlayers) {
+        if (maxPlayers > 0) {
+            this.maxPlayers = maxPlayers;
         }
     }
 
@@ -217,13 +217,13 @@ public class ServerConfig {
         this.printDebugMessages = printDebugMessages;
     }
 
-    public int getDefaultItemDespawnTime() {
-        return defaultItemDespawnTime;
+    public int getItemDefaultDespawnTime() {
+        return itemDefaultDespawnTime;
     }
 
-    public void setDefaultItemDespawnTime(int defaultItemDespawnTime) {
-        if (defaultItemDespawnTime > 0) {
-            this.defaultItemDespawnTime = defaultItemDespawnTime;
+    public void setItemDefaultDespawnTime(int itemDefaultDespawnTime) {
+        if (itemDefaultDespawnTime > 0) {
+            this.itemDefaultDespawnTime = itemDefaultDespawnTime;
         } else {
             throw new IllegalArgumentException("The time must be higher than 0");
         }

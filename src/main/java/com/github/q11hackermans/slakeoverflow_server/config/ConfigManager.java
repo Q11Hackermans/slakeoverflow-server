@@ -40,27 +40,31 @@ public class ConfigManager {
                 String out = sb.toString();
 
                 try {
-                    JSONObject jsonConfig = new JSONObject(out);
+                    JSONObject config = new JSONObject(out);
 
-                    this.config.setPort(jsonConfig.getInt("port"));
-                    this.config.setAutoConnectionAccept(jsonConfig.getBoolean("auto_connection_accept"));
-                    this.config.setUserAuthentication(jsonConfig.getBoolean("user_authentication"));
-                    this.config.setSlots(jsonConfig.getInt("slots"));
-                    this.config.setMaxFoodValue(jsonConfig.getInt("min_food_value"));
-                    this.config.setMaxFoodValue(jsonConfig.getInt("max_food_value"));
-                    this.config.setSnakeSpeedBase(jsonConfig.getInt("snake_speed_base"));
-                    this.config.setSnakeSpeedModifierValue(jsonConfig.getInt("snake_speed_modifier_value"));
-                    this.config.setSnakeSpeedModifierBodycount(jsonConfig.getInt("snake_speed_modifier_bodycount"));
-                    this.config.setDefaultGameFieldSizeX(jsonConfig.getInt("default_gamefield_size_x"));
-                    this.config.setDefaultGameFieldSizeY(jsonConfig.getInt("default_gamefield_size_y"));
-                    this.config.setUnauthenticatePlayerOnDeath(jsonConfig.getBoolean("unauthenticate_player_on_death"));
-                    this.config.setPrintDebugMessages(jsonConfig.getBoolean("print_debug_messages"));
-                    this.config.setDefaultItemDespawnTime(jsonConfig.getInt("default_item_despawn_time"));
-                    this.config.setItemSuperFoodDespawnTime(jsonConfig.getInt("item_superfood_despawn_time"));
+                    JSONObject serverSettings = config.getJSONObject("server_settings");
+                    this.config.setPort(serverSettings.getInt("port"));
+                    this.config.setAutoConnectionAccept(serverSettings.getBoolean("auto_connection_accept"));
+                    this.config.setUserAuthentication(serverSettings.getBoolean("user_authentication"));
+                    this.config.setMaxPlayers(serverSettings.getInt("max_players"));
+                    this.config.setUnauthenticatePlayerOnDeath(serverSettings.getBoolean("unauthenticate_player_on_death"));
+                    this.config.setPrintDebugMessages(serverSettings.getBoolean("print_debug_messages"));
 
-                    this.config.setOverrideServerTickrate(jsonConfig.getBoolean("advanced_override_server_tickrate"));
-                    this.config.setCustomServerTickrate(jsonConfig.getInt("advanced_custom_server_tickrate"));
-                    this.config.setCustomServerTickrateIdle(jsonConfig.getInt("advanced_custom_server_tickrate_idle"));
+                    JSONObject gameSettings = config.getJSONObject("game_settings");
+                    this.config.setMaxFoodValue(gameSettings.getInt("min_food_value"));
+                    this.config.setMaxFoodValue(gameSettings.getInt("max_food_value"));
+                    this.config.setSnakeSpeedBase(gameSettings.getInt("snake_speed_base"));
+                    this.config.setSnakeSpeedModifierValue(gameSettings.getInt("snake_speed_modifier_value"));
+                    this.config.setSnakeSpeedModifierBodycount(gameSettings.getInt("snake_speed_modifier_bodycount"));
+                    this.config.setDefaultGameFieldSizeX(gameSettings.getInt("default_gamefield_size_x"));
+                    this.config.setDefaultGameFieldSizeY(gameSettings.getInt("default_gamefield_size_y"));
+                    this.config.setItemDefaultDespawnTime(gameSettings.getInt("default_item_despawn_time"));
+                    this.config.setItemSuperFoodDespawnTime(gameSettings.getInt("item_superfood_despawn_time"));
+
+                    JSONObject advancedSettings = config.getJSONObject("advanced_settings");
+                    this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
+                    this.config.setCustomServerTickrate(advancedSettings.getInt("advanced_custom_server_tickrate"));
+                    this.config.setCustomServerTickrateIdle(advancedSettings.getInt("advanced_custom_server_tickrate_idle"));
 
                     SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
                 } catch (JSONException e) {
@@ -85,25 +89,33 @@ public class ConfigManager {
                 this.configFile.createNewFile();
 
                 JSONObject config = new JSONObject();
-                config.put("port", 26677);
-                config.put("auto_connection_accept", false);
-                config.put("user_authentication", false);
-                config.put("slots", 10);
-                config.put("min_food_value", 1);
-                config.put("max_food_value", 2);
-                config.put("snake_speed_base", 20);
-                config.put("snake_speed_modifier_value", 1);
-                config.put("snake_speed_modifier_bodycount", 2);
-                config.put("default_gamefield_size_x", 100);
-                config.put("default_gamefield_size_y", 100);
-                config.put("unauthenticate_player_on_death", true);
-                config.put("print_debug_messages", false);
-                config.put("default_item_despawn_time", 60);
-                config.put("item_superfood_despawn_time", 120);
 
-                config.put("advanced_override_server_tickrate", false);
-                config.put("advanced_custom_server_tickrate", 50);
-                config.put("advanced_custom_server_tickrate_idle", 950);
+                JSONObject serverSettings = new JSONObject();
+                serverSettings.put("port", this.config.getPort());
+                serverSettings.put("auto_connection_accept", this.config.isAutoConnectionAccept());
+                serverSettings.put("user_authentication", this.config.isUserAuthentication());
+                serverSettings.put("max_players", this.config.getMaxPlayers());
+                serverSettings.put("unauthenticate_player_on_death", this.config.isUnauthenticatePlayerOnDeath());
+                serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages());
+                config.put("server_settings", serverSettings);
+
+                JSONObject gameSettings = new JSONObject();
+                gameSettings.put("min_food_value", this.config.getMinFoodValue());
+                gameSettings.put("max_food_value", this.config.getMaxFoodValue());
+                gameSettings.put("snake_speed_base", this.config.getSnakeSpeedBase());
+                gameSettings.put("snake_speed_modifier_value", this.config.getSnakeSpeedModifierValue());
+                gameSettings.put("snake_speed_modifier_bodycount", this.config.getSnakeSpeedModifierBodycount());
+                gameSettings.put("default_gamefield_size_x", this.config.getDefaultGameFieldSizeX());
+                gameSettings.put("default_gamefield_size_y", this.config.getDefaultGameFieldSizeY());
+                gameSettings.put("default_item_despawn_time", this.config.getItemDefaultDespawnTime());
+                gameSettings.put("item_superfood_despawn_time", this.config.getItemSuperFoodDespawnTime());
+                config.put("game_settings", gameSettings);
+
+                JSONObject advancedSettings = new JSONObject();
+                advancedSettings.put("advanced_override_server_tickrate", this.config.isOverrideServerTickrate());
+                advancedSettings.put("advanced_custom_server_tickrate", this.config.getCustomServerTickrate());
+                advancedSettings.put("advanced_custom_server_tickrate_idle", this.config.getCustomServerTickrateIdle());
+                config.put("advanced_settings", advancedSettings);
 
                 FileWriter writer = new FileWriter(this.configFile);
                 writer.write(config.toString(4));
