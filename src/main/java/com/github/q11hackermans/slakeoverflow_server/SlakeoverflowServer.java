@@ -438,7 +438,9 @@ public class SlakeoverflowServer {
         }
 
         for (ServerConnection connection : this.connectionList) {
-            if ((connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR) && this.gameState != GameState.RUNNING && this.gameState != GameState.PAUSED) {
+            if (!this.isGameAvail() && (connection.getAuthenticationState() == AuthenticationState.PLAYER || connection.getAuthenticationState() == AuthenticationState.SPECTATOR)) {
+                connection.unauthenticate();
+            } else if (this.isGameAvail() && !this.configManager.getConfig().isEnableSpectator() && connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connection.unauthenticate();
             }
         }
