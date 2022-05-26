@@ -85,16 +85,25 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setUserAuthentication(Boolean.parseBoolean(cmd[3]));
                         return "Updated value user_authentication to " + cmd[3];
-                    } else if (cmd[2].equalsIgnoreCase("slots")) {
+                    } else if (cmd[2].equalsIgnoreCase("max_connections")) {
                         try {
-                            int slots = Integer.parseInt(cmd[3]);
-                            if (slots > 0) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxPlayers(slots);
-                                return "Updated value slots to " + slots;
-                            } else {
-                                return "You can only set a positive int value";
-                            }
-                        } catch (NumberFormatException e) {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxConnections(Integer.parseInt(cmd[3]));
+                            return "Updated value max_connections";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("max_players")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxPlayers(Integer.parseInt(cmd[3]));
+                            return "Updated value max_connections";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("max_spectators")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxSpectators(Integer.parseInt(cmd[3]));
+                            return "Updated value max_connections";
+                        } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("min_food_value")) {
@@ -237,8 +246,12 @@ public class ConsoleCommands {
                 if (cmd.length == 3) {
                     if (cmd[2].equalsIgnoreCase("port")) {
                         return "Value port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort();
-                    } else if (cmd[2].equalsIgnoreCase("slots")) {
-                        return "Value slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers();
+                    } else if (cmd[2].equalsIgnoreCase("max_connections")) {
+                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections();
+                    } else if (cmd[2].equalsIgnoreCase("max_players")) {
+                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers();
+                    } else if (cmd[2].equalsIgnoreCase("max_spectators")) {
+                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxSpectators();
                     } else if (cmd[2].equalsIgnoreCase("auto_connection_accept")) {
                         return "Value auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept();
                     } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
@@ -289,12 +302,14 @@ public class ConsoleCommands {
                 return "CONFIG OPTIONS:\n" +
                         "Server Settings:\n" +
                         "port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort() + "\n" +
-                        "slots: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers() + "\n" +
+                        "max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections() + "\n" +
                         "auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept() + "\n" +
                         "user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication() + "\n" +
                         "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
                         "print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
                         "Game Settings:\n" +
+                        "max_players: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers() + "\n" +
+                        "max_spectators: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxSpectators() + "\n" +
                         "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
                         "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
                         "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n" +

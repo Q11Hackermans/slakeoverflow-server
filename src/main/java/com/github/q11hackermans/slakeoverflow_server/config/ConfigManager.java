@@ -45,12 +45,14 @@ public class ConfigManager {
                     JSONObject serverSettings = config.getJSONObject("server_settings");
                     this.config.setPort(serverSettings.getInt("port"));
                     this.config.setAutoConnectionAccept(serverSettings.getBoolean("auto_connection_accept"));
+                    this.config.setMaxConnections(serverSettings.getInt("max_connections"));
                     this.config.setUserAuthentication(serverSettings.getBoolean("user_authentication"));
-                    this.config.setMaxPlayers(serverSettings.getInt("max_players"));
                     this.config.setUnauthenticatePlayerOnDeath(serverSettings.getBoolean("unauthenticate_player_on_death"));
                     this.config.setPrintDebugMessages(serverSettings.getBoolean("print_debug_messages"));
 
                     JSONObject gameSettings = config.getJSONObject("game_settings");
+                    this.config.setMaxPlayers(gameSettings.getInt("max_players"));
+                    this.config.setMaxSpectators(gameSettings.getInt("max_spectators"));
                     this.config.setMaxFoodValue(gameSettings.getInt("min_food_value"));
                     this.config.setMaxFoodValue(gameSettings.getInt("max_food_value"));
                     this.config.setSnakeSpeedBase(gameSettings.getInt("snake_speed_base"));
@@ -96,12 +98,14 @@ public class ConfigManager {
                 serverSettings.put("port", this.config.getPort());
                 serverSettings.put("auto_connection_accept", this.config.isAutoConnectionAccept());
                 serverSettings.put("user_authentication", this.config.isUserAuthentication());
-                serverSettings.put("max_players", this.config.getMaxPlayers());
+                serverSettings.put("max_connections", this.config.getMaxConnections());
                 serverSettings.put("unauthenticate_player_on_death", this.config.isUnauthenticatePlayerOnDeath());
                 serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages());
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();
+                gameSettings.put("max_players", this.config.getMaxPlayers());
+                gameSettings.put("max_spectators", this.config.getMaxSpectators());
                 gameSettings.put("min_food_value", this.config.getMinFoodValue());
                 gameSettings.put("max_food_value", this.config.getMaxFoodValue());
                 gameSettings.put("snake_speed_base", this.config.getSnakeSpeedBase());

@@ -7,9 +7,10 @@ public class ServerConfig {
     private boolean userAuthentication;
     private boolean unauthenticatePlayerOnDeath;
     private boolean printDebugMessages;
-    private int maxPlayers;
-
+    private int maxConnections;
     // GAME OPTIONS
+    private int maxPlayers;
+    private int maxSpectators;
     private int minFoodValue;
     private int maxFoodValue;
     private int defaultSnakeLength;
@@ -34,9 +35,11 @@ public class ServerConfig {
         this.port = 26677;
         this.autoConnectionAccept = true;
         this.userAuthentication = false;
-        this.maxPlayers = 10;
+        this.maxConnections = 20;
 
         // GAME OPTIONS
+        this.maxPlayers = 10;
+        this.maxSpectators = 2;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
@@ -213,7 +216,7 @@ public class ServerConfig {
     }
 
     public boolean isUnauthenticatePlayerOnDeath() {
-        return unauthenticatePlayerOnDeath;
+        return this.unauthenticatePlayerOnDeath;
     }
 
     public void setUnauthenticatePlayerOnDeath(boolean unauthenticatePlayerOnDeath) {
@@ -221,7 +224,7 @@ public class ServerConfig {
     }
 
     public boolean isPrintDebugMessages() {
-        return printDebugMessages;
+        return this.printDebugMessages;
     }
 
     public void setPrintDebugMessages(boolean printDebugMessages) {
@@ -253,7 +256,7 @@ public class ServerConfig {
     }
 
     public boolean isEnableSpectator() {
-        return enableSpectator;
+        return this.enableSpectator;
     }
 
     public void setEnableSpectator(boolean enableSpectator) {
@@ -267,6 +270,30 @@ public class ServerConfig {
     public void setSpectatorUpdateInterval(int spectatorUpdateInterval) {
         if(spectatorUpdateInterval > 0) {
             this.spectatorUpdateInterval = spectatorUpdateInterval;
+        } else {
+            throw new IllegalArgumentException("The value must be higher than 0");
+        }
+    }
+
+    public int getMaxConnections() {
+        return this.maxConnections;
+    }
+
+    public void setMaxConnections(int maxConnections) {
+        if (maxConnections > 0) {
+            this.maxConnections = maxConnections;
+        } else {
+            throw new IllegalArgumentException("The value must be higher than 0");
+        }
+    }
+
+    public int getMaxSpectators() {
+        return this.maxSpectators;
+    }
+
+    public void setMaxSpectators(int maxSpectators) {
+        if(maxSpectators > 0) {
+            this.maxSpectators = maxSpectators;
         } else {
             throw new IllegalArgumentException("The value must be higher than 0");
         }

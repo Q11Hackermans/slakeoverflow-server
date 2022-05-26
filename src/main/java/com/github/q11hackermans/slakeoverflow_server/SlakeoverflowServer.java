@@ -359,10 +359,24 @@ public class SlakeoverflowServer {
         return null;
     }
 
+    public int getConnectionCount() {
+        return this.getConnectionList().size();
+    }
+
     public int getPlayerCount() {
         int connectionCount = 0;
-        for (ServerConnection connection : this.connectionList) {
+        for (ServerConnection connection : this.getConnectionList()) {
             if (connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                connectionCount++;
+            }
+        }
+        return connectionCount;
+    }
+
+    public int getSpectatorCount() {
+        int connectionCount = 0;
+        for (ServerConnection connection : this.getConnectionList()) {
+            if (connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connectionCount++;
             }
         }
@@ -378,10 +392,21 @@ public class SlakeoverflowServer {
         }
     }
 
-    public void unauthenticateConnection(UUID connectionUUID) {
+    public void authenticateConnectionAsSpectator(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
-            connection.unauthenticate();
+            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getSpectatorCount() < this.configManager.getConfig().getMaxSpectators())) {
+                connection.authenticateAsSpectator();
+            }
+        }
+    }
+
+    public void unauthenticateConnection(UUID connectionUUID, boolean ignoreConnectionConditions) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        if (connection != null) {
+            if (ignoreConnectionConditions || this.configManager.getConfig().isUserAuthentication()) {
+                connection.unauthenticate();
+            }
         }
     }
 
