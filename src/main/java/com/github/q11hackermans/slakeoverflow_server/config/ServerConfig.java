@@ -151,7 +151,7 @@ public class ServerConfig {
         if (this.snakeSpeedBase > 0) {
             return snakeSpeedBase;
         } else {
-            return 20;
+            return 4;
         }
     }
 
@@ -165,13 +165,15 @@ public class ServerConfig {
         if (this.snakeSpeedModifierValue >= 0) {
             return snakeSpeedModifierValue;
         } else {
-            return 1;
+            return 0;
         }
     }
 
     public void setSnakeSpeedModifierValue(int snakeSpeedModifierValue) {
         if (snakeSpeedModifierValue >= 0) {
             this.snakeSpeedModifierValue = snakeSpeedModifierValue;
+        } else {
+            throw new IllegalArgumentException("The value must be 0 or higher");
         }
     }
 

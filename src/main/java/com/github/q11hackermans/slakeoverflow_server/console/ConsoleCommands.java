@@ -158,7 +158,7 @@ public class ConsoleCommands {
                         try {
                             int snakeSpeedModifierValue = Integer.parseInt(cmd[3]);
                             if (snakeSpeedModifierValue >= 0) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedBase(snakeSpeedModifierValue);
+                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierValue(snakeSpeedModifierValue);
                                 return "Updated value snake_speed_modifier_value";
                             } else {
                                 return "You can only set a positive (or 0) int value";
