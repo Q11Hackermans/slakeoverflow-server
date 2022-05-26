@@ -205,7 +205,7 @@ public class ConsoleCommands {
                             SlakeoverflowServer.getServer().getConfigManager().getConfig().setItemSuperFoodDespawnTime(Integer.parseInt(cmd[3]));
                             return "Updated value item_superfood_despawn_time";
                         } catch (IllegalArgumentException e) {
-                            return "You can only set a positive int value (50 or higher)";
+                            return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
@@ -213,13 +213,23 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("print_debug_messages")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setPrintDebugMessages(Boolean.parseBoolean(cmd[3]));
                         return "Updated value print_debug_messages to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("enable_spectator")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableSpectator(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_spectator to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("spectator_update_interval")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setSpectatorUpdateInterval(Integer.parseInt(cmd[3]));
+                            return "Updated value spectator_update_interval";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
+                        return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
+                    } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
+                        return "This option can't be changed while the server is running";
                     } else {
                         return "Unknown config option";
                     }
-                } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
-                    return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
-                } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
-                    return "This option can't be changed while the server is running";
                 } else {
                     return "Run command without arguments for help";
                 }
@@ -245,6 +255,10 @@ public class ConsoleCommands {
                         return "Value snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
                     } else if (cmd[2].equalsIgnoreCase("snake_speed_modifier_bodycount")) {
                         return "Value snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+                    } else if (cmd[2].equalsIgnoreCase("enable_spectator")) {
+                        return "Value enable_spectator: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator();
+                    } else if (cmd[2].equalsIgnoreCase("spectator_update_interval")) {
+                        return "Value spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
                     } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
                         return "Value enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled();
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate")) {
@@ -291,6 +305,8 @@ public class ConsoleCommands {
                         "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
                         "default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime() + "\n" +
                         "item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime() + "\n" +
+                        "enable_spectator: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator() + "\n" +
+                        "spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval() + "\n" +
                         "Advanced Settings:\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +

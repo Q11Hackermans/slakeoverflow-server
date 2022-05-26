@@ -1,10 +1,15 @@
 package com.github.q11hackermans.slakeoverflow_server.config;
 
 public class ServerConfig {
+    // SERVER OPTIONS
     private int port;
     private boolean autoConnectionAccept;
     private boolean userAuthentication;
+    private boolean unauthenticatePlayerOnDeath;
+    private boolean printDebugMessages;
     private int maxPlayers;
+
+    // GAME OPTIONS
     private int minFoodValue;
     private int maxFoodValue;
     private int defaultSnakeLength;
@@ -13,10 +18,10 @@ public class ServerConfig {
     private int snakeSpeedModifierBodycount;
     private int defaultGameFieldSizeX;
     private int defaultGameFieldSizeY;
-    private boolean unauthenticatePlayerOnDeath;
-    private boolean printDebugMessages;
     private int itemDefaultDespawnTime;
     private int ItemSuperFoodDespawnTime;
+    private boolean enableSpectator;
+    private int spectatorUpdateInterval;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -25,10 +30,13 @@ public class ServerConfig {
     private int customServerTickrateIdle;
 
     public ServerConfig(boolean advancedOptionsEnabled) {
+        // SERVER OPTIONS
         this.port = 26677;
         this.autoConnectionAccept = true;
         this.userAuthentication = false;
         this.maxPlayers = 10;
+
+        // GAME OPTIONS
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
@@ -41,7 +49,10 @@ public class ServerConfig {
         this.printDebugMessages = false;
         this.itemDefaultDespawnTime = 60;
         this.ItemSuperFoodDespawnTime = 120;
+        this.enableSpectator = true;
+        this.spectatorUpdateInterval = 200;
 
+        // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
         this.overrideServerTickrate = false;
         this.customServerTickrate = 50;
@@ -238,6 +249,26 @@ public class ServerConfig {
             this.ItemSuperFoodDespawnTime = itemSuperFoodDespawnTime;
         } else {
             throw new IllegalArgumentException("The time must be higher than 0");
+        }
+    }
+
+    public boolean isEnableSpectator() {
+        return enableSpectator;
+    }
+
+    public void setEnableSpectator(boolean enableSpectator) {
+        this.enableSpectator = enableSpectator;
+    }
+
+    public int getSpectatorUpdateInterval() {
+        return spectatorUpdateInterval;
+    }
+
+    public void setSpectatorUpdateInterval(int spectatorUpdateInterval) {
+        if(spectatorUpdateInterval > 0) {
+            this.spectatorUpdateInterval = spectatorUpdateInterval;
+        } else {
+            throw new IllegalArgumentException("The value must be higher than 0");
         }
     }
 

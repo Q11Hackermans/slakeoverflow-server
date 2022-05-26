@@ -60,6 +60,8 @@ public class ConfigManager {
                     this.config.setDefaultGameFieldSizeY(gameSettings.getInt("default_gamefield_size_y"));
                     this.config.setItemDefaultDespawnTime(gameSettings.getInt("default_item_despawn_time"));
                     this.config.setItemSuperFoodDespawnTime(gameSettings.getInt("item_superfood_despawn_time"));
+                    this.config.setEnableSpectator(gameSettings.getBoolean("enable_spectator"));
+                    this.config.setSpectatorUpdateInterval(gameSettings.getInt("spectator_update_interval"));
 
                     JSONObject advancedSettings = config.getJSONObject("advanced_settings");
                     this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
@@ -109,6 +111,8 @@ public class ConfigManager {
                 gameSettings.put("default_gamefield_size_y", this.config.getDefaultGameFieldSizeY());
                 gameSettings.put("default_item_despawn_time", this.config.getItemDefaultDespawnTime());
                 gameSettings.put("item_superfood_despawn_time", this.config.getItemSuperFoodDespawnTime());
+                gameSettings.put("enable_spectator", this.config.isEnableSpectator());
+                gameSettings.put("spectator_update_interval", this.config.getSpectatorUpdateInterval());
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();
