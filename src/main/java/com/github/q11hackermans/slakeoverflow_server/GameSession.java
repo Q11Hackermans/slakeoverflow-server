@@ -79,6 +79,7 @@ public class GameSession {
                         this.killItem(this.itemList.indexOf(item));
                     }
                 }
+                this.nextItemDespawn = 20;
             }
 
             // ADD NEW SNAKES
