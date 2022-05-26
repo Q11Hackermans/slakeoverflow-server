@@ -156,8 +156,15 @@ public class GameSession {
         synchronized (this.itemList) {
             try {
                 this.itemList.remove(index);
-            } catch (IndexOutOfBoundsException ignored) {
-            }
+            } catch (IndexOutOfBoundsException ignored) {}
+        }
+    }
+
+    public void killItem(Item item) {
+        synchronized (this.itemList) {
+            try {
+                this.itemList.remove(item);
+            } catch (IndexOutOfBoundsException ignored) {}
         }
     }
 
