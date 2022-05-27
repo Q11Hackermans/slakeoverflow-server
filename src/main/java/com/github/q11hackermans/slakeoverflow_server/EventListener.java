@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
+import com.github.q11hackermans.slakeoverflow_server.config.ServerConfig;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
@@ -192,6 +193,81 @@ public class EventListener extends CMListenerAdapter {
                                 }
                             }
                         }
+                    case "get_user_info":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            JSONObject response = new JSONObject();
+
+                            response.put("auth", connection.getAuthenticationState());
+
+                            AccountData account = connection.getAccount();
+                            if(account != null) {
+                                response.put("account_id", account.getId());
+                                response.put("account_name", account.getUsername());
+                                response.put("account_permission", account.getPermissionLevel());
+                            } else {
+                                response.put("account_id", -1);
+                                response.put("account_name", "");
+                                response.put("account_permission", "");
+                            }
+
+                            connection.sendUTF(response.toString());
+                        }
+
+                        break;
+                    }
+                    case "get_server_info":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            ServerConfig config = SlakeoverflowServer.getServer().getConfigManager().getConfig();
+
+                            JSONObject response = new JSONObject();
+
+                            JSONObject serverSettings = new JSONObject();
+                            serverSettings.put("server_name", "Slakeoverflow-Server");
+                            serverSettings.put("user_authentication", config.isUserAuthentication());
+                            serverSettings.put("allow_guests", config.isAllowGuests());
+                            serverSettings.put("allow_login", config.isAllowLogin());
+                            serverSettings.put("also_disable_privileged_login", config.isAlsoDisablePrivilegedLogin());
+                            serverSettings.put("allow_registration", config.isAllowRegistration());
+                            response.put("server_settings", serverSettings);
+
+                            JSONObject gameSettings = new JSONObject();
+                            gameSettings.put("max_players", config.getMaxPlayers());
+                            gameSettings.put("max_spectators", config.getMaxSpectators());
+                            gameSettings.put("snake_speed_base", config.getSnakeSpeedBase());
+                            gameSettings.put("snake_speed_modifier_value", config.getSnakeSpeedModifierValue());
+                            gameSettings.put("snake_speed_modifier_bodycount", config.getSnakeSpeedModifierBodycount());
+                            gameSettings.put("min_food_value", config.getMinFoodValue());
+                            gameSettings.put("max_food_value", config.getMaxFoodValue());
+                            gameSettings.put("default_snake_length", config.getDefaultSnakeLength());
+                            gameSettings.put("item_default_despawn_time", config.getItemDefaultDespawnTime());
+                            gameSettings.put("item_superfood_despawn_time", config.getItemSuperFoodDespawnTime());
+                            gameSettings.put("enable_spectator", config.isEnableSpectator());
+                            gameSettings.put("spectator_update_interval", config.getSpectatorUpdateInterval());
+                            response.put("game_settings", gameSettings);
+
+                            JSONObject advancedSettings = new JSONObject();
+                            advancedSettings.put("server_tickrate", SlakeoverflowServer.getServer().getTickSpeed());
+                            advancedSettings.put("server_idle_tickrate", SlakeoverflowServer.getServer().getIdleTickSpeed());
+                            response.put("advanced_settings", advancedSettings);
+
+                            JSONObject serverStats = new JSONObject();
+                            advancedSettings.put("tickrate", SlakeoverflowServer.getServer().getTickRate());
+                            advancedSettings.put("connection_count", SlakeoverflowServer.getServer().getConnectionCount());
+                            advancedSettings.put("player_count", SlakeoverflowServer.getServer().getPlayerCount());
+                            advancedSettings.put("spectator_count", SlakeoverflowServer.getServer().getSpectatorCount());
+                            response.put("server_stats", serverStats);
+
+                            connection.sendUTF(response.toString());
+                        }
+
+                        break;
+                    }
                 }
             }
         } catch (JSONException e) {

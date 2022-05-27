@@ -460,13 +460,18 @@ public class SlakeoverflowServer {
         }
     }
 
-    public void registerAccount(UUID connectionUUID, String username, String password, boolean ignoreRegistrationConditions) {
+    public boolean registerAccount(UUID connectionUUID, String username, String password, boolean ignoreRegistrationConditions) {
         if(ignoreRegistrationConditions || this.configManager.getConfig().isAllowRegistration()) {
             long userid = this.accountSystem.createAccount(username, password);
 
             if(userid > 0 && this.getConnectionByUUID(connectionUUID) != null) {
                 this.loginConnection(connectionUUID, userid, false);
+                return true;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
     }
 
@@ -557,6 +562,12 @@ public class SlakeoverflowServer {
                 statusMessage.put("cmd", "status");
                 statusMessage.put("status", this.gameState);
                 statusMessage.put("auth", connection.getAuthenticationState());
+                AccountData account = connection.getAccount();
+                if(account != null) {
+                    statusMessage.put("account", account.getId());
+                } else {
+                    statusMessage.put("account", -1);
+                }
 
                 connection.sendUTF(statusMessage.toString());
             }
@@ -658,6 +669,14 @@ public class SlakeoverflowServer {
 
     public AccountSystem getAccountSystem() {
         return this.accountSystem;
+    }
+
+    public int getTickSpeed() {
+        return this.tickSpeed;
+    }
+
+    public int getIdleTickSpeed() {
+        return this.idleTickSpeed;
     }
 
     // THREAD TEMPLATES
