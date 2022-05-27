@@ -491,10 +491,20 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
                             if (connection != null) {
+
+                                String accountString;
+                                if(connection.getAccount() != null) {
+                                    accountString = "LOGGED IN (" + connection.getAccount().getId() + ", " + connection.getAccount().getUsername() + ")";
+                                } else {
+                                    accountString = "LOGGED OUT";
+                                }
+
                                 return "USER INFO:\n" +
                                         "UUID: " + connection.getClientId() + "\n" +
-                                        "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n";
+                                        "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n" +
+                                        "Account: " + accountString + "\n";
                             } else {
                                 return "This user does not exist";
                             }
@@ -543,6 +553,40 @@ public class ConsoleCommands {
                     } else {
                         return "Run command without arguments for help";
                     }
+                case "login":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            if (connection != null) {
+                                AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[3]));
+
+                                if(account != null) {
+                                    connection.setAccount(account.getId());
+                                    return "Logged in user " + connection.getClientId() + " into account " + account.getUsername() + " (" + account.getId() + ")";
+                                } else {
+                                    return "Account does not exist";
+                                }
+                            } else {
+                                return "This user does not exist";
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "Usage: user login <UUID> <AccountID>";
+                    }
+                case "logout":
+                    try {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                        if (connection != null) {
+                            connection.removeAccount();
+                            return "Logged out user " + connection.getClientId();
+                        } else {
+                            return "This user does not exist";
+                        }
+                    } catch (IllegalArgumentException e) {
+                        return "Please enter a valid UUID";
+                    }
                 default:
                     return "Run command without arguments for help";
             }
@@ -551,7 +595,9 @@ public class ConsoleCommands {
                     "user list\n" +
                     "user info <UUID>\n" +
                     "user auth <UUID> player/spectator\n" +
-                    "user unauth <UUID>\n";
+                    "user unauth <UUID>\n" +
+                    "user login <UUID> <AccountID>\n" +
+                    "user logout <UUID>\n";
         }
     }
 

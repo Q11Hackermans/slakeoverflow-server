@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.connections;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
@@ -11,10 +12,12 @@ import java.util.UUID;
 public class ServerConnection {
     private UUID clientId;
     private int authenticationState;
+    private long accountId;
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
         this.authenticationState = AuthenticationState.UNAUTHENTICATED;
+        this.accountId = -1;
     }
 
     // AUTHORISATION
@@ -41,6 +44,20 @@ public class ServerConnection {
     public void unauthenticate() {
         this.authenticationState = AuthenticationState.UNAUTHENTICATED;
         SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " unauthenticated");
+    }
+
+    // ACCOUNT SYSTEM
+
+    public void setAccount(long id) {
+        if(id > 0) {
+            this.accountId = id;
+        } else {
+            throw new IllegalArgumentException("Invalid account id");
+        }
+    }
+
+    public void removeAccount() {
+        this.accountId = -1;
     }
 
     // CONNECTION
@@ -82,6 +99,18 @@ public class ServerConnection {
      */
     public DataIOStreamHandler getDataIOStreamHandler() {
         return SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(this.clientId);
+    }
+
+    /**
+     * Returns the account the serverconnection is currently logged in
+     * @return AccountData
+     */
+    public AccountData getAccount() {
+        return SlakeoverflowServer.getServer().getAccountSystem().getAccount(this.accountId);
+    }
+
+    public long getAccountId() {
+        return this.accountId;
     }
 
     /**
