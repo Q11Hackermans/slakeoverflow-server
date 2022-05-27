@@ -289,15 +289,16 @@ public class GameSession {
                 } else {
                     GameObject field = this.getField(ix, iy);
                     if (field instanceof Snake) {
+                        Snake fieldSnake = (Snake) field;
                         if (field == snake) {
                             if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(snake.getFacing())));
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(fieldSnake.getFacing())));
                             } else {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OWN));
                             }
                         } else {
                             if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOtherValue(snake.getFacing())));
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOtherValue(fieldSnake.getFacing())));
                             } else {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OTHER));
                             }
