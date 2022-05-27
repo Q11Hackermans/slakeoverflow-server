@@ -528,6 +528,14 @@ public class SlakeoverflowServer {
             } else if (this.isGameAvail() && !this.configManager.getConfig().isEnableSpectator() && connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connection.unauthenticate();
             }
+
+            if(connection.getAccountId() != -1) {
+                AccountData account = SlakeoverflowServer.getServer().accountSystem.getAccount(connection.getAccountId());
+
+                if(account == null) {
+                    connection.removeAccount();
+                }
+            }
         }
     }
 
