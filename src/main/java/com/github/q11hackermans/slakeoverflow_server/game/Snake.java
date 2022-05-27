@@ -303,7 +303,7 @@ public class Snake implements GameObject {
                 this.setFacing(Direction.NORTH);
             }
 
-        } else if (dir == Direction.EAST && this.facing != Direction.WEST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
+        } else if (dir == Direction.EAST && gameSession.isOtherPlayerFree((this.posx + 1), this.posy, this) && this.posx < (this.gameSession.getBorder()[0] - 1)) {
             if (this.facing != Direction.WEST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
                 if (newHeadField == this) {
@@ -327,7 +327,7 @@ public class Snake implements GameObject {
                 this.setFacing(Direction.EAST);
             }
 
-        } else if (dir == Direction.SOUTH && this.facing != Direction.NORTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
+        } else if (dir == Direction.SOUTH && gameSession.isOtherPlayerFree(this.posx, (this.posy + 1), this) && this.posy < (this.gameSession.getBorder()[1] - 1)) {
             if (this.facing != Direction.NORTH) {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
                 if (newHeadField == this) {
@@ -351,7 +351,7 @@ public class Snake implements GameObject {
                 this.setFacing(Direction.SOUTH);
             }
 
-        } else if (dir == Direction.WEST && this.facing != Direction.EAST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
+        } else if (dir == Direction.WEST && gameSession.isOtherPlayerFree((this.posx - 1), this.posy, this) && this.posx > 1) {
             if (this.facing != Direction.EAST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
                 if (newHeadField == this) {
