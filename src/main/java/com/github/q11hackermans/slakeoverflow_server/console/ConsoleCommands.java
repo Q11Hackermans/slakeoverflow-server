@@ -51,12 +51,14 @@ public class ConsoleCommands {
                         return loggerCommand(cmd);
                     case "info":
                         return infoCommand();
+                    case "account":
+                        return accountCommand(cmd);
                     default:
                         return "Unknown command";
                 }
             }
         } catch (Exception e) {
-            return "Command error: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace());
+            return "Command error: " + e.toString() + ": " + e.getMessage() + " " + Arrays.toString(e.getStackTrace());
         }
         return "";
     }
@@ -68,6 +70,7 @@ public class ConsoleCommands {
                 "config: Get or set config\n" +
                 "connection: Connection management (ConnectionManager)\n" +
                 "user: User management (ServerConnections)\n" +
+                "account: User account management (Database)\n" +
                 "blacklist: IP blacklist management\n" +
                 "game: Game management\n" +
                 "logger: Logging management\n" +
@@ -1153,18 +1156,23 @@ public class ConsoleCommands {
                 if(cmd.length == 3) {
                     AccountData accountData = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
 
-                    String password;
-                    if(accountData.getPassword() != null) {
-                        password = "AVAIL";
+                    if(accountData != null) {
+                        String password;
+                        if(accountData.getPassword() != null) {
+                            password = "AVAIL";
+                        } else {
+                            password = "DISABLED";
+                        }
+
+                        return "ACCOUNT INFORMATION:\n" +
+                                "ID: " + accountData.getId() + "\n" +
+                                "Username: " + accountData.getUsername() + "\n" +
+                                "Password: " + password + "\n" +
+                                "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n";
                     } else {
-                        password = "DISABLED";
+                        return "Account does not exist";
                     }
 
-                    return "ACCOUNT INFORMATION:\n" +
-                            "ID: " + accountData.getId() + "\n" +
-                            "Username: " + accountData.getUsername() + "\n" +
-                            "Password: " + password + "\n" +
-                            "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n";
                 } else {
                     return "Usage: account info <ID>";
                 }
@@ -1181,7 +1189,7 @@ public class ConsoleCommands {
                         password = "DISABLED";
                     }
 
-                    returnString = returnString + account.getId() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n";
+                    returnString = returnString + account.getId() + " " + account.getUsername() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n";
                     count++;
                 }
                 returnString = returnString + "---- " + count + " registered accounts ----";

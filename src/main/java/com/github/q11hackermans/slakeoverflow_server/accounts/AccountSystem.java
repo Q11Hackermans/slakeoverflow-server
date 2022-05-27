@@ -18,7 +18,7 @@ public class AccountSystem {
 
     // CONSTRUCTOR
     public AccountSystem() {
-        this.databaseFile = new File(System.getProperty("user.dir") + "accounts.db");
+        this.databaseFile = new File(System.getProperty("user.dir"), "database.db");
 
         this.connect();
     }
@@ -37,7 +37,7 @@ public class AccountSystem {
             List<AccountData> accounts = this.getAccounts();
 
             for(AccountData account : accounts) {
-                if(!account.getUsername().equalsIgnoreCase(username)) {
+                if(account.getUsername().equalsIgnoreCase(username)) {
                     return -1;
                 }
             }
@@ -48,24 +48,23 @@ public class AccountSystem {
                 statement.setString(1, username);
                 statement.setString(2, this.getPasswordHashValue(password));
                 statement.execute();
-
-                String sql2 = "SELECT id FROM users WHERE username = ? AND password = ?";
-                PreparedStatement statement2 = database.prepareStatement(sql2);
-                statement2.setString(1, username);
-                statement2.setString(2, this.getPasswordHashValue(password));
-                ResultSet rs = statement.executeQuery();
-
-                if(rs.next()) {
-                    return rs.getLong("id");
-                } else {
-                    return -1;
-                }
-
             } else {
                 String sql = "INSERT INTO users (username, password) values (?,?)";
                 PreparedStatement statement = database.prepareStatement(sql);
                 statement.setString(1, username);
                 statement.setNull(2, Types.VARCHAR);
+                statement.execute();
+            }
+
+            String sql2 = "SELECT id FROM users WHERE username = ?";
+            PreparedStatement statement2 = database.prepareStatement(sql2);
+            statement2.setString(1, username);
+            ResultSet rs = statement2.executeQuery();
+
+            if(rs.next()) {
+                return rs.getLong("id");
+            } else {
+                return -1;
             }
 
         } catch(SQLException ignored) {}
@@ -80,19 +79,21 @@ public class AccountSystem {
      */
     public boolean deleteAccount(long id) {
         try {
-            String sql = "SELECT id FROM users WHERE id = ?;";
+            String sql = "SELECT id FROM users WHERE id = ?";
             PreparedStatement statement = database.prepareStatement(sql);
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
-                String sql2 = "DELETE FROM users (id) WHERE id = ?;";
+                String sql2 = "DELETE FROM users WHERE id = ?;";
                 PreparedStatement statement2 = database.prepareStatement(sql2);
                 statement2.setLong(1, id);
                 statement2.execute();
 
                 return true;
             }
-        } catch(SQLException ignored) {}
+        } catch(SQLException ignored) {
+            ignored.printStackTrace();
+        }
 
         return false;
     }
@@ -257,6 +258,7 @@ public class AccountSystem {
 
             if(!databaseFile.exists()) {
                 databaseFile.createNewFile();
+                System.out.println("created");
             }
 
             database = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
