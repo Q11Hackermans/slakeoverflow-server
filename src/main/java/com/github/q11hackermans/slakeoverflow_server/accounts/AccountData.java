@@ -17,7 +17,7 @@ public class AccountData {
      * Get the user ID
      * @return User ID
      */
-    long getId() {
+    public long getId() {
         return this.id;
     }
 
@@ -25,7 +25,7 @@ public class AccountData {
      * Get the username
      * @return Username String
      */
-    String getUsername() {
+    public String getUsername() {
         return this.username;
     }
 
@@ -33,7 +33,7 @@ public class AccountData {
      * Get the hashed password
      * @return Hashed password String
      */
-    String getPassword() {
+    public String getPassword() {
         return this.password;
     }
 
@@ -41,7 +41,7 @@ public class AccountData {
      * Check if the account is an admin
      * @return Player admin status
      */
-    int getPermissionLevel() {
+    public int getPermissionLevel() {
         return this.permissionLevel;
     }
 

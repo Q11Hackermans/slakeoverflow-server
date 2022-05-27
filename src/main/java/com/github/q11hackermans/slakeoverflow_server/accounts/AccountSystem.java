@@ -31,27 +31,46 @@ public class AccountSystem {
      * @param password Password (unhashed, this method will automatically hash the specified password string)
      * @return success
      */
-    public boolean createAccount(String username, String password) {
+    public long createAccount(String username, String password) {
         try {
 
             List<AccountData> accounts = this.getAccounts();
 
             for(AccountData account : accounts) {
                 if(!account.getUsername().equalsIgnoreCase(username)) {
-                    return false;
+                    return -1;
                 }
             }
 
-            String sql = "INSERT INTO users (username, password) values (?,?)";
-            PreparedStatement statement = database.prepareStatement(sql);
-            statement.setString(1, username);
-            statement.setString(2, this.getPasswordHashValue(password));
+            if(password != null) {
+                String sql = "INSERT INTO users (username, password) values (?,?)";
+                PreparedStatement statement = database.prepareStatement(sql);
+                statement.setString(1, username);
+                statement.setString(2, this.getPasswordHashValue(password));
+                statement.execute();
 
-            return true;
+                String sql2 = "SELECT id FROM users WHERE username = ? AND password = ?";
+                PreparedStatement statement2 = database.prepareStatement(sql2);
+                statement2.setString(1, username);
+                statement2.setString(2, this.getPasswordHashValue(password));
+                ResultSet rs = statement.executeQuery();
+
+                if(rs.next()) {
+                    return rs.getLong("id");
+                } else {
+                    return -1;
+                }
+
+            } else {
+                String sql = "INSERT INTO users (username, password) values (?,?)";
+                PreparedStatement statement = database.prepareStatement(sql);
+                statement.setString(1, username);
+                statement.setNull(2, Types.VARCHAR);
+            }
 
         } catch(SQLException ignored) {}
 
-        return false;
+        return -1;
     }
 
     /**
@@ -84,7 +103,7 @@ public class AccountSystem {
      * @param username New username
      * @return success
      */
-    public boolean updateUsername(int id, String username) {
+    public boolean updateUsername(long id, String username) {
         AccountData data = this.getAccount(id);
 
         if(data != null) {
@@ -110,19 +129,29 @@ public class AccountSystem {
      * @param password Unhashed password (this method will hash the password before saving it into database)
      * @return success
      */
-    public boolean updatePassword(int id, String password) {
+    public boolean updatePassword(long id, String password) {
         AccountData data = this.getAccount(id);
 
         if(data != null) {
             try {
 
-                String sql = "UPDATE users SET password = ? WHERE id = ?";
-                PreparedStatement statement = this.database.prepareStatement(sql);
-                statement.setString(1, this.getPasswordHashValue(password));
-                statement.setLong(2, data.getId());
-                statement.execute();
+                if(password != null) {
+                    String sql = "UPDATE users SET password = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setString(1, this.getPasswordHashValue(password));
+                    statement.setLong(2, data.getId());
+                    statement.execute();
 
-                return true;
+                    return true;
+                } else {
+                    String sql = "UPDATE users SET password = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setNull(1, Types.VARCHAR);
+                    statement.setLong(2, data.getId());
+                    statement.execute();
+
+                    return true;
+                }
 
             } catch(SQLException ignored) {}
         }
@@ -136,21 +165,23 @@ public class AccountSystem {
      * @param permissionLevel permission level
      * @return success
      */
-    public boolean updatePermissionLevel(int id, int permissionLevel) {
-        AccountData data = this.getAccount(id);
+    public boolean updatePermissionLevel(long id, int permissionLevel) {
+        if(permissionLevel >= 0 && permissionLevel <= 2) {
+            AccountData data = this.getAccount(id);
 
-        if(data != null) {
-            try {
+            if(data != null) {
+                try {
 
-                String sql = "UPDATE users SET permission = ? WHERE id = ?";
-                PreparedStatement statement = this.database.prepareStatement(sql);
-                statement.setInt(1, permissionLevel);
-                statement.setLong(2, data.getId());
-                statement.execute();
+                    String sql = "UPDATE users SET permission = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setInt(1, permissionLevel);
+                    statement.setLong(2, data.getId());
+                    statement.execute();
 
-                return true;
+                    return true;
 
-            } catch(SQLException ignored) {}
+                } catch(SQLException ignored) {}
+            }
         }
 
         return false;

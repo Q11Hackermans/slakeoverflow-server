@@ -1,7 +1,9 @@
 package com.github.q11hackermans.slakeoverflow_server.console;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
+import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
@@ -1115,5 +1117,130 @@ public class ConsoleCommands {
                 "Manager Thread: " + SlakeoverflowServer.getServer().isManagerThreadAlive() + " " + SlakeoverflowServer.getServer().getManagerThreadState() + "\n" +
                 "Tick Thread: " + SlakeoverflowServer.getServer().isTickThreadAlive() + " " + SlakeoverflowServer.getServer().getTickThreadState() + "\n" +
                 "Times Thread: " + SlakeoverflowServer.getServer().isTimesThreadAlive() + " " + SlakeoverflowServer.getServer().getTimesThreadState() + "\n";
+    }
+
+    private static String accountCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            if(cmd[1].equalsIgnoreCase("create")) {
+                if(cmd.length == 3) {
+                    long id = SlakeoverflowServer.getServer().getAccountSystem().createAccount(cmd[2], null);
+                    if(id > -1) {
+                        return "Account created with id " + id;
+                    } else {
+                        return "Account could not be created";
+                    }
+                } else if(cmd.length == 4) {
+                    long id = SlakeoverflowServer.getServer().getAccountSystem().createAccount(cmd[2], cmd[3]);
+                    if(id > -1) {
+                        return "Account created with id " + id;
+                    } else {
+                        return "Account could not be created";
+                    }
+                } else {
+                    return "USAGE: account create <username> (password)";
+                }
+            } else if(cmd[1].equalsIgnoreCase("delete")) {
+                if(cmd.length == 3) {
+                    if(SlakeoverflowServer.getServer().getAccountSystem().deleteAccount(Long.parseLong(cmd[2]))) {
+                        return "Account deleted";
+                    } else {
+                        return "Account could not be deleted";
+                    }
+                } else {
+                    return "USAGE: account delete <ID>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("info")) {
+                if(cmd.length == 3) {
+                    AccountData accountData = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
+
+                    String password;
+                    if(accountData.getPassword() != null) {
+                        password = "AVAIL";
+                    } else {
+                        password = "DISABLED";
+                    }
+
+                    return "ACCOUNT INFORMATION:\n" +
+                            "ID: " + accountData.getId() + "\n" +
+                            "Username: " + accountData.getUsername() + "\n" +
+                            "Password: " + password + "\n" +
+                            "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n";
+                } else {
+                    return "Usage: account info <ID>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("list")) {
+                List<AccountData> accountDataList = SlakeoverflowServer.getServer().getAccountSystem().getAccounts();
+
+                int count = 0;
+                String returnString = "REGISTERED ACCOUNTS:\n";
+                for(AccountData account : accountDataList) {
+                    String password;
+                    if(account.getPassword() != null) {
+                        password = "AVAIL";
+                    } else {
+                        password = "DISABLED";
+                    }
+
+                    returnString = returnString + account.getId() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n";
+                    count++;
+                }
+                returnString = returnString + "---- " + count + " registered accounts ----";
+                return returnString;
+            } else if(cmd[1].equalsIgnoreCase("update")) {
+                if(cmd.length == 5) {
+                    AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
+
+                    if(account != null) {
+                        if(cmd[3].equalsIgnoreCase("username")) {
+                            if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
+                                return "Updated username";
+                            } else {
+                                return "Username not updated";
+                            }
+                        } else if(cmd[3].equalsIgnoreCase("password")) {
+                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
+                                return "Updated password";
+                            } else {
+                                return "Password not updated";
+                            }
+                        } else if(cmd[3].equalsIgnoreCase("permission")) {
+                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                return "Updated permission level";
+                            } else {
+                                return "Permission level was not updated";
+                            }
+                        } else {
+                            return "Run command without arguments for help";
+                        }
+                    } else {
+                        return "Account does not exist";
+                    }
+                } else {
+                    return "Usage: account update <ID> username/password/permission <value>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("getid")) {
+                if(cmd.length == 3) {
+                    AccountData accountData = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+
+                    if(accountData != null) {
+                        return "Account ID of " + accountData.getUsername() + ": " + accountData.getId();
+                    } else {
+                        return "Username not found";
+                    }
+                } else {
+                    return "Usage: account getid <username>";
+                }
+            } else {
+                return "Run command without arguments for help";
+            }
+        } else {
+            return "ACCOUNT COMMAND USAGE:\n" +
+                    "account create <username> (password)\n" +
+                    "account delete <ID>\n" +
+                    "account info <ID>\n" +
+                    "account list\n" +
+                    "account update <ID> username/password/permission <value>\n" +
+                    "account getid <username>\n";
+        }
     }
 }
