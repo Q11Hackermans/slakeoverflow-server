@@ -49,6 +49,7 @@ public class ConfigManager {
                     this.config.setUserAuthentication(serverSettings.getBoolean("user_authentication"));
                     this.config.setUnauthenticatePlayerOnDeath(serverSettings.getBoolean("unauthenticate_player_on_death"));
                     this.config.setPrintDebugMessages(serverSettings.getBoolean("print_debug_messages"));
+                    this.config.setAllowGuests(serverSettings.getBoolean("allow_guests"));
 
                     JSONObject gameSettings = config.getJSONObject("game_settings");
                     this.config.setMaxPlayers(gameSettings.getInt("max_players"));
@@ -101,6 +102,7 @@ public class ConfigManager {
                 serverSettings.put("max_connections", this.config.getMaxConnections());
                 serverSettings.put("unauthenticate_player_on_death", this.config.isUnauthenticatePlayerOnDeath());
                 serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages());
+                serverSettings.put("allow_guests", this.config.isAllowGuests());
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();

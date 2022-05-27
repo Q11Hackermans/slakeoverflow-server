@@ -8,6 +8,7 @@ public class ServerConfig {
     private boolean unauthenticatePlayerOnDeath;
     private boolean printDebugMessages;
     private int maxConnections;
+    private boolean allowGuests;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -36,6 +37,7 @@ public class ServerConfig {
         this.autoConnectionAccept = true;
         this.userAuthentication = false;
         this.maxConnections = 20;
+        this.allowGuests = true;
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -299,6 +301,14 @@ public class ServerConfig {
         } else {
             throw new IllegalArgumentException("The value must be higher than 0");
         }
+    }
+
+    public boolean isAllowGuests() {
+        return this.allowGuests;
+    }
+
+    public void setAllowGuests(boolean allowGuests) {
+        this.allowGuests = allowGuests;
     }
 
     // ADVANCED

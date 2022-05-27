@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountSystem;
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
@@ -35,6 +36,8 @@ public class SlakeoverflowServer {
     // CONNECTION MANAGER
     private final CMSServer connectionhandler;
     private final DataIOManager dataIOManager;
+    // ACCOUNT SYSTEM
+    private final AccountSystem accountSystem;
     // MANAGER THREADS
     private Thread managerThread;
     private Thread managerUtilsThread;
@@ -88,6 +91,9 @@ public class SlakeoverflowServer {
         this.connectionhandler.addGlobalListener(new EventListener());
         this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.MULTI_STREAM_HANDLER_CONSUMING);
         this.dataIOManager.addEventListener(new EventListener());
+
+        // ACCOUNT SYSTEM
+        this.accountSystem = new AccountSystem();
 
         // GAME SESSION
         this.gameState = GameState.STOPPED;
@@ -586,6 +592,10 @@ public class SlakeoverflowServer {
 
     public int getManualTicks() {
         return this.manualTicks;
+    }
+
+    public AccountSystem getAccountSystem() {
+        return this.accountSystem;
     }
 
     // THREAD TEMPLATES
