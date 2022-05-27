@@ -4,13 +4,13 @@ public class AccountData {
     private final long id;
     private final String username;
     private final String password;
-    private final boolean admin;
+    private final int permissionLevel;
 
-    public AccountData(long id, String username, String password, boolean isAdmin) {
+    public AccountData(long id, String username, String password, int permissionLevel) {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.admin = isAdmin;
+        this.permissionLevel = permissionLevel;
     }
 
     /**
@@ -41,8 +41,8 @@ public class AccountData {
      * Check if the account is an admin
      * @return Player admin status
      */
-    boolean isAdmin() {
-        return this.admin;
+    int getPermissionLevel() {
+        return this.permissionLevel;
     }
 
     public boolean equalsOtherAccount(AccountData otherAccount) {

@@ -131,20 +131,20 @@ public class AccountSystem {
     }
 
     /**
-     * Update the admin status of an account
+     * Update the permission level of an account
      * @param id User ID
-     * @param adminStatus admin status
+     * @param permissionLevel permission level
      * @return success
      */
-    public boolean updateAdminStatus(int id, boolean adminStatus) {
+    public boolean updatePermissionLevel(int id, int permissionLevel) {
         AccountData data = this.getAccount(id);
 
         if(data != null) {
             try {
 
-                String sql = "UPDATE users SET admin = ? WHERE id = ?";
+                String sql = "UPDATE users SET permission = ? WHERE id = ?";
                 PreparedStatement statement = this.database.prepareStatement(sql);
-                statement.setBoolean(1, adminStatus);
+                statement.setInt(1, permissionLevel);
                 statement.setLong(2, data.getId());
                 statement.execute();
 
@@ -172,7 +172,7 @@ public class AccountSystem {
 
             if(rs.next()) {
                 if(rs.getLong("id") == id) {
-                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getBoolean("admin"));
+                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"));
                 }
             }
 
@@ -210,7 +210,7 @@ public class AccountSystem {
             ResultSet result = statement.executeQuery();
 
             while(result.next()) {
-                accounts.add(new AccountData(result.getLong("id"), result.getString("username"), result.getString("password"), result.getBoolean("admin")));
+                accounts.add(new AccountData(result.getLong("id"), result.getString("username"), result.getString("password"), result.getInt("permission")));
             }
         } catch(SQLException e) {
             SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQL Exception: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
@@ -235,7 +235,7 @@ public class AccountSystem {
                     "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                     "username VARCHAR(255)," +
                     "password VARCHAR(255)," +
-                    "admin boolean NOT NULL DEFAULT false" +
+                    "permission INTEGER NOT NULL DEFAULT 0" +
                     ");";
             PreparedStatement statement = database.prepareStatement(createUsersTable);
             statement.execute();
