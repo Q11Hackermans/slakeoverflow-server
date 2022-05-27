@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
@@ -130,6 +131,44 @@ public class EventListener extends CMListenerAdapter {
                             }
                         }
                         break;
+                    case "login":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            if(data.has("username") && data.has("password")) {
+                                AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(data.getString("username"));
+
+                                if(account != null) {
+                                    SlakeoverflowServer.getServer().loginConnection(cmsClient.getUniqueId(), account.getId(), false);
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case "logout":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            SlakeoverflowServer.getServer().logoutConnection(cmsClient.getUniqueId(), false);
+                        }
+
+                        break;
+                    }
+                    case "register":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            if(data.has("username") && data.has("password")) {
+                                SlakeoverflowServer.getServer().registerAccount(cmsClient.getUniqueId(), data.getString("username"), data.getString("password"), false);
+                            }
+                        }
+
+                        break;
+                    }
                     case "game_direction_change":
                         if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
                             if (data.has("direction")) {

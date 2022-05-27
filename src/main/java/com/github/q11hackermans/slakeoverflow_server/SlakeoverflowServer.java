@@ -1,10 +1,12 @@
 package com.github.q11hackermans.slakeoverflow_server;
 
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountSystem;
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
+import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
@@ -365,6 +367,20 @@ public class SlakeoverflowServer {
         return null;
     }
 
+    /**
+     * Get a connection with a specific account id
+     * @param id Account ID
+     * @return ServerConnection (if exists), null (if not exists)
+     */
+    public ServerConnection getConnectionByAccountId(long id) {
+        for(ServerConnection connection : this.getConnectionList()) {
+            if(connection.getAccountId() == id) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
     public int getConnectionCount() {
         return this.getConnectionList().size();
     }
@@ -412,6 +428,44 @@ public class SlakeoverflowServer {
         if (connection != null) {
             if (ignoreConnectionConditions || this.configManager.getConfig().isUserAuthentication()) {
                 connection.unauthenticate();
+            }
+        }
+    }
+
+    public void loginConnection(UUID connectionUUID, long accountID, boolean ignoreLoginConditions) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        AccountData account = this.accountSystem.getAccount(accountID);
+
+        if(connection != null && account != null) {
+            if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
+                connection.setAccount(account.getId());
+            }
+        }
+    }
+
+    public void logoutConnection(UUID connectionUUID, boolean ignoreLoginConditions) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+
+        if(connection != null) {
+            AccountData account = this.accountSystem.getAccount(connection.getAccountId());
+
+            if(account != null) {
+                if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
+                    connection.removeAccount();
+                }
+            } else {
+                connection.removeAccount();
+            }
+
+        }
+    }
+
+    public void registerAccount(UUID connectionUUID, String username, String password, boolean ignoreRegistrationConditions) {
+        if(ignoreRegistrationConditions || this.configManager.getConfig().isAllowRegistration()) {
+            long userid = this.accountSystem.createAccount(username, password);
+
+            if(userid > 0 && this.getConnectionByUUID(connectionUUID) != null) {
+                this.loginConnection(connectionUUID, userid, false);
             }
         }
     }

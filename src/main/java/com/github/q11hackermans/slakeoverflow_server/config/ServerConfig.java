@@ -9,6 +9,9 @@ public class ServerConfig {
     private boolean printDebugMessages;
     private int maxConnections;
     private boolean allowGuests;
+    private boolean allowLogin;
+    private boolean alsoDisablePrivilegedLogin;
+    private boolean allowRegistration;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -38,6 +41,9 @@ public class ServerConfig {
         this.userAuthentication = false;
         this.maxConnections = 20;
         this.allowGuests = true;
+        this.allowLogin = true;
+        this.alsoDisablePrivilegedLogin = false;
+        this.allowRegistration = true;
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -309,6 +315,30 @@ public class ServerConfig {
 
     public void setAllowGuests(boolean allowGuests) {
         this.allowGuests = allowGuests;
+    }
+
+    public boolean isAllowLogin() {
+        return this.allowLogin;
+    }
+
+    public void setAllowLogin(boolean allowLogin) {
+        this.allowLogin = allowLogin;
+    }
+
+    public boolean isAlsoDisablePrivilegedLogin() {
+        return this.alsoDisablePrivilegedLogin;
+    }
+
+    public void setAlsoDisablePrivilegedLogin(boolean alsoDisablePrivilegedLogin) {
+        this.alsoDisablePrivilegedLogin = alsoDisablePrivilegedLogin;
+    }
+
+    public boolean isAllowRegistration() {
+        return allowRegistration;
+    }
+
+    public void setAllowRegistration(boolean allowRegistration) {
+        this.allowRegistration = allowRegistration;
     }
 
     // ADVANCED
