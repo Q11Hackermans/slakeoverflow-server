@@ -292,7 +292,7 @@ public class GameSession {
                         Snake fieldSnake = (Snake) field;
                         if (field == snake) {
                             if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
-                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(fieldSnake.getFacing())));
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(fieldSnake.getFacing()), fieldSnake.isHasMoved()));
                             } else {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OWN));
                             }
@@ -346,6 +346,15 @@ public class GameSession {
         jsonArray.put(x);
         jsonArray.put(y);
         jsonArray.put(fieldState);
+        return jsonArray;
+    }
+
+    private JSONArray createCoordsJSONArray(int x, int y, int fieldState, boolean hasMoved) {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(x);
+        jsonArray.put(y);
+        jsonArray.put(fieldState);
+        jsonArray.put(hasMoved);
         return jsonArray;
     }
 
