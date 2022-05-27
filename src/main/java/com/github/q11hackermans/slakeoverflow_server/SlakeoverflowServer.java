@@ -483,13 +483,15 @@ public class SlakeoverflowServer {
     }
 
     private void sendStatusMessage() {
-        for (ServerConnection connection : this.connectionList) {
-            JSONObject statusMessage = new JSONObject();
-            statusMessage.put("cmd", "status");
-            statusMessage.put("status", this.gameState);
-            statusMessage.put("auth", connection.getAuthenticationState());
+        synchronized(this.connectionList) {
+            for (ServerConnection connection : this.connectionList) {
+                JSONObject statusMessage = new JSONObject();
+                statusMessage.put("cmd", "status");
+                statusMessage.put("status", this.gameState);
+                statusMessage.put("auth", connection.getAuthenticationState());
 
-            connection.sendUTF(statusMessage.toString());
+                connection.sendUTF(statusMessage.toString());
+            }
         }
     }
 
