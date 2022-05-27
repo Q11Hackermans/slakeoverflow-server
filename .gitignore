@@ -2,4 +2,4 @@
 /out/
 /config.json
 log.json
-/database.json
+/database.db
