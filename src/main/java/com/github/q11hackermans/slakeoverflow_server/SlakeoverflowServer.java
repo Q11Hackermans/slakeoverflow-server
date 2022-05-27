@@ -407,8 +407,9 @@ public class SlakeoverflowServer {
 
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+
         if (connection != null) {
-            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getPlayerCount() < this.configManager.getConfig().getMaxPlayers())) {
+            if (ignoreConnectionConditions || this.getAuthenticationCondition(connection, (this.getPlayerCount() < this.configManager.getConfig().getMaxPlayers()))) {
                 connection.authenticateAsPlayer();
             }
         }
@@ -417,7 +418,7 @@ public class SlakeoverflowServer {
     public void authenticateConnectionAsSpectator(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
-            if (ignoreConnectionConditions || (this.configManager.getConfig().isUserAuthentication() && this.getSpectatorCount() < this.configManager.getConfig().getMaxSpectators())) {
+            if (ignoreConnectionConditions || this.getAuthenticationCondition(connection, (this.getSpectatorCount() < this.configManager.getConfig().getMaxSpectators()))) {
                 connection.authenticateAsSpectator();
             }
         }
@@ -572,6 +573,44 @@ public class SlakeoverflowServer {
                 connection.sendUTF(statusMessage.toString());
             }
         }
+    }
+
+    private boolean getAuthenticationCondition(ServerConnection connection, boolean customCondition) {
+        if(connection != null) {
+            AccountData account = connection.getAccount();
+
+            boolean isUserAuthentication = SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
+            boolean isAllowGuests = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuests();
+            boolean isUser;
+            boolean isAdmin;
+            if(account != null) {
+                isUser = true;
+                if(account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN) {
+                    isAdmin = true;
+                } else {
+                    isAdmin = false;
+                }
+            } else {
+                isUser = false;
+                isAdmin = false;
+            }
+
+            // CONDITIONS
+
+            if(isAdmin) {
+                return true;
+            }
+
+            if(isUserAuthentication && isAllowGuests && customCondition) {
+                return true;
+            }
+
+            if(isUserAuthentication && isUser && customCondition) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // IP BLACKLIST
