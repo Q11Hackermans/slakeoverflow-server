@@ -200,6 +200,8 @@ public class EventListener extends CMListenerAdapter {
                         if(connection != null) {
                             JSONObject response = new JSONObject();
 
+                            response.put("cmd", "user_info");
+
                             response.put("auth", connection.getAuthenticationState());
 
                             AccountData account = connection.getAccount();
@@ -226,6 +228,8 @@ public class EventListener extends CMListenerAdapter {
                             ServerConfig config = SlakeoverflowServer.getServer().getConfigManager().getConfig();
 
                             JSONObject response = new JSONObject();
+
+                            response.put("cmd", "server_info");
 
                             JSONObject serverSettings = new JSONObject();
                             serverSettings.put("server_name", "Slakeoverflow-Server");
