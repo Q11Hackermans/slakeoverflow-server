@@ -53,6 +53,7 @@ public class ConfigManager {
                     this.config.setAllowLogin(serverSettings.getBoolean("allow_login"));
                     this.config.setAlsoDisablePrivilegedLogin(serverSettings.getBoolean("also_disable_privileged_login"));
                     this.config.setAllowRegistration(serverSettings.getBoolean("allow_registration"));
+                    this.config.setServerName(serverSettings.getString("server_name"));
 
                     JSONObject gameSettings = config.getJSONObject("game_settings");
                     this.config.setMaxPlayers(gameSettings.getInt("max_players"));
@@ -109,6 +110,7 @@ public class ConfigManager {
                 serverSettings.put("allow_login", this.config.isAllowLogin());
                 serverSettings.put("also_disable_privileged_login", this.config.isAlsoDisablePrivilegedLogin());
                 serverSettings.put("allow_registration", this.config.isAllowRegistration());
+                serverSettings.put("server_name", this.config.getServerName());
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();

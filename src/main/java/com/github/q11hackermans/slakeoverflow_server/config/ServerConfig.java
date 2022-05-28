@@ -1,5 +1,8 @@
 package com.github.q11hackermans.slakeoverflow_server.config;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
 public class ServerConfig {
     // SERVER OPTIONS
     private int port;
@@ -12,6 +15,7 @@ public class ServerConfig {
     private boolean allowLogin;
     private boolean alsoDisablePrivilegedLogin;
     private boolean allowRegistration;
+    private String serverName;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -44,6 +48,7 @@ public class ServerConfig {
         this.allowLogin = true;
         this.alsoDisablePrivilegedLogin = false;
         this.allowRegistration = true;
+        this.serverName = "Slakeoverflow-Server";
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -339,6 +344,21 @@ public class ServerConfig {
 
     public void setAllowRegistration(boolean allowRegistration) {
         this.allowRegistration = allowRegistration;
+    }
+
+    public String getServerName() {
+        return this.serverName;
+    }
+
+    public void setServerName(String serverName) {
+        byte[] bytes = serverName.getBytes(StandardCharsets.UTF_8);
+
+        String addString = "";
+        for(byte b : bytes) {
+            addString = addString + (char) b;
+        }
+
+        this.serverName = addString;
     }
 
     // ADVANCED

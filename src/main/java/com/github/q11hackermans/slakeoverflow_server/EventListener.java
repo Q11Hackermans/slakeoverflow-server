@@ -232,7 +232,7 @@ public class EventListener extends CMListenerAdapter {
                             response.put("cmd", "server_info");
 
                             JSONObject serverSettings = new JSONObject();
-                            serverSettings.put("server_name", "Slakeoverflow-Server");
+                            serverSettings.put("server_name", config.getServerName());
                             serverSettings.put("user_authentication", config.isUserAuthentication());
                             serverSettings.put("allow_guests", config.isAllowGuests());
                             serverSettings.put("allow_login", config.isAllowLogin());
