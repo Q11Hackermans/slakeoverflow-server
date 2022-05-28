@@ -433,18 +433,21 @@ public class SlakeoverflowServer {
         }
     }
 
-    public void loginConnection(UUID connectionUUID, long accountID, boolean ignoreLoginConditions) {
+    public boolean loginConnection(UUID connectionUUID, long accountID, boolean ignoreLoginConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         AccountData account = this.accountSystem.getAccount(accountID);
 
         if(connection != null && account != null) {
             if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
                 connection.setAccount(account.getId());
+                return true;
             }
         }
+
+        return false;
     }
 
-    public void logoutConnection(UUID connectionUUID, boolean ignoreLoginConditions) {
+    public boolean logoutConnection(UUID connectionUUID, boolean ignoreLoginConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
 
         if(connection != null) {
@@ -453,12 +456,16 @@ public class SlakeoverflowServer {
             if(account != null) {
                 if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
                     connection.removeAccount();
+                    return true;
                 }
             } else {
                 connection.removeAccount();
+                return false; // false is returned because the user was not logged in before, but user will be logged out for safety reasons
             }
 
         }
+
+        return false;
     }
 
     public boolean registerAccount(UUID connectionUUID, String username, String password, boolean ignoreRegistrationConditions) {
