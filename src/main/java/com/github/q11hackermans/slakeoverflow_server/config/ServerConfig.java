@@ -31,6 +31,7 @@ public class ServerConfig {
     private int ItemSuperFoodDespawnTime;
     private boolean enableSpectator;
     private int spectatorUpdateInterval;
+    private boolean enableSnakeSpeedBoost;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -67,6 +68,7 @@ public class ServerConfig {
         this.ItemSuperFoodDespawnTime = 120;
         this.enableSpectator = true;
         this.spectatorUpdateInterval = 200;
+        this.enableSnakeSpeedBoost = true;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -359,6 +361,14 @@ public class ServerConfig {
         }
 
         this.serverName = addString;
+    }
+
+    public boolean isEnableSnakeSpeedBoost() {
+        return this.enableSnakeSpeedBoost;
+    }
+
+    public void setEnableSnakeSpeedBoost(boolean enableSnakeSpeedBoost) {
+        this.enableSnakeSpeedBoost = enableSnakeSpeedBoost;
     }
 
     // ADVANCED

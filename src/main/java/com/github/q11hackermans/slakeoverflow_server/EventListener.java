@@ -190,6 +190,21 @@ public class EventListener extends CMListenerAdapter {
                                 }
                             }
                         }
+                    case "game_snake_speed_boost":
+                        if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                            if(connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
+
+                                if(snake != null) {
+                                    SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "Received snake speed boost request");
+                                    snake.fastMove();
+                                }
+                            }
+                        }
+                        break;
                     case "get_user_info":
                     {
                         ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
