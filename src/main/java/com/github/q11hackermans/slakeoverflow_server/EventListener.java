@@ -128,6 +128,7 @@ public class EventListener extends CMListenerAdapter {
                                 SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId(), false);
                             }
                         }
+
                         break;
                     case "login":
                     {
@@ -190,6 +191,8 @@ public class EventListener extends CMListenerAdapter {
                                 }
                             }
                         }
+
+                        break;
                     case "game_snake_speed_boost":
                         if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
 
@@ -204,6 +207,7 @@ public class EventListener extends CMListenerAdapter {
                                 }
                             }
                         }
+
                         break;
                     case "get_user_info":
                     {
