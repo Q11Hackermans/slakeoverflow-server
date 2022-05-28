@@ -239,15 +239,16 @@ public class Snake implements GameObject {
 
             this.moveIn = this.calcMoveIn();
 
-            if(this.fastMove) {
-                this.fastMove = false;
+            this.fastMove = false;
+
+            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
                 this.removeBody(1);
             }
 
             this.hasMoved = true;
         } else {
 
-            if(this.fastMove && this.moveIn != 1) {
+            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove && this.moveIn != 1) {
                 this.moveIn -= 2;
             } else {
                 this.moveIn--;
@@ -428,7 +429,9 @@ public class Snake implements GameObject {
     }
 
     public void fastMove() {
-        this.fastMove = true;
+        if(!this.getBodyPositions().isEmpty()) {
+            this.fastMove = true;
+        }
     }
 
     public boolean isFastMove() {

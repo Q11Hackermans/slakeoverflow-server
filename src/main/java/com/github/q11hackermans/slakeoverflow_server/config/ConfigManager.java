@@ -69,6 +69,7 @@ public class ConfigManager {
                     this.config.setItemSuperFoodDespawnTime(gameSettings.getInt("item_superfood_despawn_time"));
                     this.config.setEnableSpectator(gameSettings.getBoolean("enable_spectator"));
                     this.config.setSpectatorUpdateInterval(gameSettings.getInt("spectator_update_interval"));
+                    this.config.setEnableSnakeSpeedBoost(gameSettings.getBoolean("enable_snake_speed_boost"));
 
                     JSONObject advancedSettings = config.getJSONObject("advanced_settings");
                     this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
@@ -127,6 +128,7 @@ public class ConfigManager {
                 gameSettings.put("item_superfood_despawn_time", this.config.getItemSuperFoodDespawnTime());
                 gameSettings.put("enable_spectator", this.config.isEnableSpectator());
                 gameSettings.put("spectator_update_interval", this.config.getSpectatorUpdateInterval());
+                gameSettings.put("enable_snake_speed_boost", this.config.isEnableSnakeSpeedBoost());
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();
