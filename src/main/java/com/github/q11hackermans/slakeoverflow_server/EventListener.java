@@ -121,9 +121,6 @@ public class EventListener extends CMListenerAdapter {
                     case "auth":
                         if (data.has("type")) {
                             if (data.getInt("type") == AuthenticationState.PLAYER) {
-                                if (data.has("username")) {
-                                    // CURRENTLY NOT WORKING
-                                }
                                 SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
                             } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
                                 SlakeoverflowServer.getServer().authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
