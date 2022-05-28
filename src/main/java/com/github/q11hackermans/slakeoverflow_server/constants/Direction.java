@@ -5,6 +5,7 @@ public final class Direction {
     public static final int SOUTH = 2;
     public static final int EAST = 1;
     public static final int WEST = 3;
+    public static final int SPEED = 4;
 
     private Direction() {
     }
@@ -19,6 +20,8 @@ public final class Direction {
                 return "EAST";
             case WEST:
                 return "WEST";
+            case SPEED:
+                return "SPEED";
             default:
                 return "";
         }
