@@ -26,6 +26,7 @@ public class Snake implements GameObject {
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
     private int moveIn;
+    private boolean fastMove;
     private boolean hasMoved;
 
     public Snake(ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions, GameSession gameSession) {
@@ -39,6 +40,7 @@ public class Snake implements GameObject {
         this.gameSession = gameSession;
         this.alive = true;
         this.moveIn = 0;
+        this.fastMove = false;
         this.hasMoved = false;
 
         if (bodyPositions != null) {
@@ -228,15 +230,29 @@ public class Snake implements GameObject {
         }
 
         if (this.moveIn <= 0) {
+
             if (this.facing != this.newFacing) {
                 this.move(this.newFacing);
             } else {
                 this.move();
             }
+
             this.moveIn = this.calcMoveIn();
+
+            if(this.fastMove) {
+                this.fastMove = false;
+                this.removeBody(1);
+            }
+
             this.hasMoved = true;
         } else {
-            this.moveIn--;
+
+            if(this.fastMove && this.moveIn != 1) {
+                this.moveIn -= 2;
+            } else {
+                this.moveIn--;
+            }
+
             this.hasMoved = false;
         }
     }
@@ -409,6 +425,14 @@ public class Snake implements GameObject {
                 this.bodyPositions.set(i, new int[]{prev[0], prev[1]});
             }
         }
+    }
+
+    public void fastMove() {
+        this.fastMove = true;
+    }
+
+    public boolean isFastMove() {
+        return this.fastMove;
     }
 
     public boolean isHasMoved() {

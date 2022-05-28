@@ -220,7 +220,7 @@ public class AccountSystem {
      */
     public AccountData getAccount(String username) {
         for(AccountData data : this.getAccounts()) {
-            if(data.getUsername().equalsIgnoreCase("username")) {
+            if(data.getUsername().equalsIgnoreCase(username)) {
                 return data;
             }
         }
