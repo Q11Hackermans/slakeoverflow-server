@@ -429,7 +429,9 @@ public class Snake implements GameObject {
     }
 
     public void fastMove() {
-        this.fastMove = true;
+        if(!this.getBodyPositions().isEmpty()) {
+            this.fastMove = true;
+        }
     }
 
     public boolean isFastMove() {
