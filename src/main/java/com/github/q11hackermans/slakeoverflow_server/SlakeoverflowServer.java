@@ -325,12 +325,19 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Add ticks to the manual tick system
+     * @param ticks tick count
+     */
     public void addManualTicks(int ticks) {
         if (ticks > 0 && ticks <= 120) {
             this.manualTicks += ticks;
         }
     }
 
+    /**
+     * Reset the manual ticks count
+     */
     public void resetManualTicks() {
         this.manualTicks = 0;
     }
@@ -381,10 +388,18 @@ public class SlakeoverflowServer {
         return null;
     }
 
+    /**
+     * Get a count of all connections
+     * @return connection count
+     */
     public int getConnectionCount() {
         return this.getConnectionList().size();
     }
 
+    /**
+     * Get count of all connections which are authenticated as players
+     * @return player count
+     */
     public int getPlayerCount() {
         int connectionCount = 0;
         for (ServerConnection connection : this.getConnectionList()) {
@@ -395,6 +410,10 @@ public class SlakeoverflowServer {
         return connectionCount;
     }
 
+    /**
+     * Get count of all connection which are authenticated as spectators
+     * @return spectator count
+     */
     public int getSpectatorCount() {
         int connectionCount = 0;
         for (ServerConnection connection : this.getConnectionList()) {
@@ -405,6 +424,13 @@ public class SlakeoverflowServer {
         return connectionCount;
     }
 
+    /**
+     * Authenticate a connection as player.
+     * This method checks also if the connection is allowed to authenticate.
+     * To force-authenticate the connection (disable auth allowed checks), set ignoreConnectionConditions to true.
+     * @param connectionUUID UUID of the connection
+     * @param ignoreConnectionConditions Force-authenticate connection
+     */
     public void authenticateConnectionAsPlayer(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
 
@@ -415,6 +441,13 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Authenticate a connection as spectator.
+     * This method checks also if the connection is allowed to authenticate.
+     * To force-authenticate the connection (disable auth allowed checks), set ignoreConnectionConditions to true.
+     * @param connectionUUID UUID of the connection
+     * @param ignoreConnectionConditions Force-authenticate connection
+     */
     public void authenticateConnectionAsSpectator(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
@@ -424,6 +457,13 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Unauthenticate connection.
+     * This method checks also if the connection is allowed to unauthenticate.
+     * To force-unauthenticate the connection (disable auth allowed checks), set ignoreConnectionConditions to true.
+     * @param connectionUUID UUID of the connection
+     * @param ignoreConnectionConditions Force-unauthenticate connection
+     */
     public void unauthenticateConnection(UUID connectionUUID, boolean ignoreConnectionConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         if (connection != null) {
@@ -433,6 +473,15 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Login a connection into a specific account.
+     * This method also checks if the connection is allowed to login.
+     * To force-login the connection, set ignoreLoginConditions to true.
+     * @param connectionUUID Connection UUID
+     * @param accountID account ID
+     * @param ignoreLoginConditions force-login connection
+     * @return success
+     */
     public boolean loginConnection(UUID connectionUUID, long accountID, boolean ignoreLoginConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
         AccountData account = this.accountSystem.getAccount(accountID);
@@ -447,6 +496,14 @@ public class SlakeoverflowServer {
         return false;
     }
 
+    /**
+     * Logout a connection.
+     * This method also checks if the connection is allowed to logout.
+     * To force-logout the connection, set ignoreLoginConditions to true.
+     * @param connectionUUID Connection UUID
+     * @param ignoreLoginConditions force-logout connection
+     * @return success
+     */
     public boolean logoutConnection(UUID connectionUUID, boolean ignoreLoginConditions) {
         ServerConnection connection = this.getConnectionByUUID(connectionUUID);
 
@@ -468,6 +525,16 @@ public class SlakeoverflowServer {
         return false;
     }
 
+    /**
+     * Register an account and login the connection into this account.
+     * This method also checks if registration is enabled/disabled.
+     * To ignore this and register anyway, set ignoreRegistrationConditions to true.
+     * @param connectionUUID Connection UUID
+     * @param username Username
+     * @param password Password (unhashed)
+     * @param ignoreRegistrationConditions force-register account
+     * @return success
+     */
     public boolean registerAccount(UUID connectionUUID, String username, String password, boolean ignoreRegistrationConditions) {
         if(ignoreRegistrationConditions || this.configManager.getConfig().isAllowRegistration()) {
             long userid = this.accountSystem.createAccount(username, password);
@@ -484,6 +551,11 @@ public class SlakeoverflowServer {
     }
 
     // PRIVATE METHODS
+
+    /**
+     * Method for the manager thread to check the ConnectionManager.
+     * Server will stop if the CMSServer is closed or null.
+     */
     private void checkConnectionManager() {
         if (this.connectionhandler == null || this.connectionhandler.isClosed()) {
             this.getLogger().warning("MANAGER", "Connection manager is closed. Stopping server.");
@@ -491,6 +563,10 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Method for the manager thread to check other Threads.
+     * If a thread stops, this method will restart it.
+     */
     private void checkThreads() {
         if (this.tickThread == null || !this.tickThread.isAlive()) {
             if (this.managerUtilsThread != null && this.managerUtilsThread.isAlive()) {
@@ -523,6 +599,12 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Method for the manager thread to sync connections with the CMSServer.
+     * Adds new CMSClients of the server as ServerConnections and removes disconnected ServerConnections.
+     * Unauthenticates connections if no game is running.
+     * Check if connections are logged in into an account that does not existsand log them out.
+     */
     private void checkConnections() {
         //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
         //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
@@ -552,6 +634,9 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Method for the manager thread to check the game session and game state
+     */
     private void checkGameSession() {
         if ((this.game == null) || (this.gameState == GameState.STOPPED)) {
             if (this.game == null && this.gameState != GameState.STOPPED && this.gameState != GameState.PREPARING) {
@@ -563,6 +648,9 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Method for tick thread to send status messages to all connections.
+     */
     private void sendStatusMessage() {
         synchronized(this.connectionList) {
             for (ServerConnection connection : this.connectionList) {
@@ -582,6 +670,12 @@ public class SlakeoverflowServer {
         }
     }
 
+    /**
+     * Method for the authentication methods to check if a connection is allowed to authenticate or not
+     * @param connection connection
+     * @param customCondition own condition (e.g. slot condition)
+     * @return true = allowed, false = not allowed
+     */
     private boolean getAuthenticationCondition(ServerConnection connection, boolean customCondition) {
         if(connection != null) {
             AccountData account = connection.getAccount();
@@ -726,6 +820,11 @@ public class SlakeoverflowServer {
     }
 
     // THREAD TEMPLATES
+
+    /**
+     * Tick thread template.
+     * @return tick thread
+     */
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
@@ -761,6 +860,10 @@ public class SlakeoverflowServer {
         return thread;
     }
 
+    /**
+     * Times thread template
+     * @return times thread
+     */
     private Thread getTimesThreadTemplate() {
         Thread thread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
