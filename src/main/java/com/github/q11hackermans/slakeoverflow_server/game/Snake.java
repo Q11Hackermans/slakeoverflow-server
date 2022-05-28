@@ -239,11 +239,11 @@ public class Snake implements GameObject {
 
             this.moveIn = this.calcMoveIn();
 
-            this.fastMove = false;
-
             if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
                 this.removeBody(1);
             }
+
+            this.fastMove = false;
 
             this.hasMoved = true;
         } else {
