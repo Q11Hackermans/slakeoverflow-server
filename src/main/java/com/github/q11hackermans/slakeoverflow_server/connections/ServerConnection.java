@@ -48,7 +48,7 @@ public class ServerConnection {
 
     // ACCOUNT SYSTEM
 
-    public void setAccount(long id) {
+    public void login(long id) {
         if(id > 0) {
             this.accountId = id;
         } else {
@@ -56,7 +56,7 @@ public class ServerConnection {
         }
     }
 
-    public void removeAccount() {
+    public void logout() {
         this.accountId = -1;
     }
 
@@ -107,6 +107,14 @@ public class ServerConnection {
      */
     public AccountData getAccount() {
         return SlakeoverflowServer.getServer().getAccountSystem().getAccount(this.accountId);
+    }
+
+    /**
+     * Check if the serverconnection is currently logged in
+     * @return true if logged in
+     */
+    public boolean isLoggedIn() {
+        return this.accountId > 0;
     }
 
     public long getAccountId() {

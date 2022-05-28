@@ -561,7 +561,7 @@ public class ConsoleCommands {
                                 AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[3]));
 
                                 if(account != null) {
-                                    connection.setAccount(account.getId());
+                                    connection.login(account.getId());
                                     return "Logged in user " + connection.getClientId() + " into account " + account.getUsername() + " (" + account.getId() + ")";
                                 } else {
                                     return "Account does not exist";
@@ -579,7 +579,7 @@ public class ConsoleCommands {
                     try {
                         ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
                         if (connection != null) {
-                            connection.removeAccount();
+                            connection.logout();
                             return "Logged out user " + connection.getClientId();
                         } else {
                             return "This user does not exist";

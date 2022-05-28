@@ -439,7 +439,7 @@ public class SlakeoverflowServer {
 
         if(connection != null && account != null) {
             if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
-                connection.setAccount(account.getId());
+                connection.login(account.getId());
                 return true;
             }
         }
@@ -455,11 +455,11 @@ public class SlakeoverflowServer {
 
             if(account != null) {
                 if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
-                    connection.removeAccount();
+                    connection.logout();
                     return true;
                 }
             } else {
-                connection.removeAccount();
+                connection.logout();
                 return false; // false is returned because the user was not logged in before, but user will be logged out for safety reasons
             }
 
@@ -546,7 +546,7 @@ public class SlakeoverflowServer {
                 AccountData account = SlakeoverflowServer.getServer().accountSystem.getAccount(connection.getAccountId());
 
                 if(account == null) {
-                    connection.removeAccount();
+                    connection.logout();
                 }
             }
         }
