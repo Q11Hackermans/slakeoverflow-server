@@ -237,6 +237,12 @@ public class ConsoleCommands {
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
+                    } else if (cmd[2].equalsIgnoreCase("enable_snake_speed_boost")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableSnakeSpeedBoost(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_snake_speed_boost to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEatOwnSnake(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value eat_own_snake to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
                         return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
@@ -297,6 +303,10 @@ public class ConsoleCommands {
                         return "Value default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime();
                     } else if (cmd[2].equalsIgnoreCase("item_superfood_despawn_time")) {
                         return "Value item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime();
+                    } else if (cmd[2].equalsIgnoreCase("enable_snake_speed_boost")) {
+                        return "Value enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost();
+                    } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
+                        return "Value eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake();
                     } else {
                         return "Unknown config option";
                     }
@@ -327,6 +337,8 @@ public class ConsoleCommands {
                         "item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime() + "\n" +
                         "enable_spectator: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator() + "\n" +
                         "spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval() + "\n" +
+                        "enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() + "\n" +
+                        "eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake() + "\n" +
                         "Advanced Settings:\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
