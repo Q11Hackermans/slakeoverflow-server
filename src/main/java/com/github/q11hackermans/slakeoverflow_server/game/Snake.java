@@ -191,7 +191,16 @@ public class Snake implements GameObject {
      * @return int - [-1 not this snake, 0 <= bodypositions]
      */
     private int getPosBodyID(int posX, int posY) {
-        return bodyPositions.indexOf(new int[]{posX, posY});
+
+        for(int i = 0; i < this.bodyPositions.size(); i++) {
+            int[] body = this.bodyPositions.get(i);
+
+            if(body[0] == posX && body[1] == posY) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -305,6 +314,7 @@ public class Snake implements GameObject {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
                 if (newHeadField == this) {
                     int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
+                    System.out.println(bodyId);
                     while (bodyId < (bodyPositions.size() - 1)) {
                         bodyPositions.remove(bodyId);
                     }
@@ -329,6 +339,7 @@ public class Snake implements GameObject {
                 GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
                 if (newHeadField == this) {
                     int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
+                    System.out.println(bodyId);
                     while (bodyId < (bodyPositions.size() - 1)) {
                         bodyPositions.remove(bodyId);
                     }
@@ -353,6 +364,7 @@ public class Snake implements GameObject {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
                 if (newHeadField == this) {
                     int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
+                    System.out.println(bodyId);
                     while (bodyId < (bodyPositions.size() - 1)) {
                         bodyPositions.remove(bodyId);
                     }
@@ -377,6 +389,7 @@ public class Snake implements GameObject {
                 GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
                 if (newHeadField == this) {
                     int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
+                    System.out.println(bodyId);
                     while (bodyId < (bodyPositions.size() - 1)) {
                         bodyPositions.remove(bodyId);
                     }
