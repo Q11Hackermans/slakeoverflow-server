@@ -51,6 +51,7 @@ public class ServerConfig {
         this.alsoDisablePrivilegedLogin = false;
         this.allowRegistration = true;
         this.serverName = "Slakeoverflow-Server";
+        this.printDebugMessages = false;
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -64,7 +65,6 @@ public class ServerConfig {
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
-        this.printDebugMessages = false;
         this.itemDefaultDespawnTime = 60;
         this.ItemSuperFoodDespawnTime = 120;
         this.enableSpectator = true;
