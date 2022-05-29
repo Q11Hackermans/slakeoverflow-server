@@ -321,7 +321,7 @@ public class Snake implements GameObject {
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
                 if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField((this.posx - 1), this.posy);
+                    GameObject gameObject = gameSession.getField(this.posx, (this.posy - 1));
                     if(gameObject instanceof Item) {
                         gameSession.killItem((Item) gameObject);
                     }
@@ -346,7 +346,7 @@ public class Snake implements GameObject {
                 }
                 int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
                 if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField((this.posx - 1), this.posy);
+                    GameObject gameObject = gameSession.getField((this.posx + 1), this.posy);
                     if(gameObject instanceof Item) {
                         gameSession.killItem((Item) gameObject);
                     }
@@ -371,7 +371,7 @@ public class Snake implements GameObject {
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
                 if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField((this.posx - 1), this.posy);
+                    GameObject gameObject = gameSession.getField(this.posx, (this.posy + 1));
                     if(gameObject instanceof Item) {
                         gameSession.killItem((Item) gameObject);
                     }

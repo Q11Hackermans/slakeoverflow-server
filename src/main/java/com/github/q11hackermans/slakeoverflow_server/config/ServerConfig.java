@@ -57,9 +57,9 @@ public class ServerConfig {
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
-        this.snakeSpeedBase = 4;
+        this.snakeSpeedBase = 2;
         this.snakeSpeedModifierValue = 1;
-        this.snakeSpeedModifierBodycount = 2;
+        this.snakeSpeedModifierBodycount = 5;
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
