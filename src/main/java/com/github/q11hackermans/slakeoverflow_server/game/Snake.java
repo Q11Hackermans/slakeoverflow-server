@@ -313,10 +313,13 @@ public class Snake implements GameObject {
             if (this.facing != Direction.SOUTH) {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
                 if (newHeadField == this) {
-                    int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
-                    System.out.println(bodyId);
-                    while (bodyId < (bodyPositions.size() - 1)) {
-                        bodyPositions.remove(bodyId);
+                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                        int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
+                        while (bodyId < (bodyPositions.size() - 1)) {
+                            bodyPositions.remove(bodyId);
+                        }
+                    } else {
+                        this.killSnake();
                     }
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
@@ -338,10 +341,13 @@ public class Snake implements GameObject {
             if (this.facing != Direction.WEST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
                 if (newHeadField == this) {
-                    int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
-                    System.out.println(bodyId);
-                    while (bodyId < (bodyPositions.size() - 1)) {
-                        bodyPositions.remove(bodyId);
+                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                        int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
+                        while (bodyId < (bodyPositions.size() - 1)) {
+                            bodyPositions.remove(bodyId);
+                        }
+                    } else {
+                        this.killSnake();
                     }
                 }
                 int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
@@ -363,10 +369,13 @@ public class Snake implements GameObject {
             if (this.facing != Direction.NORTH) {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
                 if (newHeadField == this) {
-                    int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
-                    System.out.println(bodyId);
-                    while (bodyId < (bodyPositions.size() - 1)) {
-                        bodyPositions.remove(bodyId);
+                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                        int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
+                        while (bodyId < (bodyPositions.size() - 1)) {
+                            bodyPositions.remove(bodyId);
+                        }
+                    } else {
+                        this.killSnake();
                     }
                 }
                 int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
@@ -388,10 +397,13 @@ public class Snake implements GameObject {
             if (this.facing != Direction.EAST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
                 if (newHeadField == this) {
-                    int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
-                    System.out.println(bodyId);
-                    while (bodyId < (bodyPositions.size() - 1)) {
-                        bodyPositions.remove(bodyId);
+                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                        int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
+                        while (bodyId < (bodyPositions.size() - 1)) {
+                            bodyPositions.remove(bodyId);
+                        }
+                    } else {
+                        this.killSnake();
                     }
                 }
                 int foodValue = gameSession.getFoodValue((this.posx - 1), this.posy);

@@ -32,6 +32,7 @@ public class ServerConfig {
     private boolean enableSpectator;
     private int spectatorUpdateInterval;
     private boolean enableSnakeSpeedBoost;
+    private boolean eatOwnSnake;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -69,6 +70,7 @@ public class ServerConfig {
         this.enableSpectator = true;
         this.spectatorUpdateInterval = 200;
         this.enableSnakeSpeedBoost = true;
+        this.eatOwnSnake = true;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -369,6 +371,14 @@ public class ServerConfig {
 
     public void setEnableSnakeSpeedBoost(boolean enableSnakeSpeedBoost) {
         this.enableSnakeSpeedBoost = enableSnakeSpeedBoost;
+    }
+
+    public boolean isEatOwnSnake() {
+        return this.eatOwnSnake;
+    }
+
+    public void setEatOwnSnake(boolean eatOwnSnake) {
+        this.eatOwnSnake = eatOwnSnake;
     }
 
     // ADVANCED

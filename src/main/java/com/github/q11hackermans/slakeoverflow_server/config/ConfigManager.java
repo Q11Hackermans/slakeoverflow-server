@@ -70,6 +70,7 @@ public class ConfigManager {
                     this.config.setEnableSpectator(gameSettings.getBoolean("enable_spectator"));
                     this.config.setSpectatorUpdateInterval(gameSettings.getInt("spectator_update_interval"));
                     this.config.setEnableSnakeSpeedBoost(gameSettings.getBoolean("enable_snake_speed_boost"));
+                    this.config.setEatOwnSnake(gameSettings.getBoolean("eat_own_snake"));
 
                     JSONObject advancedSettings = config.getJSONObject("advanced_settings");
                     this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
@@ -129,6 +130,7 @@ public class ConfigManager {
                 gameSettings.put("enable_spectator", this.config.isEnableSpectator());
                 gameSettings.put("spectator_update_interval", this.config.getSpectatorUpdateInterval());
                 gameSettings.put("enable_snake_speed_boost", this.config.isEnableSnakeSpeedBoost());
+                gameSettings.put("eat_own_snake", this.config.isEatOwnSnake());
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();
