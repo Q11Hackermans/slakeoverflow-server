@@ -831,14 +831,14 @@ public class ConsoleCommands {
                 if (SlakeoverflowServer.getServer().isGameAvail()) {
                     if (cmd.length >= 3) {
                         if (cmd[2].equalsIgnoreCase("snakes")) {
-                            String returnString = "SNAKES (ID UUID X Y LENGTH ALIVE):\n";
+                            String returnString = "SNAKES (ID UUID X Y LENGTH FREEZED ALIVE):\n";
                             List<Snake> snakeList = SlakeoverflowServer.getServer().getGameSession().getSnakeList();
                             for (int i = 0; i < snakeList.size(); i++) {
                                 Snake snake = snakeList.get(i);
                                 if (snake.getConnection() != null) {
-                                    returnString = returnString + i + " " + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                                    returnString = returnString + i + " " + snake.getConnection().getClientId() + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isFreezed() + " " + snake.isAlive() + "\n";
                                 } else {
-                                    returnString = returnString + i + " " + "NULL" + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isAlive() + "\n";
+                                    returnString = returnString + i + " " + "NULL" + " x=" + snake.getPosX() + " y=" + snake.getPosY() + " " + snake.getLength() + " " + snake.isFreezed() + " " + snake.isAlive() + "\n";
                                 }
                             }
                             return returnString;
@@ -870,6 +870,7 @@ public class ConsoleCommands {
                                         "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
                                         "Length: " + snake.getLength() + "\n" +
                                         "Facing: " + snake.getFacing() + "\n" +
+                                        "Freezed: " + snake.isFreezed() + "\n" +
                                         "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
                                         "Body positions: " + bodyPositionString + "\n";
                             } else {
@@ -1001,6 +1002,13 @@ public class ConsoleCommands {
 
                                             } else {
                                                 return "USAGE: game modify snake <UUID/ID> connection <newConnectionUUID>";
+                                            }
+                                        } else if(cmd[4].equalsIgnoreCase("freeze")) {
+                                            if(cmd.length == 6) {
+                                                snake.setFreezed(Boolean.parseBoolean(cmd[5]));
+                                                return "Set freeze snake to " + snake.isFreezed();
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> freeze true/false";
                                             }
                                         } else {
                                             return "Unknown action";

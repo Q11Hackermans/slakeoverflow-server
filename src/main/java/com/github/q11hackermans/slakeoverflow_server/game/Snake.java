@@ -25,6 +25,7 @@ public class Snake implements GameObject {
     private boolean newFacingUpdated;
     private List<int[]> bodyPositions; //[gerade Zahlen] = X - [ungerade Zahlen] = Y
     private boolean alive;
+    private boolean freezed;
     private int moveIn;
     private boolean fastMove;
     private boolean hasMoved;
@@ -39,6 +40,7 @@ public class Snake implements GameObject {
         this.newFacingUpdated = false;
         this.gameSession = gameSession;
         this.alive = true;
+        this.freezed = false;
         this.moveIn = 0;
         this.fastMove = false;
         this.hasMoved = false;
@@ -238,33 +240,38 @@ public class Snake implements GameObject {
             return;
         }
 
-        if (this.moveIn <= 0) {
+        if(!this.freezed) {
+            if (this.moveIn <= 0) {
 
-            if (this.facing != this.newFacing) {
-                this.move(this.newFacing);
+                if (this.facing != this.newFacing) {
+                    this.move(this.newFacing);
+                } else {
+                    this.move();
+                }
+
+                this.moveIn = this.calcMoveIn();
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
+                    this.removeBody(1);
+                }
+
+                this.fastMove = false;
+
+                this.hasMoved = true;
             } else {
-                this.move();
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove && this.moveIn != 1) {
+                    this.moveIn -= 2;
+                } else {
+                    this.moveIn--;
+                }
+
+                this.hasMoved = false;
             }
-
-            this.moveIn = this.calcMoveIn();
-
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
-                this.removeBody(1);
-            }
-
-            this.fastMove = false;
-
-            this.hasMoved = true;
         } else {
-
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove && this.moveIn != 1) {
-                this.moveIn -= 2;
-            } else {
-                this.moveIn--;
-            }
-
             this.hasMoved = false;
         }
+
     }
 
     /**
@@ -463,6 +470,14 @@ public class Snake implements GameObject {
                 this.bodyPositions.set(i, new int[]{prev[0], prev[1]});
             }
         }
+    }
+
+    public void setFreezed(boolean freezed) {
+        this.freezed = freezed;
+    }
+
+    public boolean isFreezed() {
+        return this.freezed;
     }
 
     public void fastMove() {
