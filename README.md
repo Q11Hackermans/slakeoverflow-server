@@ -1,4 +1,8 @@
-# Slakeoverflow Documentation
+# Slakeoverflow Server Documentation
+
+## What is Slakeoverflow?
+Slakeoverflow is a multiplayer snake game.  
+This documentation explains how to use the server.
 
 ## Game Management
 
