@@ -1096,6 +1096,7 @@ public class ConsoleCommands {
                                 "game modify snake <UUID/ID> connection <newConnectionUUID>" +
                                 "game modify item <ID> kill\n" +
                                 "game modify item <ID> position <X> <Y>\n" +
+                                "game modify item <ID> despawn <time>\n" +
                                 "game modify items kill\n";
                     }
                 } else {
@@ -1114,7 +1115,7 @@ public class ConsoleCommands {
                     "game resume\n" +
                     "game info\n" +
                     "game getsave\n" +
-                    "game mcontrol\n" +
+                    "game mcontrol <...>\n" +
                     "game get <...>\n" +
                     "game modify <...>\n";
         }
