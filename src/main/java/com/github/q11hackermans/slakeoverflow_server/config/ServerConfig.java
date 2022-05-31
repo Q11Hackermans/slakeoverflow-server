@@ -16,6 +16,9 @@ public class ServerConfig {
     private boolean alsoDisablePrivilegedLogin;
     private boolean allowRegistration;
     private String serverName;
+    private boolean enableChat;
+    private boolean allowGuestChat;
+    private boolean enableAdminCommand;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -52,6 +55,9 @@ public class ServerConfig {
         this.allowRegistration = true;
         this.serverName = "Slakeoverflow-Server";
         this.printDebugMessages = false;
+        this.enableChat = true;
+        this.allowGuestChat = false;
+        this.enableAdminCommand = true;
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -379,6 +385,30 @@ public class ServerConfig {
 
     public void setEatOwnSnake(boolean eatOwnSnake) {
         this.eatOwnSnake = eatOwnSnake;
+    }
+
+    public boolean isEnableChat() {
+        return enableChat;
+    }
+
+    public void setEnableChat(boolean enableChat) {
+        this.enableChat = enableChat;
+    }
+
+    public boolean isAllowGuestChat() {
+        return allowGuestChat;
+    }
+
+    public void setAllowGuestChat(boolean allowGuestChatW) {
+        this.allowGuestChat = allowGuestChatW;
+    }
+
+    public boolean isEnableAdminCommand() {
+        return enableAdminCommand;
+    }
+
+    public void setEnableAdminCommand(boolean enableAdminCommand) {
+        this.enableAdminCommand = enableAdminCommand;
     }
 
     // ADVANCED

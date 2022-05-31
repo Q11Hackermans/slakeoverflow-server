@@ -2,6 +2,7 @@ package com.github.q11hackermans.slakeoverflow_server;
 
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountSystem;
+import com.github.q11hackermans.slakeoverflow_server.chat.ChatSystem;
 import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
@@ -40,6 +41,8 @@ public class SlakeoverflowServer {
     private final DataIOManager dataIOManager;
     // ACCOUNT SYSTEM
     private final AccountSystem accountSystem;
+    // CHAT
+    private final ChatSystem chatSystem;
     // MANAGER THREADS
     private Thread managerThread;
     private Thread managerUtilsThread;
@@ -107,6 +110,9 @@ public class SlakeoverflowServer {
 
         // LIST
         this.ipBlacklist = new ArrayList<>();
+
+        // CHAT SYSTEM
+        this.chatSystem = new ChatSystem();
 
         // MISC
         this.alreadyStopping = false;
@@ -817,6 +823,10 @@ public class SlakeoverflowServer {
 
     public int getIdleTickSpeed() {
         return this.idleTickSpeed;
+    }
+
+    public ChatSystem getChatSystem() {
+        return this.chatSystem;
     }
 
     // THREAD TEMPLATES

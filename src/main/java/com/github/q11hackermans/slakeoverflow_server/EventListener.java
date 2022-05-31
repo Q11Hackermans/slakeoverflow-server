@@ -288,6 +288,17 @@ public class EventListener extends CMListenerAdapter {
 
                         break;
                     }
+
+                    case "chat":
+                    {
+                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                        if(connection != null) {
+                            SlakeoverflowServer.getServer().getChatSystem().onChatEventReceived(connection, data);
+                        }
+
+                        break;
+                    }
                 }
             }
         } catch (JSONException e) {
