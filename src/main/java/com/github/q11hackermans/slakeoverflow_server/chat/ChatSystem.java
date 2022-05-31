@@ -21,6 +21,7 @@ public class ChatSystem {
     }
 
     public void sendPublicChatMessage(String from, String message) {
+        this.addLogEntry(from, "EVERYONE", message, true);
         this.send("[CHAT] " + from + ": " + message, false);
     }
 
@@ -116,27 +117,27 @@ public class ChatSystem {
                             }
 
                             if(cmd[1].equalsIgnoreCase("config")) {
-                                return ConsoleCommands.run(new String[]{})
+                                return ConsoleCommands.run(this.createCmdArray("config", args));
                             } else if(cmd[1].equalsIgnoreCase("connection")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("connection", args));
                             } else if(cmd[1].equalsIgnoreCase("user")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("user", args));
                             } else if(cmd[1].equalsIgnoreCase("account")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("account", args));
                             } else if(cmd[1].equalsIgnoreCase("blacklist")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("blacklist", args));
                             } else if(cmd[1].equalsIgnoreCase("game")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("game", args));
                             } else if(cmd[1].equalsIgnoreCase("logger")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("logger", args));
                             } else if(cmd[1].equalsIgnoreCase("info")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("info", args));
                             } else if(cmd[1].equalsIgnoreCase("stop")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("stop", args));
                             } else if(cmd[1].equalsIgnoreCase("help")) {
-
+                                return ConsoleCommands.run(this.createCmdArray("help", args));
                             } else {
-                                return "Unknown command";
+                                return "Use /admin help for a list of commands";
                             }
                         } else {
                             return "USAGE: /admin <ADMIN COMMAND> (Use /admin help for command list)";
@@ -147,6 +148,29 @@ public class ChatSystem {
                 } else {
                     return "No permission";
                 }
+            } else if(cmd[0].equalsIgnoreCase("msg")) {
+                AccountData sender = commandExecutor.getAccount();
+
+                if(sender != null) {
+                    if(cmd.length >= 3) {
+                        String messageString = "";
+
+                        for(int i = 2; i < cmd.length; i++) {
+                            messageString = messageString + " " + cmd[i];
+                        }
+
+                        AccountData receiver = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[1]);
+                        ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
+
+                        this.sendPrivateChatMessage(sender.getUsername(), receiverConnection, messageString);
+                    } else {
+                        return "Usage: /msg <TO> <MESSAGE>";
+                    }
+                } else {
+                    return "You need to be logged in to send private messages";
+                }
+            } else {
+                return "Unknown command";
             }
 
         } else {
@@ -159,16 +183,17 @@ public class ChatSystem {
 
         cmd[0] = command;
 
-        for(int i = 1; i < args.length, i++) {
-
+        for(int i = 1; i < cmd.length; i++) {
+            cmd[i] = args[i-1];
         }
+
+        return cmd;
     }
 
     // LOGGER
-    private void addLogEntry(String type, String sender, String receiver, String message, boolean sent) {
+    private void addLogEntry(String sender, String receiver, String message, boolean sent) {
         JSONObject logEntry = new JSONObject();
 
-        logEntry.put("type", type);
         logEntry.put("time", this.getTimeString());
         logEntry.put("sender", sender);
         logEntry.put("receiver", receiver);
