@@ -1,6 +1,8 @@
 package com.github.q11hackermans.slakeoverflow_server.accounts;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,6 +191,88 @@ public class AccountSystem {
     }
 
     /**
+     * Update level of an account
+     * @param id Account ID
+     * @param level new level
+     * @return success
+     */
+    public boolean updateLevel(long id, int level) {
+        if(level >= 0) {
+            AccountData data = this.getAccount(id);
+
+            if(data != null) {
+                try {
+
+                    String sql = "UPDATE users SET level = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setInt(1, level);
+                    statement.setLong(2, data.getId());
+                    statement.execute();
+
+                    return true;
+
+                } catch (SQLException ignored) {}
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Update balance of an account
+     * @param id Account ID
+     * @param level new balance
+     * @return success
+     */
+    public boolean updateBalance(long id, int level) {
+        if(level >= 0) {
+            AccountData data = this.getAccount(id);
+
+            if(data != null) {
+                try {
+
+                    String sql = "UPDATE users SET level = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setInt(1, level);
+                    statement.setLong(2, data.getId());
+                    statement.execute();
+
+                    return true;
+
+                } catch (SQLException ignored) {}
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Update shop data of an account
+     * @param id Account ID
+     * @param shopData new shop data
+     * @return success
+     */
+    public boolean updateShopData(long id, JSONArray shopData) {
+            AccountData data = this.getAccount(id);
+
+            if(data != null) {
+                try {
+
+                    String sql = "UPDATE users SET level = ? WHERE id = ?";
+                    PreparedStatement statement = this.database.prepareStatement(sql);
+                    statement.setString(1, shopData.toString());
+                    statement.setLong(2, data.getId());
+                    statement.execute();
+
+                    return true;
+
+                } catch (SQLException ignored) {}
+            }
+
+        return false;
+    }
+
+    /**
      * Get an account with a specific id
      * @param id ID
      * @return AccountData
@@ -204,7 +288,14 @@ public class AccountSystem {
 
             if(rs.next()) {
                 if(rs.getLong("id") == id) {
-                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"));
+                    JSONArray shopData;
+                    try {
+                        shopData = new JSONArray(new JSONArray(rs.getString("shopData")));
+                    } catch(JSONException e) {
+                        shopData = new JSONArray();
+                    }
+
+                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getInt("level"), rs.getInt("balance"), shopData);
                 }
             }
 
@@ -239,10 +330,17 @@ public class AccountSystem {
             String getUsersStatement = "SELECT * FROM users;";
 
             PreparedStatement statement = this.database.prepareStatement(getUsersStatement);
-            ResultSet result = statement.executeQuery();
+            ResultSet rs = statement.executeQuery();
 
-            while(result.next()) {
-                accounts.add(new AccountData(result.getLong("id"), result.getString("username"), result.getString("password"), result.getInt("permission")));
+            while(rs.next()) {
+                JSONArray shopData;
+                try {
+                    shopData = new JSONArray(new JSONArray(rs.getString("shopData")));
+                } catch(JSONException e) {
+                    shopData = new JSONArray();
+                }
+
+                accounts.add(new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getInt("level"), rs.getInt("balance"), shopData));
             }
         } catch(SQLException e) {
             SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQL Exception: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
@@ -268,7 +366,10 @@ public class AccountSystem {
                     "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                     "username VARCHAR(255)," +
                     "password VARCHAR(255)," +
-                    "permission INTEGER NOT NULL DEFAULT 0" +
+                    "permission INTEGER NOT NULL DEFAULT 0," +
+                    "level INTEGER NOT NULL DEFAULT 0," +
+                    "balance INTEGER NOT NULL DEFAULT 0," +
+                    "shopdata VARCHAR(255) NOT NULL DEFAULT '[]'" +
                     ");";
             PreparedStatement statement = database.prepareStatement(createUsersTable);
             statement.execute();
