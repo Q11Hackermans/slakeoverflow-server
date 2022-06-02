@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatSystem {
@@ -21,7 +22,6 @@ public class ChatSystem {
     }
 
     public void sendPublicChatMessage(String from, String message) {
-        this.addLogEntry(from, "EVERYONE", message, true);
         this.send("[CHAT] " + from + ": " + message, false);
     }
 
@@ -49,6 +49,14 @@ public class ChatSystem {
         msg.put("title", title);
         msg.put("msg", message);
 
+        String type;
+        if(title) {
+            type = "MESSAGE_TITLE";
+        } else {
+            type = "MESSAGE";
+        }
+
+        this.addLogEntry(type, "@everyone", message);
         for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
             connection.sendUTF(msg.toString());
         }
@@ -61,6 +69,22 @@ public class ChatSystem {
         msg.put("title", title);
         msg.put("msg", message);
 
+        String type;
+        if(title) {
+            type = "MESSAGE_TITLE";
+        } else {
+            type = "MESSAGE";
+        }
+
+        AccountData account = connection.getAccount();
+        String receiver;
+        if(account != null) {
+            receiver = String.valueOf(account.getId());
+        } else {
+            receiver = String.valueOf(connection.getClientId());
+        }
+
+        this.addLogEntry(type, receiver, message);
         connection.sendUTF(msg.toString());
     }
 
@@ -89,10 +113,8 @@ public class ChatSystem {
                         }
                     }
 
-                    this.addLogEntry("RECEIVED", String.valueOf(connection.getAccountId()), "EVERYONE", msg, true);
                     this.sendPublicChatMessage(accountName, msg);
                 } else {
-                    this.addLogEntry("RECEIVED", String.valueOf(connection.getAccountId()), "EVERYONE", msg, false);
                     this.send("You don't have the permission to use the chat", false, connection);
                 }
 
@@ -101,6 +123,17 @@ public class ChatSystem {
     }
 
     public String chatCommand(ServerConnection commandExecutor, String[] cmd) {
+        AccountData accountData = commandExecutor.getAccount();
+        String accountString;
+
+        if(accountData != null) {
+            accountString = String.valueOf(accountData.getId());
+        } else {
+            accountString = String.valueOf(commandExecutor.getClientId());
+        }
+
+        this.addLogEntry("COMMAND", accountString, Arrays.toString(cmd));
+
         if(cmd.length >= 1) {
 
             if(cmd[0].equalsIgnoreCase("admin") && SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand()) {
@@ -191,14 +224,13 @@ public class ChatSystem {
     }
 
     // LOGGER
-    private void addLogEntry(String sender, String receiver, String message, boolean sent) {
+    private void addLogEntry(String type, String user, String message) {
         JSONObject logEntry = new JSONObject();
 
         logEntry.put("time", this.getTimeString());
-        logEntry.put("sender", sender);
-        logEntry.put("receiver", receiver);
+        logEntry.put("type", type);
+        logEntry.put("user", user);
         logEntry.put("message", message);
-        logEntry.put("sent", sent);
 
         this.log.put(logEntry);
     }
