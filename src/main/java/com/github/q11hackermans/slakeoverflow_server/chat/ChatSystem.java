@@ -196,6 +196,7 @@ public class ChatSystem {
                         ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
 
                         this.sendPrivateChatMessage(sender.getUsername(), receiverConnection, messageString);
+                        return "YOU --> " + sender.getUsername() + ":" + messageString;
                     } else {
                         return "Usage: /msg <TO> <MESSAGE>";
                     }
