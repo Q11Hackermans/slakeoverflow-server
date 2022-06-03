@@ -20,6 +20,7 @@ import net.jandie1505.connectionmanager.streams.CMConsumingInputStream;
 import net.jandie1505.connectionmanager.streams.CMTimedInputStream;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.events.DataIOUTFReceivedEvent;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -117,24 +118,24 @@ public class EventListener extends CMListenerAdapter {
             JSONObject data = new JSONObject(event.getData());
 
             if (data.has("cmd")) {
-                switch (data.getString("cmd")) {
-                    case "auth":
-                        if (data.has("type")) {
-                            if (data.getInt("type") == AuthenticationState.PLAYER) {
-                                SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
-                            } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
-                                SlakeoverflowServer.getServer().authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
-                            } else {
-                                SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId(), false);
+                ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+
+                if(connection != null) {
+                    switch (data.getString("cmd")) {
+                        case "auth":
+                            if (data.has("type")) {
+                                if (data.getInt("type") == AuthenticationState.PLAYER) {
+                                    SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
+                                } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
+                                    SlakeoverflowServer.getServer().authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
+                                } else {
+                                    SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId(), false);
+                                }
                             }
-                        }
 
-                        break;
-                    case "login":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                            break;
+                        case "login":
+                        {
                             if(data.has("username") && data.has("password")) {
                                 AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(data.getString("username"));
 
@@ -142,78 +143,62 @@ public class EventListener extends CMListenerAdapter {
                                     SlakeoverflowServer.getServer().loginConnection(cmsClient.getUniqueId(), account.getId(), false);
                                 }
                             }
+
+                            break;
                         }
-
-                        break;
-                    }
-                    case "logout":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                        case "logout":
+                        {
                             SlakeoverflowServer.getServer().logoutConnection(cmsClient.getUniqueId(), false);
+
+                            break;
                         }
-
-                        break;
-                    }
-                    case "register":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                        case "register":
+                        {
                             if(data.has("username") && data.has("password")) {
                                 SlakeoverflowServer.getServer().registerAccount(cmsClient.getUniqueId(), data.getString("username"), data.getString("password"), false);
                             }
+
+                            break;
                         }
+                        case "game_direction_change":
+                            if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                                if (data.has("direction")) {
+                                    try {
+                                        int sendDirection = data.getInt("direction");
 
-                        break;
-                    }
-                    case "game_direction_change":
-                        if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
-                            if (data.has("direction")) {
-                                try {
-                                    int sendDirection = data.getInt("direction");
+                                        if (connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                                            Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
 
-                                    ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+                                            if (snake != null) {
 
-                                    if (connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
-                                        Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
-
-                                        if (snake != null) {
-
-                                            if (Direction.isValid(sendDirection)) {
-                                                SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "received snake[" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection)) + "] direction change to: " + Direction.toString(sendDirection));
-                                                snake.setNewFacing(sendDirection, true);
+                                                if (Direction.isValid(sendDirection)) {
+                                                    SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "received snake[" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection)) + "] direction change to: " + Direction.toString(sendDirection));
+                                                    snake.setNewFacing(sendDirection, true);
+                                                }
                                             }
                                         }
+                                    } catch (JSONException ignored) {
                                     }
-                                } catch (JSONException ignored) {
                                 }
                             }
-                        }
 
-                        break;
-                    case "game_snake_speed_boost":
-                        if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                            break;
+                        case "game_snake_speed_boost":
+                            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
 
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+                                if(connection.getAuthenticationState() == AuthenticationState.PLAYER) {
+                                    Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
 
-                            if(connection != null && connection.getAuthenticationState() == AuthenticationState.PLAYER) {
-                                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
-
-                                if(snake != null) {
-                                    SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "Received snake speed boost request");
-                                    snake.fastMove();
+                                    if(snake != null) {
+                                        SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "Received snake speed boost request");
+                                        snake.fastMove();
+                                    }
                                 }
                             }
-                        }
 
-                        break;
-                    case "get_user_info":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                            break;
+                        case "get_user_info":
+                        {
                             JSONObject response = new JSONObject();
 
                             response.put("cmd", "user_info");
@@ -225,22 +210,24 @@ public class EventListener extends CMListenerAdapter {
                                 response.put("account_id", account.getId());
                                 response.put("account_name", account.getUsername());
                                 response.put("account_permission", account.getPermissionLevel());
+                                response.put("account_level", account.getLevel());
+                                response.put("account_balance", account.getBalance());
+                                response.put("shopData", account.getShopData());
                             } else {
                                 response.put("account_id", -1);
                                 response.put("account_name", "");
                                 response.put("account_permission", "");
+                                response.put("account_level", 0);
+                                response.put("account_balance", 0);
+                                response.put("shopData", new JSONArray());
                             }
 
                             connection.sendUTF(response.toString());
+
+                            break;
                         }
-
-                        break;
-                    }
-                    case "get_server_info":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                        case "get_server_info":
+                        {
                             ServerConfig config = SlakeoverflowServer.getServer().getConfigManager().getConfig();
 
                             JSONObject response = new JSONObject();
@@ -284,20 +271,21 @@ public class EventListener extends CMListenerAdapter {
                             response.put("server_stats", serverStats);
 
                             connection.sendUTF(response.toString());
+
+                            break;
                         }
-
-                        break;
-                    }
-
-                    case "chat":
-                    {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
-
-                        if(connection != null) {
+                        case "chat":
+                        {
                             SlakeoverflowServer.getServer().getChatSystem().onChatEventReceived(connection, data);
-                        }
 
-                        break;
+                            break;
+                        }
+                        case "shop_purchase":
+                        {
+
+
+                            break;
+                        }
                     }
                 }
             }
