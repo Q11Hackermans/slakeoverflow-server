@@ -5,13 +5,15 @@ import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ShopManager {
-    private final List<Integer> customShopIds;
+    private final Map<Integer, Integer> customShopIds;
 
     public ShopManager() {
-        this.customShopIds = new ArrayList<>();
+        this.customShopIds = new HashMap<>();
     }
 
     // ACCOUNT SHOP DATA
@@ -33,6 +35,30 @@ public class ShopManager {
 
             SlakeoverflowServer.getServer().getAccountSystem().updateShopData(account.getId(), shopData);
         }
+    }
+
+    /**
+     * Purchase an item as an account
+     * @param accountId account id
+     * @param itemId item id
+     * @return success
+     */
+    public boolean purchaseItem(long accountId, int itemId) {
+        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+
+        if(account != null) {
+            if(this.itemExists(itemId) && !account.getShopData().toList().contains(itemId)) {
+                int price = this.customShopIds.get(itemId);
+                if(account.getBalance() >= price) {
+                    SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
+                    this.addItemToAccount(account.getId(), itemId);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -90,7 +116,7 @@ public class ShopManager {
     // SHOP IDS
 
     public boolean itemExists(int itemId) {
-        if(this.customShopIds.contains(itemId)) {
+        if(this.customShopIds.containsKey(itemId)) {
             return true;
         }
         return false;
@@ -98,9 +124,9 @@ public class ShopManager {
 
     // CUSTOM SHOP IDS
 
-    public void addCustomShopItem(int id) {
-        if(id > 100 && this.customShopIds.contains(id)) {
-            this.customShopIds.add(id);
+    public void addCustomShopItem(int id, int price) {
+        if(id > 100 && this.customShopIds.containsKey(id)) {
+            this.customShopIds.put(id, price);
         }
     }
 
@@ -112,7 +138,7 @@ public class ShopManager {
         this.customShopIds.clear();
     }
 
-    public List<Integer> getCustomShopItems() {
-        return List.copyOf(this.customShopIds);
+    public Map<Integer, Integer> getCustomShopItems() {
+        return Map.copyOf(this.customShopIds);
     }
 }
