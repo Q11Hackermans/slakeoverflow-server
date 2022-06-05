@@ -57,11 +57,17 @@ public class GameSession {
             // CHECK IF SNAKE IS ALIVE
             this.checkSnakes();
 
+            // TICK 1
+            this.onTick1();
+
             // RUNNING TICK ON SNAKES
             for (Snake snake : this.snakeList) {
                 snake.tick();
             }
             this.spawnFood(this.calcFoodSpawnTries());
+
+            // TICK 2
+            this.onTick2();
 
             // SENDING PLAYERDATA TO SNAKES
             for (Snake snake : this.snakeList) {
@@ -85,6 +91,9 @@ public class GameSession {
                 }
             }
 
+            // TICK 3
+            this.onTick3();
+
             if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator()) {
                 if(this.nextSpectatorUpdate <= 0) {
                     this.nextSpectatorUpdate = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
@@ -100,6 +109,9 @@ public class GameSession {
                     this.nextSpectatorUpdate--;
                 }
             }
+
+            // TICK 4
+            this.onTick4();
 
             // ADD NEW SNAKES
             this.addNewSnakes();
@@ -752,4 +764,17 @@ public class GameSession {
 
         return savegame;
     }
+
+    // EXTENDS
+
+    /**
+     * This method will be executed if
+     */
+    public void onTick1() {}
+
+    public void onTick2() {}
+
+    public void onTick3() {}
+
+    public void onTick4() {}
 }
