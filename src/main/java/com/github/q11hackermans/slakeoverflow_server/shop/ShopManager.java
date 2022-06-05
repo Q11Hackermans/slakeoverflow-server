@@ -49,7 +49,7 @@ public class ShopManager {
         if(account != null) {
             if(this.itemExists(itemId) && !account.getShopData().toList().contains(itemId)) {
                 int price = this.customShopIds.get(itemId);
-                if(account.getBalance() >= price) {
+                if(account.getBalance() >= price && price > 0) {
                     SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
                     this.addItemToAccount(account.getId(), itemId);
 
@@ -116,10 +116,19 @@ public class ShopManager {
     // SHOP IDS
 
     public boolean itemExists(int itemId) {
-        if(this.customShopIds.containsKey(itemId)) {
+        if(this.getPersistentShopItems().containsKey(itemId) || this.customShopIds.containsKey(itemId)) {
             return true;
         }
         return false;
+    }
+
+    public Map<Integer, Integer> getPersistentShopItems() {
+        return Map.of(
+                1, -1,
+                2, -1,
+                3, -1,
+                4, -1
+        );
     }
 
     // CUSTOM SHOP IDS
