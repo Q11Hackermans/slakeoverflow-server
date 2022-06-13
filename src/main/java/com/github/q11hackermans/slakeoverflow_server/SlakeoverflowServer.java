@@ -12,6 +12,7 @@ import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationSta
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
+import com.github.q11hackermans.slakeoverflow_server.shop.ShopManager;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSServer;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOManager;
@@ -43,6 +44,8 @@ public class SlakeoverflowServer {
     private final AccountSystem accountSystem;
     // CHAT
     private final ChatSystem chatSystem;
+    // SHOP
+    private final ShopManager shopManager;
     // MANAGER THREADS
     private Thread managerThread;
     private Thread managerUtilsThread;
@@ -113,6 +116,9 @@ public class SlakeoverflowServer {
 
         // CHAT SYSTEM
         this.chatSystem = new ChatSystem();
+
+        // SHOP SYSTEM
+        this.shopManager = new ShopManager();
 
         // MISC
         this.alreadyStopping = false;
@@ -827,6 +833,10 @@ public class SlakeoverflowServer {
 
     public ChatSystem getChatSystem() {
         return this.chatSystem;
+    }
+
+    public ShopManager getShopManager() {
+        return this.shopManager;
     }
 
     // THREAD TEMPLATES

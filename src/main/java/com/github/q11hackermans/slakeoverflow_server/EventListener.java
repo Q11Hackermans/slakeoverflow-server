@@ -282,7 +282,20 @@ public class EventListener extends CMListenerAdapter {
                         }
                         case "shop_purchase":
                         {
+                            AccountData account = connection.getAccount();
 
+                            if(account != null && data.has("item")) {
+                                if(SlakeoverflowServer.getServer().getShopManager().purchaseItem(account.getId(), data.getInt("item"))) {
+                                    JSONObject successMessage = new JSONObject();
+                                    successMessage.put("cmd", "shop_purchase_success");
+                                    successMessage.put("item", data.getInt("item"));
+                                    connection.sendUTF(successMessage.toString());
+                                } else {
+                                    JSONObject successMessage = new JSONObject();
+                                    successMessage.put("cmd", "shop_purchase_failure");
+                                    connection.sendUTF(successMessage.toString());
+                                }
+                            }
 
                             break;
                         }
