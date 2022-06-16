@@ -22,10 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ConsoleCommands {
     public static String run(String[] cmd) {
@@ -1316,6 +1313,126 @@ public class ConsoleCommands {
                     "account list\n" +
                     "account update <ID> username/password/permission <value>\n" +
                     "account getid <username>\n";
+        }
+    }
+
+    public static String shopCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+
+            if(cmd[1].equalsIgnoreCase("list-items")) {
+                String returnString = "SHOP ITEMS (ID, PRICE):\n";
+
+                Map<Integer, Integer> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
+                Map<Integer, Integer> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
+
+                for(int id : persistentItems.keySet()) {
+                    returnString = returnString + id + " " + persistentItems.get(id) + " " + "PERSISTENT" +  "\n";
+                }
+
+                for(int id : customItems.keySet()) {
+                    returnString = returnString + id + " " + customItems.get(id) + " " + "CUSTOM" +  "\n";
+                }
+
+                returnString = returnString + persistentItems.size() + " persistent items, " + customItems.size() + " custom items.\n";
+
+                return returnString;
+            } else if(cmd[1].equalsIgnoreCase("additem")) {
+                if(cmd.length == 4) {
+                    AccountData account;
+
+                    try {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                    } catch (NumberFormatException e) {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                    }
+
+                    if(account != null) {
+                        SlakeoverflowServer.getServer().getShopManager().addItemToAccount(account.getId(), Integer.parseInt(cmd[3]));
+                        return "Item added (if it exist)";
+                    } else {
+                        return "Account not found";
+                    }
+                } else {
+                    return "USAGE: shop additem <accountId> <itemId>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("removeitem")) {
+                if(cmd.length == 4) {
+                    AccountData account;
+
+                    try {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                    } catch (NumberFormatException e) {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                    }
+
+                    if(account != null) {
+                        SlakeoverflowServer.getServer().getShopManager().removeItemFromAccount(account.getId(), Integer.parseInt(cmd[3]));
+                        return "Item removed (if it exists)";
+                    } else {
+                        return "Account not found";
+                    }
+                } else {
+                    return "USAGE: shop removeitem <accountId> <itemId>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("clear")) {
+                if(cmd.length == 3) {
+                    AccountData account;
+
+                    try {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                    } catch (NumberFormatException e) {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                    }
+
+                    if(account != null) {
+                        SlakeoverflowServer.getServer().getShopManager().clearItemsFromAccount(account.getId());
+                        return "Items cleared";
+                    } else {
+                        return "Account not found";
+                    }
+                } else {
+                    return "USAGE: shop clear <accountId>";
+                }
+            } else if(cmd[1].equalsIgnoreCase("list")) {
+                if(cmd.length == 3) {
+                    AccountData account;
+
+                    try {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                    } catch (NumberFormatException e) {
+                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                    }
+
+                    if(account != null) {
+                        List<Integer> items = SlakeoverflowServer.getServer().getShopManager().getItemsFromAccount(account.getId());
+
+                        String returnString = "ITEMS OF ACCOUNT " + account.getId() + ":\n";
+
+                        for(int id : items) {
+                            returnString = returnString + id + " ";
+                        }
+
+                        returnString = returnString + "\n";
+
+                        returnString = returnString + account.getId() + " has " + items.size() + " items";
+
+                        return returnString;
+                    } else {
+                        return "Account not found";
+                    }
+                } else {
+                    return "USAGE: shop list <accountId>";
+                }
+            } else {
+                return "Run command without arguments for help";
+            }
+
+        } else {
+            return "SHOP COMMAND USAGE:\n" +
+                    "shop list-items\n" +
+                    "shop additem <accountId> <itemId>\n" +
+                    "shop removeitem <accountId> <itemId>\n" +
+                    "shop clear <accountId>\n";
         }
     }
 }
