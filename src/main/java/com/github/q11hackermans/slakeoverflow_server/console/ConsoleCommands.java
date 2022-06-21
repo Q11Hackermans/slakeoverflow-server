@@ -1232,7 +1232,10 @@ public class ConsoleCommands {
                                 "ID: " + accountData.getId() + "\n" +
                                 "Username: " + accountData.getUsername() + "\n" +
                                 "Password: " + password + "\n" +
-                                "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n";
+                                "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n" +
+                                "Level: " + accountData.getLevel() + "\n" +
+                                "Balance: " + accountData.getBalance() + " Coins\n" +
+                                "Shop data: " + accountData.getShopData().toString() + "\n";
                     } else {
                         return "Account does not exist";
                     }
@@ -1263,32 +1266,60 @@ public class ConsoleCommands {
                     AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
 
                     if(account != null) {
-                        if(cmd[3].equalsIgnoreCase("username")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
-                                return "Updated username";
+
+                        try {
+                            if(cmd[3].equalsIgnoreCase("username")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
+                                    return "Updated username";
+                                } else {
+                                    return "Username not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("password")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
+                                    return "Updated password";
+                                } else {
+                                    return "Password not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("permission")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated permission level";
+                                } else {
+                                    return "Permission level was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("level")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated level";
+                                } else {
+                                    return "Level was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("balance")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated balance";
+                                } else {
+                                    return "Balance was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("shopdata")) {
+                                if(cmd[4].equalsIgnoreCase("reset")) {
+                                    if(SlakeoverflowServer.getServer().getAccountSystem().resetShopData(account.getId())) {
+                                        return "Shop data was reset";
+                                    } else {
+                                        return "Shop data was not reset";
+                                    }
+                                } else {
+                                    return "Usage: account update <ID> shopData reset (ShopData can be modified via shop command)";
+                                }
                             } else {
-                                return "Username not updated";
+                                return "Run command without arguments for help";
                             }
-                        } else if(cmd[3].equalsIgnoreCase("password")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
-                                return "Updated password";
-                            } else {
-                                return "Password not updated";
-                            }
-                        } else if(cmd[3].equalsIgnoreCase("permission")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
-                                return "Updated permission level";
-                            } else {
-                                return "Permission level was not updated";
-                            }
-                        } else {
-                            return "Run command without arguments for help";
+                        } catch (IllegalArgumentException e) {
+                            return "Please specify a valid value";
                         }
+
                     } else {
                         return "Account does not exist";
                     }
                 } else {
-                    return "Usage: account update <ID> username/password/permission <value>";
+                    return "Usage: account update <ID> username/password/permission/level/balance/shopdata <value>";
                 }
             } else if(cmd[1].equalsIgnoreCase("getid")) {
                 if(cmd.length == 3) {
