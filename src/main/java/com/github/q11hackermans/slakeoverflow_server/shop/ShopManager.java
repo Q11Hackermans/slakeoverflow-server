@@ -52,7 +52,7 @@ public class ShopManager {
                 int requiredLevel = this.customShopIds.get(itemId).getRequiredLevel();
                 int price = this.customShopIds.get(itemId).getPrice();
 
-                if(isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price) {
+                if(isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price && !this.getItemsFromAccount(account.getId()).contains(itemId)) {
                     SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
                     this.addItemToAccount(account.getId(), itemId);
 
