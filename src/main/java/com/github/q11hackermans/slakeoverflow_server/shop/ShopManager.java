@@ -124,9 +124,9 @@ public class ShopManager {
 
     public Map<Integer, Integer> getPersistentShopItems() {
         return Map.of(
-                1, -1,
-                2, -1,
-                3, -1,
+                1, 500,
+                2, 5000,
+                3, 50000,
                 4, -1
         );
     }
