@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ShopManager {
-    private final Map<Integer, Integer> customShopIds;
+    private final Map<Integer, ShopItem> customShopIds;
 
     public ShopManager() {
         this.customShopIds = new HashMap<>();
@@ -48,8 +48,11 @@ public class ShopManager {
 
         if(account != null) {
             if(this.itemExists(itemId) && !account.getShopData().toList().contains(itemId)) {
-                int price = this.customShopIds.get(itemId);
-                if(account.getBalance() >= price && price > 0) {
+                boolean isEnabled = this.customShopIds.get(itemId).isEnabled();
+                int requiredLevel = this.customShopIds.get(itemId).getRequiredLevel();
+                int price = this.customShopIds.get(itemId).getPrice();
+
+                if(isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price) {
                     SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
                     this.addItemToAccount(account.getId(), itemId);
 
@@ -105,7 +108,14 @@ public class ShopManager {
         if(account != null) {
             for(Object o : account.getShopData()) {
                 try {
-                    returnList.add((int) o);
+                    int itemId = (int) o;
+                    ShopItem item = this.getShopItems().get(itemId);
+
+                    if(item != null) {
+                        if(item.isEnabled()) {
+                            returnList.add(itemId);
+                        }
+                    }
                 } catch(ClassCastException ignored) {}
             }
         }
@@ -122,20 +132,20 @@ public class ShopManager {
         return false;
     }
 
-    public Map<Integer, Integer> getPersistentShopItems() {
+    public Map<Integer, ShopItem> getPersistentShopItems() {
         return Map.of(
-                1, 500,
-                2, 5000,
-                3, 50000,
-                4, -1
+                1, new ShopItem(this, true, 0, 500),
+                2, new ShopItem(this, true, 0, 5000),
+                3, new ShopItem(this, true, 0, 50000),
+                4, new ShopItem(this, true, 0, -100)
         );
     }
 
     // CUSTOM SHOP IDS
 
-    public void addCustomShopItem(int id, int price) {
+    public void addCustomShopItem(int id, boolean enabled, int requiredLevel, int price) {
         if(id > 100 && this.customShopIds.containsKey(id)) {
-            this.customShopIds.put(id, price);
+            this.customShopIds.put(id, new ShopItem(this, enabled, requiredLevel, price));
         }
     }
 
@@ -147,7 +157,14 @@ public class ShopManager {
         this.customShopIds.clear();
     }
 
-    public Map<Integer, Integer> getCustomShopItems() {
+    public Map<Integer, ShopItem> getCustomShopItems() {
         return Map.copyOf(this.customShopIds);
+    }
+
+    public Map<Integer, ShopItem> getShopItems() {
+        Map<Integer, ShopItem> returnMap = new HashMap<>();
+        returnMap.putAll(this.getPersistentShopItems());
+        returnMap.putAll(this.getCustomShopItems());
+        return returnMap;
     }
 }

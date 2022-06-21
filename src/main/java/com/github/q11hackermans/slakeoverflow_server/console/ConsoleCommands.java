@@ -11,6 +11,7 @@ import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import com.github.q11hackermans.slakeoverflow_server.game.SuperFood;
+import com.github.q11hackermans.slakeoverflow_server.shop.ShopItem;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
@@ -1353,15 +1354,15 @@ public class ConsoleCommands {
             if(cmd[1].equalsIgnoreCase("list-items")) {
                 String returnString = "SHOP ITEMS (ID, PRICE):\n";
 
-                Map<Integer, Integer> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
-                Map<Integer, Integer> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
+                Map<Integer, ShopItem> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
+                Map<Integer, ShopItem> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
 
                 for(int id : persistentItems.keySet()) {
-                    returnString = returnString + id + " " + persistentItems.get(id) + " " + "PERSISTENT" +  "\n";
+                    returnString = returnString + id + " " + persistentItems.get(id).isEnabled() + " " + persistentItems.get(id).getRequiredLevel() + " " + persistentItems.get(id).getPrice() + " " + "PERSISTENT" +  "\n";
                 }
 
                 for(int id : customItems.keySet()) {
-                    returnString = returnString + id + " " + customItems.get(id) + " " + "CUSTOM" +  "\n";
+                    returnString = returnString + id + " " + customItems.get(id).isEnabled() + " " + customItems.get(id).getRequiredLevel() + " " + customItems.get(id).getPrice() + " " + "CUSTOM" +  "\n";
                 }
 
                 returnString = returnString + persistentItems.size() + " persistent items, " + customItems.size() + " custom items.\n";
