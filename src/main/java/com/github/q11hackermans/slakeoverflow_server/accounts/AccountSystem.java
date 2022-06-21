@@ -253,21 +253,46 @@ public class AccountSystem {
      * @return success
      */
     public boolean updateShopData(long id, JSONArray shopData) {
-            AccountData data = this.getAccount(id);
+        AccountData data = this.getAccount(id);
 
-            if(data != null) {
-                try {
+        if(data != null) {
+            try {
 
-                    String sql = "UPDATE users SET level = ? WHERE id = ?";
-                    PreparedStatement statement = this.database.prepareStatement(sql);
-                    statement.setString(1, shopData.toString());
-                    statement.setLong(2, data.getId());
-                    statement.execute();
+                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setString(1, shopData.toString());
+                statement.setLong(2, data.getId());
+                statement.execute();
 
-                    return true;
+                return true;
 
-                } catch (SQLException ignored) {}
-            }
+            } catch (SQLException ignored) {}
+        }
+
+        return false;
+    }
+
+    /**
+     * Resets shopData of an account
+     * @param id account ID
+     * @return success
+     */
+    public boolean resetShopData(long id) {
+        AccountData data = this.getAccount(id);
+
+        if(data != null) {
+            try {
+
+                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setString(1, new JSONArray().toString());
+                statement.setLong(2, data.getId());
+                statement.execute();
+
+                return true;
+
+            } catch (SQLException ignored) {}
+        }
 
         return false;
     }
