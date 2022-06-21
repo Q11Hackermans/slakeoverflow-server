@@ -51,6 +51,8 @@ public class ConsoleCommands {
                         return infoCommand();
                     case "account":
                         return accountCommand(cmd);
+                    case "shop":
+                        return shopCommand(cmd);
                     default:
                         return "Unknown command";
                 }
@@ -1351,7 +1353,7 @@ public class ConsoleCommands {
     public static String shopCommand(String[] cmd) {
         if(cmd.length >= 2) {
 
-            if(cmd[1].equalsIgnoreCase("list-items")) {
+            if(cmd[1].equalsIgnoreCase("list")) {
                 String returnString = "SHOP ITEMS (ID, PRICE):\n";
 
                 Map<Integer, ShopItem> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
@@ -1368,7 +1370,7 @@ public class ConsoleCommands {
                 returnString = returnString + persistentItems.size() + " persistent items, " + customItems.size() + " custom items.\n";
 
                 return returnString;
-            } else if(cmd[1].equalsIgnoreCase("additem")) {
+            } else if(cmd[1].equalsIgnoreCase("addItemToUser")) {
                 if(cmd.length == 4) {
                     AccountData account;
 
@@ -1385,9 +1387,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop additem <accountId> <itemId>";
+                    return "USAGE: shop addItemToUser <accountId> <itemId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("removeitem")) {
+            } else if(cmd[1].equalsIgnoreCase("removeItemFromUser")) {
                 if(cmd.length == 4) {
                     AccountData account;
 
@@ -1404,9 +1406,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop removeitem <accountId> <itemId>";
+                    return "USAGE: shop removeItemFromUser <accountId> <itemId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("clear")) {
+            } else if(cmd[1].equalsIgnoreCase("clearItemsFromUser")) {
                 if(cmd.length == 3) {
                     AccountData account;
 
@@ -1423,9 +1425,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop clear <accountId>";
+                    return "USAGE: shop clearItemsFromUser <accountId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("list")) {
+            } else if(cmd[1].equalsIgnoreCase("listItemsFromUser")) {
                 if(cmd.length == 3) {
                     AccountData account;
 
@@ -1453,7 +1455,7 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop list <accountId>";
+                    return "USAGE: shop listItemsFromUser <accountId>";
                 }
             } else {
                 return "Run command without arguments for help";
@@ -1461,10 +1463,11 @@ public class ConsoleCommands {
 
         } else {
             return "SHOP COMMAND USAGE:\n" +
-                    "shop list-items\n" +
-                    "shop additem <accountId> <itemId>\n" +
-                    "shop removeitem <accountId> <itemId>\n" +
-                    "shop clear <accountId>\n";
+                    "shop list\n" +
+                    "shop addItemToUser <accountId> <itemId>\n" +
+                    "shop removeItemsFromUser <accountId> <itemId>\n" +
+                    "shop clearItemsFromUser <accountId>\n" +
+                    "shop listItemsFromUser <accountId>\n";
         }
     }
 }
