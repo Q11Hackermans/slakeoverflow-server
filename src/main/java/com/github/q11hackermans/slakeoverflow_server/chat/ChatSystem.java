@@ -121,11 +121,11 @@ public class ChatSystem {
     }
 
     public String chatCommand(ServerConnection commandExecutor, String[] cmd) {
-        AccountData accountData = commandExecutor.getAccount();
+        AccountData account = commandExecutor.getAccount();
         String accountString;
 
-        if(accountData != null) {
-            accountString = String.valueOf(accountData.getId());
+        if(account != null) {
+            accountString = String.valueOf(account.getId());
         } else {
             accountString = String.valueOf(commandExecutor.getClientId());
         }
@@ -135,8 +135,6 @@ public class ChatSystem {
         if(cmd.length >= 1) {
 
             if(cmd[0].equalsIgnoreCase("admin") && SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand()) {
-                AccountData account = commandExecutor.getAccount();
-
                 if(account != null) {
                     if(account.getPermissionLevel() == AccountPermissionLevel.ADMIN) {
 
@@ -182,26 +180,38 @@ public class ChatSystem {
                     return "No permission";
                 }
             } else if(cmd[0].equalsIgnoreCase("msg")) {
-                AccountData sender = commandExecutor.getAccount();
+                if(account != null) {
+                    if(this.getChatEnabledCondition(commandExecutor)) {
+                        if(cmd.length >= 3) {
+                            String messageString = "";
 
-                if(sender != null) {
-                    if(cmd.length >= 3) {
-                        String messageString = "";
+                            for(int i = 2; i < cmd.length; i++) {
+                                messageString = messageString + " " + cmd[i];
+                            }
 
-                        for(int i = 2; i < cmd.length; i++) {
-                            messageString = messageString + " " + cmd[i];
+                            AccountData receiver = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[1]);
+                            ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
+
+                            this.sendPrivateChatMessage(account.getUsername(), receiverConnection, messageString);
+                            return "YOU --> " + account.getUsername() + ":" + messageString;
+                        } else {
+                            return "Usage: /msg <TO> <MESSAGE>";
                         }
-
-                        AccountData receiver = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[1]);
-                        ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
-
-                        this.sendPrivateChatMessage(sender.getUsername(), receiverConnection, messageString);
-                        return "YOU --> " + sender.getUsername() + ":" + messageString;
                     } else {
-                        return "Usage: /msg <TO> <MESSAGE>";
+                        return "You don't have the permission to send private messages";
                     }
                 } else {
                     return "You need to be logged in to send private messages";
+                }
+            } else if (cmd[0].equalsIgnoreCase("login")) {
+                if(account == null) {
+                    if(cmd.length == 3) {
+                        // LOGIN
+                    } else {
+                        return "USAGE: /login <username> <password>";
+                    }
+                } else {
+                    return "You are already logged in";
                 }
             } else {
                 return "Unknown command";
