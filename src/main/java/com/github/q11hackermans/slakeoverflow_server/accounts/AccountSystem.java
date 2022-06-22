@@ -109,6 +109,14 @@ public class AccountSystem {
     public boolean updateUsername(long id, String username) {
         AccountData data = this.getAccount(id);
 
+        List<AccountData> accounts = this.getAccounts();
+
+        for(AccountData account : accounts) {
+            if(account.getUsername().equalsIgnoreCase(username)) {
+                return false;
+            }
+        }
+
         if(data != null) {
             try {
 

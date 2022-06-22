@@ -203,15 +203,95 @@ public class ChatSystem {
                 } else {
                     return "You need to be logged in to send private messages";
                 }
-            } else if (cmd[0].equalsIgnoreCase("login")) {
-                if(account == null) {
-                    if(cmd.length == 3) {
-                        // LOGIN
+            } else if (cmd[0].equalsIgnoreCase("account")) {
+                if(cmd.length >= 2) {
+                    if(cmd[1].equalsIgnoreCase("login") && cmd.length == 4) {
+                        if(account == null) {
+                            if(SlakeoverflowServer.getServer().loginConnection(commandExecutor.getClientId(), SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]).getId(), cmd[3], false)) {
+                                return "Login successful";
+                            } else {
+                                return "Login failed";
+                            }
+                        } else {
+                            return "You are already logged in";
+                        }
+                    } else if(cmd[1].equalsIgnoreCase("logout")) {
+                        if(account != null) {
+                            if(SlakeoverflowServer.getServer().logoutConnection(commandExecutor.getClientId(), false)) {
+                                return "Logout successful";
+                            } else {
+                                return "Logout failed";
+                            }
+                        } else {
+                            return "You are already logged out";
+                        }
+                    } else if (cmd[1].equalsIgnoreCase("info")) {
+                        if (account != null) {
+                            String password;
+                            if(account.getPassword() != null) {
+                                password = "AVAIL";
+                            } else {
+                                password = "DISABLED";
+                            }
+
+                            return "YOUR ACCOUNT DETAILS:\n" +
+                                    "Account ID: " + account.getId() + "\n" +
+                                    "Username: " + account.getUsername() + "\n" +
+                                    "Password: " + password + "\n" +
+                                    "Permission: " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n" +
+                                    "Muted: " + account.isMuted() + "\n" +
+                                    "Banned: " + account.isBanned() + "\n" +
+                                    "Level: " + account.getLevel() + "\n" +
+                                    "Balance: " + account.getBalance() + "\n" +
+                                    "Shop data: " + account.getShopData().toString() + "\n";
+                        } else {
+                            return "You are not logged in";
+                        }
+                    } else if (cmd[1].equalsIgnoreCase("update") && cmd.length == 4) {
+                        if(account != null) {
+                            if(cmd[2].equalsIgnoreCase("username")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[3])) {
+                                    return "Updated username";
+                                } else {
+                                    return "Username change failed";
+                                }
+                            } else if(cmd[2].equalsIgnoreCase("password")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[3])) {
+                                    return "Updated password";
+                                } else {
+                                    return "Username change failed";
+                                }
+                            } else {
+                                return "You can only update your username or password";
+                            }
+                        } else {
+                            return "You are not logged in";
+                        }
+                    } else if(cmd[1].equalsIgnoreCase("delete")) {
+                        if(account != null) {
+                            if(cmd.length == 3 && cmd[2].equals("ISwearIKnowWhatImDoing")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().deleteAccount(account.getId())) {
+                                    commandExecutor.logout();
+                                    return "Your account was deleted and you was logged out";
+                                } else {
+                                    return "Account was not deleted";
+                                }
+                            } else {
+                                return "Run the command like this to delete your account: account delete ISwearIKnowWhatImDoing";
+                            }
+                        } else {
+                            return "You need to be logged in to do that";
+                        }
                     } else {
-                        return "USAGE: /login <username> <password>";
+                        return "Run command without arguments for help";
                     }
                 } else {
-                    return "You are already logged in";
+                    return "ACCOUNT COMMAND USAGE:\n" +
+                            "account login <username> <password>\n" +
+                            "account logout\n" +
+                            "account info\n" +
+                            "account update username/password <value>\n" +
+                            "account delete\n";
                 }
             } else {
                 return "Unknown command";
