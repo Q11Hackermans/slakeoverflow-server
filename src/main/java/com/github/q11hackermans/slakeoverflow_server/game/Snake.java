@@ -28,6 +28,7 @@ public class Snake implements GameObject {
     private boolean freezed;
     private int moveIn;
     private boolean fastMove;
+    private int fastMoveMultiplier;
     private boolean hasMoved;
 
     public Snake(ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions, GameSession gameSession) {
@@ -43,6 +44,7 @@ public class Snake implements GameObject {
         this.freezed = false;
         this.moveIn = 0;
         this.fastMove = false;
+        this.fastMoveMultiplier = 1;
         this.hasMoved = false;
 
         if (bodyPositions != null) {
@@ -260,10 +262,16 @@ public class Snake implements GameObject {
                 this.hasMoved = true;
             } else {
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove && this.moveIn != 1) {
-                    this.moveIn -= 2;
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
+                    if((this.moveIn -= this.fastMoveMultiplier) >= 0) {
+                        this.moveIn -= this.fastMoveMultiplier;
+                    } else {
+                        this.moveIn = 0;
+                    }
+                    this.fastMoveMultiplier += 1;
                 } else {
                     this.moveIn--;
+                    this.fastMoveMultiplier = 2;
                 }
 
                 this.hasMoved = false;
