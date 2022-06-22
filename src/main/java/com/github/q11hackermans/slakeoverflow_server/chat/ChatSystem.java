@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.*;
 
 public class ChatSystem {
     private final JSONArray log;
@@ -24,6 +24,14 @@ public class ChatSystem {
     }
 
     public void sendPrivateChatMessage(String from, ServerConnection to, String message) {
+        String username;
+        if(to.getAccount() != null) {
+            username = to.getAccount().getUsername();
+        } else {
+            username = String.valueOf(to.getClientId());
+        }
+
+        this.sendSocialSpy(from, username, message);
         this.send("[MSG] " + from + " --> YOU: " + message, false, to);
     }
 
@@ -326,7 +334,18 @@ public class ChatSystem {
         this.log.put(logEntry);
     }
 
+    // SOCIALSPY
+
+    public void sendSocialSpy(String sender, String receiver, String message) {
+        for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+            if(connection.isSocialSpy()) {
+                this.send("[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message, false, connection);
+            }
+        }
+    }
+
     // UTILITIES
+
     private String getTimeString() {
         return LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
     }
@@ -356,5 +375,11 @@ public class ChatSystem {
         }
 
         return false;
+    }
+
+    // GETTER
+
+    public JSONArray getLog() {
+        return this.log;
     }
 }

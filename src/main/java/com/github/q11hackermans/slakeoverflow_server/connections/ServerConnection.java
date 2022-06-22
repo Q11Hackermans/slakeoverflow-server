@@ -2,6 +2,7 @@ package com.github.q11hackermans.slakeoverflow_server.connections;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
+import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOStreamHandler;
@@ -15,11 +16,15 @@ public class ServerConnection {
     private long accountId;
     private boolean muted;
     private boolean banned;
+    private boolean socialSpy;
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
         this.authenticationState = AuthenticationState.UNAUTHENTICATED;
         this.accountId = -1;
+        this.banned = false;
+        this.muted = false;
+        this.socialSpy = false;
     }
 
     // AUTHORISATION
@@ -75,6 +80,16 @@ public class ServerConnection {
 
     public void setBanned(boolean banned) {
         this.banned = banned;
+    }
+
+    // SOCIALSPY
+
+    public void setSocialSpy(boolean socialSpy) {
+        if(this.getAccount() != null && (this.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN || this.getAccount().getPermissionLevel() == AccountPermissionLevel.MODERATOR)) {
+            this.socialSpy = socialSpy;
+        } else {
+            this.socialSpy = false;
+        }
     }
 
     // GETTER METHODS
@@ -176,6 +191,21 @@ public class ServerConnection {
     public boolean isConnectionBanned() {
         return this.banned;
     }
+
+    /**
+     * Returns if the connection has socialspy enabled and has the permissions for it.
+     * @return boolean
+     */
+    public boolean isSocialSpy() {
+        if(this.getAccount() != null && (this.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN || this.getAccount().getPermissionLevel() == AccountPermissionLevel.MODERATOR)) {
+            return this.socialSpy;
+        } else {
+            this.socialSpy = false;
+            return false;
+        }
+    }
+
+    // SEND DATA
 
     /**
      * A null safe way to send data to a connection

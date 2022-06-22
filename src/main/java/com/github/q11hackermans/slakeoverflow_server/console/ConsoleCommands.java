@@ -536,7 +536,8 @@ public class ConsoleCommands {
                                         "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n" +
                                         "Account: " + accountString + "\n" +
                                         "Muted: " + mutedString + "\n" +
-                                        "Banned: " + bannedString + "\n";
+                                        "Banned: " + bannedString + "\n" +
+                                        "Social Spy: " + connection.isSocialSpy() + "\n";
                             } else {
                                 return "This user does not exist";
                             }
@@ -624,28 +625,52 @@ public class ConsoleCommands {
                         try {
                             ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
 
-                            connection.setBanned(Boolean.parseBoolean(cmd[3]));
-
-                            return "Set banned for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                            if(connection != null) {
+                                connection.setBanned(Boolean.parseBoolean(cmd[3]));
+                                return "Set banned for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                            } else {
+                                return "Invalid user";
+                            }
                         } catch (IllegalArgumentException e) {
                             return "Please enter a valid UUID";
                         }
                     } else {
-                        return "USAGE: connection ban <UUID> true/false";
+                        return "USAGE: user ban <UUID> true/false";
                     }
                 case "mute":
                     if(cmd.length == 4) {
                         try {
                             ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
 
-                            connection.setMuted(Boolean.parseBoolean(cmd[3]));
+                            if(connection != null) {
+                                connection.setMuted(Boolean.parseBoolean(cmd[3]));
+                                return "Set muted for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                            } else {
+                                return "Invalid user";
+                            }
 
-                            return "Set muted for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
                         } catch (IllegalArgumentException e) {
                             return "Please enter a valid UUID";
                         }
                     } else {
-                        return "USAGE: connection mute <UUID> true/false";
+                        return "USAGE: user mute <UUID> true/false";
+                    }
+                case "socialspy":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                            if(connection != null) {
+                                connection.setSocialSpy(Boolean.parseBoolean(cmd[3]));
+                                return "Set socialspy for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                            } else {
+                                return "Invalid user";
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "USAGE: user socialspy <UUID> true/false";
                     }
                 default:
                     return "Run command without arguments for help";
@@ -659,7 +684,8 @@ public class ConsoleCommands {
                     "user login <UUID> <AccountID>\n" +
                     "user logout <UUID>\n" +
                     "user ban <UUID> true/false\n" +
-                    "user mute <UUID> true/false\n";
+                    "user mute <UUID> true/false\n" +
+                    "user socialspy <UUID> true/false\n";
         }
     }
 
