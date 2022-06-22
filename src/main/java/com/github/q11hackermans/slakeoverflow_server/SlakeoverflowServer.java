@@ -634,6 +634,8 @@ public class SlakeoverflowServer {
                 connection.unauthenticate();
             } else if (this.isGameAvail() && !this.configManager.getConfig().isEnableSpectator() && connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                 connection.unauthenticate();
+            } else if (connection.isBanned() && (connection.getAuthenticationState() != AuthenticationState.UNAUTHENTICATED)) {
+                connection.unauthenticate();
             }
 
             if(connection.getAccountId() != -1) {
@@ -692,12 +694,14 @@ public class SlakeoverflowServer {
         if(connection != null) {
             AccountData account = connection.getAccount();
 
+            boolean isBanned = connection.isBanned();
             boolean isUserAuthentication = SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
             boolean isAllowGuests = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuests();
             boolean isUser;
             boolean isAdmin;
             if(account != null) {
                 isUser = true;
+
                 if(account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                     isAdmin = true;
                 } else {
@@ -712,6 +716,10 @@ public class SlakeoverflowServer {
 
             if(isAdmin) {
                 return true;
+            }
+
+            if(isBanned) {
+                return false;
             }
 
             if(isUserAuthentication && isAllowGuests && customCondition) {

@@ -493,9 +493,9 @@ public class ConsoleCommands {
         if (cmd.length >= 2) {
             switch (cmd[1]) {
                 case "list": {
-                    String returnString = "USER LIST:\n";
+                    String returnString = "USER LIST (UUID, AUTH STATE, ACCOUNT ID, MUTED, BANNED):\n";
                     for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
-                        returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n";
+                        returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + " " + connection.getAccountId() + " " + connection.isMuted() + " " + connection.isBanned() + "\n";
                     }
                     return returnString;
                 }
@@ -513,10 +513,30 @@ public class ConsoleCommands {
                                     accountString = "LOGGED OUT";
                                 }
 
+                                String mutedString;
+                                if(connection.isMuted() && connection.isConnectionMuted()) {
+                                    mutedString = "true (CONNECTION)";
+                                } else if(connection.isMuted() && !connection.isConnectionMuted()) {
+                                    mutedString = "true (ACCOUNT)";
+                                } else {
+                                    mutedString = "false";
+                                }
+
+                                String bannedString;
+                                if(connection.isBanned() && connection.isConnectionBanned()) {
+                                    bannedString = "true (CONNECTION)";
+                                } else if(connection.isBanned() && !connection.isConnectionBanned()) {
+                                    bannedString = "true (ACCOUNT)";
+                                } else {
+                                    bannedString = "false";
+                                }
+
                                 return "USER INFO:\n" +
                                         "UUID: " + connection.getClientId() + "\n" +
                                         "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n" +
-                                        "Account: " + accountString + "\n";
+                                        "Account: " + accountString + "\n" +
+                                        "Muted: " + mutedString + "\n" +
+                                        "Banned: " + bannedString + "\n";
                             } else {
                                 return "This user does not exist";
                             }
@@ -599,6 +619,34 @@ public class ConsoleCommands {
                     } catch (IllegalArgumentException e) {
                         return "Please enter a valid UUID";
                     }
+                case "ban":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                            connection.setBanned(Boolean.parseBoolean(cmd[3]));
+
+                            return "Set banned for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "USAGE: connection ban <UUID> true/false";
+                    }
+                case "mute":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                            connection.setMuted(Boolean.parseBoolean(cmd[3]));
+
+                            return "Set muted for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "USAGE: connection mute <UUID> true/false";
+                    }
                 default:
                     return "Run command without arguments for help";
             }
@@ -609,7 +657,9 @@ public class ConsoleCommands {
                     "user auth <UUID> player/spectator\n" +
                     "user unauth <UUID>\n" +
                     "user login <UUID> <AccountID>\n" +
-                    "user logout <UUID>\n";
+                    "user logout <UUID>\n" +
+                    "user ban <UUID> true/false\n" +
+                    "user mute <UUID> true/false\n";
         }
     }
 
@@ -1236,6 +1286,8 @@ public class ConsoleCommands {
                                 "Username: " + accountData.getUsername() + "\n" +
                                 "Password: " + password + "\n" +
                                 "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n" +
+                                "Muted: " + accountData.isMuted() + "\n" +
+                                "Banned: " + accountData.isBanned() + "\n" +
                                 "Level: " + accountData.getLevel() + "\n" +
                                 "Balance: " + accountData.getBalance() + " Coins\n" +
                                 "Shop data: " + accountData.getShopData().toString() + "\n";
@@ -1259,7 +1311,7 @@ public class ConsoleCommands {
                         password = "DISABLED";
                     }
 
-                    returnString = returnString + account.getId() + " " + account.getUsername() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n";
+                    returnString = returnString + account.getId() + " " + account.getUsername() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + " " + account.isMuted() + " " + account.isBanned() + "\n";
                     count++;
                 }
                 returnString = returnString + "---- " + count + " registered accounts ----";
@@ -1288,6 +1340,18 @@ public class ConsoleCommands {
                                     return "Updated permission level";
                                 } else {
                                     return "Permission level was not updated";
+                                }
+                            } else if (cmd[3].equalsIgnoreCase("ban")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBanned(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                    return "Updated banned state to " + Boolean.parseBoolean(cmd[4]);
+                                } else {
+                                    return "Banned state was not updated";
+                                }
+                            } else if (cmd[3].equalsIgnoreCase("mute")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateMuted(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                    return "Updated muted state to " + Boolean.parseBoolean(cmd[4]);
+                                } else {
+                                    return "Muted state was not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("level")) {
                                 if(SlakeoverflowServer.getServer().getAccountSystem().updateLevel(account.getId(), Integer.parseInt(cmd[4]))) {
@@ -1322,7 +1386,7 @@ public class ConsoleCommands {
                         return "Account does not exist";
                     }
                 } else {
-                    return "Usage: account update <ID> username/password/permission/level/balance/shopdata <value>";
+                    return "Usage: account update <ID> username/password/permission/ban/mute/level/balance/shopdata <value>";
                 }
             } else if(cmd[1].equalsIgnoreCase("getid")) {
                 if(cmd.length == 3) {
@@ -1345,7 +1409,7 @@ public class ConsoleCommands {
                     "account delete <ID>\n" +
                     "account info <ID>\n" +
                     "account list\n" +
-                    "account update <ID> username/password/permission <value>\n" +
+                    "account update <ID> username/password/permission/ban/mute/level/balance/shopdata <value>\n" +
                     "account getid <username>\n";
         }
     }

@@ -13,6 +13,8 @@ public class ServerConnection {
     private UUID clientId;
     private int authenticationState;
     private long accountId;
+    private boolean muted;
+    private boolean banned;
 
     public ServerConnection(UUID clientId) {
         this.clientId = clientId;
@@ -63,6 +65,16 @@ public class ServerConnection {
     // CONNECTION
     public boolean isConnected() {
         return SlakeoverflowServer.getServer().getConnectionList().contains(this);
+    }
+
+    // PUNISHMENTS
+
+    public void setMuted(boolean muted) {
+        this.muted = muted;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 
     // GETTER METHODS
@@ -119,6 +131,50 @@ public class ServerConnection {
 
     public long getAccountId() {
         return this.accountId;
+    }
+
+    /**
+     * Returns if the connection or the account is muted
+     * @return boolean
+     */
+    public boolean isMuted() {
+        AccountData account = this.getAccount();
+
+        if(account != null) {
+            return this.muted || account.isMuted();
+        } else {
+            return this.muted;
+        }
+    }
+
+    /**
+     * Returns if the connection or the account is banned
+     * @return boolean
+     */
+    public boolean isBanned() {
+        AccountData account = this.getAccount();
+
+        if(account != null) {
+            return this.banned || account.isBanned();
+        } else {
+            return this.banned;
+        }
+    }
+
+    /**
+     * Returns only true if the connection is muted, NOT THE ACCOUNT.
+     * @return boolean
+     */
+    public boolean isConnectionMuted() {
+        return this.muted;
+    }
+
+    /**
+     * Returns only true if the connection is banned, NOT THE ACCOUNT.
+     * @return boolean
+     */
+    public boolean isConnectionBanned() {
+        return this.banned;
     }
 
     /**
