@@ -140,7 +140,7 @@ public class EventListener extends CMListenerAdapter {
                                 AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(data.getString("username"));
 
                                 if(account != null) {
-                                    SlakeoverflowServer.getServer().loginConnection(cmsClient.getUniqueId(), account.getId(), false);
+                                    SlakeoverflowServer.getServer().loginConnection(cmsClient.getUniqueId(), account.getId(), data.getString("password"), false);
                                 }
                             }
 

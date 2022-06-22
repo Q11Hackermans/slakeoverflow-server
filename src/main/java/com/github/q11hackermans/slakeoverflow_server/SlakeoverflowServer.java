@@ -509,6 +509,30 @@ public class SlakeoverflowServer {
     }
 
     /**
+     * Login a connection only if the password matches
+     * @param connectionUUID connection UUID
+     * @param accountID account ID
+     * @param password password (not the hash)
+     * @param ignoreLoginConditions ignoreloginconditions
+     * @return success
+     */
+    public boolean loginConnection(UUID connectionUUID, long accountID, String password, boolean ignoreLoginConditions) {
+        ServerConnection connection = this.getConnectionByUUID(connectionUUID);
+        AccountData account = this.accountSystem.getAccount(accountID);
+
+        if(connection != null && account != null) {
+            if(ignoreLoginConditions || this.configManager.getConfig().isAllowLogin() || (!this.configManager.getConfig().isAllowLogin() && this.configManager.getConfig().isAlsoDisablePrivilegedLogin() && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN))) {
+                if(account.getPassword().equalsIgnoreCase(this.getAccountSystem().getPasswordHashValue(password))) {
+                    connection.login(account.getId());
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Logout a connection.
      * This method also checks if the connection is allowed to logout.
      * To force-logout the connection, set ignoreLoginConditions to true.
