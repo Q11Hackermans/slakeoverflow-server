@@ -2,7 +2,6 @@ package com.github.q11hackermans.slakeoverflow_server.chat;
 
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
-import com.github.q11hackermans.slakeoverflow_server.config.ConfigManager;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleCommands;
 import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
@@ -12,7 +11,6 @@ import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 
 public class ChatSystem {
     private final JSONArray log;
@@ -169,6 +167,8 @@ public class ChatSystem {
                                 return ConsoleCommands.run(this.createCmdArray("stop", args));
                             } else if(cmd[1].equalsIgnoreCase("help")) {
                                 return ConsoleCommands.run(this.createCmdArray("help", args));
+                            } else if(cmd[1].equalsIgnoreCase("shop")) {
+                                return ConsoleCommands.run(this.createCmdArray("shop", args));
                             } else {
                                 return "Use /admin help for a list of commands";
                             }
@@ -242,6 +242,7 @@ public class ChatSystem {
     }
 
     private boolean getChatEnabledCondition(ServerConnection connection) {
+        boolean isPunished = connection.isBanned() || connection.isMuted();
         boolean chatEnabled = SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableChat();
         boolean guestChat = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuestChat();
         AccountData account = connection.getAccount();
@@ -250,6 +251,10 @@ public class ChatSystem {
 
         if(isAdmin) {
             return true;
+        }
+
+        if(isPunished) {
+            return false;
         }
 
         if(chatEnabled && isUser) {

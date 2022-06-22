@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server.accounts;
 
+import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
 import org.json.JSONArray;
 
 public class AccountData {
@@ -7,15 +8,19 @@ public class AccountData {
     private final String username;
     private final String password;
     private final int permissionLevel;
+    private final boolean muted;
+    private final boolean banned;
     private final int level;
     private final int balance;
     private final JSONArray shopData;
 
-    public AccountData(long id, String username, String password, int permissionLevel, int level, int balance, JSONArray shopData) {
+    public AccountData(long id, String username, String password, int permissionLevel, boolean muted, boolean banned, int level, int balance, JSONArray shopData) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.permissionLevel = permissionLevel;
+        this.muted = muted;
+        this.banned = banned;
         this.level = level;
         this.balance = balance;
         this.shopData = shopData;
@@ -51,6 +56,32 @@ public class AccountData {
      */
     public int getPermissionLevel() {
         return this.permissionLevel;
+    }
+
+    /**
+     * Returns if the account is currently muted.
+     * This will always return false if the account has permission level 2 (ADMIN).
+     * @return boolean
+     */
+    public boolean isMuted() {
+        if(this.permissionLevel == AccountPermissionLevel.ADMIN) {
+            return false;
+        } else {
+            return this.muted;
+        }
+    }
+
+    /**
+     * Returns if the account is currently banned.
+     * This will always return false if the account has permission level 2 (ADMIN).
+     * @return boolean
+     */
+    public boolean isBanned() {
+        if(this.permissionLevel == AccountPermissionLevel.ADMIN) {
+            return false;
+        } else {
+            return this.banned;
+        }
     }
 
     public boolean equalsOtherAccount(AccountData otherAccount) {

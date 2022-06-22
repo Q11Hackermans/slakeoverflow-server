@@ -11,6 +11,7 @@ import com.github.q11hackermans.slakeoverflow_server.game.Food;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import com.github.q11hackermans.slakeoverflow_server.game.SuperFood;
+import com.github.q11hackermans.slakeoverflow_server.shop.ShopItem;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.server.CMSClient;
 import net.jandie1505.connectionmanager.server.CMSPendingClient;
@@ -50,6 +51,8 @@ public class ConsoleCommands {
                         return infoCommand();
                     case "account":
                         return accountCommand(cmd);
+                    case "shop":
+                        return shopCommand(cmd);
                     default:
                         return "Unknown command";
                 }
@@ -490,9 +493,9 @@ public class ConsoleCommands {
         if (cmd.length >= 2) {
             switch (cmd[1]) {
                 case "list": {
-                    String returnString = "USER LIST:\n";
+                    String returnString = "USER LIST (UUID, AUTH STATE, ACCOUNT ID, MUTED, BANNED):\n";
                     for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
-                        returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n";
+                        returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + " " + connection.getAccountId() + " " + connection.isMuted() + " " + connection.isBanned() + "\n";
                     }
                     return returnString;
                 }
@@ -510,10 +513,30 @@ public class ConsoleCommands {
                                     accountString = "LOGGED OUT";
                                 }
 
+                                String mutedString;
+                                if(connection.isMuted() && connection.isConnectionMuted()) {
+                                    mutedString = "true (CONNECTION)";
+                                } else if(connection.isMuted() && !connection.isConnectionMuted()) {
+                                    mutedString = "true (ACCOUNT)";
+                                } else {
+                                    mutedString = "false";
+                                }
+
+                                String bannedString;
+                                if(connection.isBanned() && connection.isConnectionBanned()) {
+                                    bannedString = "true (CONNECTION)";
+                                } else if(connection.isBanned() && !connection.isConnectionBanned()) {
+                                    bannedString = "true (ACCOUNT)";
+                                } else {
+                                    bannedString = "false";
+                                }
+
                                 return "USER INFO:\n" +
                                         "UUID: " + connection.getClientId() + "\n" +
                                         "Auth state: " + AuthenticationState.toString(connection.getAuthenticationState()) + "\n" +
-                                        "Account: " + accountString + "\n";
+                                        "Account: " + accountString + "\n" +
+                                        "Muted: " + mutedString + "\n" +
+                                        "Banned: " + bannedString + "\n";
                             } else {
                                 return "This user does not exist";
                             }
@@ -596,6 +619,34 @@ public class ConsoleCommands {
                     } catch (IllegalArgumentException e) {
                         return "Please enter a valid UUID";
                     }
+                case "ban":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                            connection.setBanned(Boolean.parseBoolean(cmd[3]));
+
+                            return "Set banned for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "USAGE: connection ban <UUID> true/false";
+                    }
+                case "mute":
+                    if(cmd.length == 4) {
+                        try {
+                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                            connection.setMuted(Boolean.parseBoolean(cmd[3]));
+
+                            return "Set muted for connection " + connection.getClientId() + " to " + Boolean.parseBoolean(cmd[3]);
+                        } catch (IllegalArgumentException e) {
+                            return "Please enter a valid UUID";
+                        }
+                    } else {
+                        return "USAGE: connection mute <UUID> true/false";
+                    }
                 default:
                     return "Run command without arguments for help";
             }
@@ -606,7 +657,9 @@ public class ConsoleCommands {
                     "user auth <UUID> player/spectator\n" +
                     "user unauth <UUID>\n" +
                     "user login <UUID> <AccountID>\n" +
-                    "user logout <UUID>\n";
+                    "user logout <UUID>\n" +
+                    "user ban <UUID> true/false\n" +
+                    "user mute <UUID> true/false\n";
         }
     }
 
@@ -1232,7 +1285,12 @@ public class ConsoleCommands {
                                 "ID: " + accountData.getId() + "\n" +
                                 "Username: " + accountData.getUsername() + "\n" +
                                 "Password: " + password + "\n" +
-                                "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n";
+                                "Permission: " + AccountPermissionLevel.toString(accountData.getPermissionLevel()) + "\n" +
+                                "Muted: " + accountData.isMuted() + "\n" +
+                                "Banned: " + accountData.isBanned() + "\n" +
+                                "Level: " + accountData.getLevel() + "\n" +
+                                "Balance: " + accountData.getBalance() + " Coins\n" +
+                                "Shop data: " + accountData.getShopData().toString() + "\n";
                     } else {
                         return "Account does not exist";
                     }
@@ -1253,7 +1311,7 @@ public class ConsoleCommands {
                         password = "DISABLED";
                     }
 
-                    returnString = returnString + account.getId() + " " + account.getUsername() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + "\n";
+                    returnString = returnString + account.getId() + " " + account.getUsername() + " " + password + " " + AccountPermissionLevel.toString(account.getPermissionLevel()) + " " + account.isMuted() + " " + account.isBanned() + "\n";
                     count++;
                 }
                 returnString = returnString + "---- " + count + " registered accounts ----";
@@ -1263,32 +1321,72 @@ public class ConsoleCommands {
                     AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
 
                     if(account != null) {
-                        if(cmd[3].equalsIgnoreCase("username")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
-                                return "Updated username";
+
+                        try {
+                            if(cmd[3].equalsIgnoreCase("username")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
+                                    return "Updated username";
+                                } else {
+                                    return "Username not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("password")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
+                                    return "Updated password";
+                                } else {
+                                    return "Password not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("permission")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated permission level";
+                                } else {
+                                    return "Permission level was not updated";
+                                }
+                            } else if (cmd[3].equalsIgnoreCase("ban")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBanned(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                    return "Updated banned state to " + Boolean.parseBoolean(cmd[4]);
+                                } else {
+                                    return "Banned state was not updated";
+                                }
+                            } else if (cmd[3].equalsIgnoreCase("mute")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateMuted(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                    return "Updated muted state to " + Boolean.parseBoolean(cmd[4]);
+                                } else {
+                                    return "Muted state was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("level")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated level";
+                                } else {
+                                    return "Level was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("balance")) {
+                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), Integer.parseInt(cmd[4]))) {
+                                    return "Updated balance";
+                                } else {
+                                    return "Balance was not updated";
+                                }
+                            } else if(cmd[3].equalsIgnoreCase("shopdata")) {
+                                if(cmd[4].equalsIgnoreCase("reset")) {
+                                    if(SlakeoverflowServer.getServer().getAccountSystem().resetShopData(account.getId())) {
+                                        return "Shop data was reset";
+                                    } else {
+                                        return "Shop data was not reset";
+                                    }
+                                } else {
+                                    return "Usage: account update <ID> shopData reset (ShopData can be modified via shop command)";
+                                }
                             } else {
-                                return "Username not updated";
+                                return "Run command without arguments for help";
                             }
-                        } else if(cmd[3].equalsIgnoreCase("password")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
-                                return "Updated password";
-                            } else {
-                                return "Password not updated";
-                            }
-                        } else if(cmd[3].equalsIgnoreCase("permission")) {
-                            if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
-                                return "Updated permission level";
-                            } else {
-                                return "Permission level was not updated";
-                            }
-                        } else {
-                            return "Run command without arguments for help";
+                        } catch (IllegalArgumentException e) {
+                            return "Please specify a valid value";
                         }
+
                     } else {
                         return "Account does not exist";
                     }
                 } else {
-                    return "Usage: account update <ID> username/password/permission <value>";
+                    return "Usage: account update <ID> username/password/permission/ban/mute/level/balance/shopdata <value>";
                 }
             } else if(cmd[1].equalsIgnoreCase("getid")) {
                 if(cmd.length == 3) {
@@ -1311,7 +1409,7 @@ public class ConsoleCommands {
                     "account delete <ID>\n" +
                     "account info <ID>\n" +
                     "account list\n" +
-                    "account update <ID> username/password/permission <value>\n" +
+                    "account update <ID> username/password/permission/ban/mute/level/balance/shopdata <value>\n" +
                     "account getid <username>\n";
         }
     }
@@ -1319,24 +1417,24 @@ public class ConsoleCommands {
     public static String shopCommand(String[] cmd) {
         if(cmd.length >= 2) {
 
-            if(cmd[1].equalsIgnoreCase("list-items")) {
+            if(cmd[1].equalsIgnoreCase("list")) {
                 String returnString = "SHOP ITEMS (ID, PRICE):\n";
 
-                Map<Integer, Integer> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
-                Map<Integer, Integer> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
+                Map<Integer, ShopItem> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
+                Map<Integer, ShopItem> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
 
                 for(int id : persistentItems.keySet()) {
-                    returnString = returnString + id + " " + persistentItems.get(id) + " " + "PERSISTENT" +  "\n";
+                    returnString = returnString + id + " " + persistentItems.get(id).isEnabled() + " " + persistentItems.get(id).getRequiredLevel() + " " + persistentItems.get(id).getPrice() + " " + "PERSISTENT" +  "\n";
                 }
 
                 for(int id : customItems.keySet()) {
-                    returnString = returnString + id + " " + customItems.get(id) + " " + "CUSTOM" +  "\n";
+                    returnString = returnString + id + " " + customItems.get(id).isEnabled() + " " + customItems.get(id).getRequiredLevel() + " " + customItems.get(id).getPrice() + " " + "CUSTOM" +  "\n";
                 }
 
                 returnString = returnString + persistentItems.size() + " persistent items, " + customItems.size() + " custom items.\n";
 
                 return returnString;
-            } else if(cmd[1].equalsIgnoreCase("additem")) {
+            } else if(cmd[1].equalsIgnoreCase("addItemToUser")) {
                 if(cmd.length == 4) {
                     AccountData account;
 
@@ -1353,9 +1451,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop additem <accountId> <itemId>";
+                    return "USAGE: shop addItemToUser <accountId> <itemId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("removeitem")) {
+            } else if(cmd[1].equalsIgnoreCase("removeItemFromUser")) {
                 if(cmd.length == 4) {
                     AccountData account;
 
@@ -1372,9 +1470,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop removeitem <accountId> <itemId>";
+                    return "USAGE: shop removeItemFromUser <accountId> <itemId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("clear")) {
+            } else if(cmd[1].equalsIgnoreCase("clearItemsFromUser")) {
                 if(cmd.length == 3) {
                     AccountData account;
 
@@ -1391,9 +1489,9 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop clear <accountId>";
+                    return "USAGE: shop clearItemsFromUser <accountId>";
                 }
-            } else if(cmd[1].equalsIgnoreCase("list")) {
+            } else if(cmd[1].equalsIgnoreCase("listItemsFromUser")) {
                 if(cmd.length == 3) {
                     AccountData account;
 
@@ -1421,7 +1519,7 @@ public class ConsoleCommands {
                         return "Account not found";
                     }
                 } else {
-                    return "USAGE: shop list <accountId>";
+                    return "USAGE: shop listItemsFromUser <accountId>";
                 }
             } else {
                 return "Run command without arguments for help";
@@ -1429,10 +1527,11 @@ public class ConsoleCommands {
 
         } else {
             return "SHOP COMMAND USAGE:\n" +
-                    "shop list-items\n" +
-                    "shop additem <accountId> <itemId>\n" +
-                    "shop removeitem <accountId> <itemId>\n" +
-                    "shop clear <accountId>\n";
+                    "shop list\n" +
+                    "shop addItemToUser <accountId> <itemId>\n" +
+                    "shop removeItemsFromUser <accountId> <itemId>\n" +
+                    "shop clearItemsFromUser <accountId>\n" +
+                    "shop listItemsFromUser <accountId>\n";
         }
     }
 }

@@ -191,6 +191,58 @@ public class AccountSystem {
     }
 
     /**
+     * Update the muted state of an account
+     * @param id account ID
+     * @param muted muted state
+     * @return success
+     */
+    public boolean updateMuted(long id, boolean muted) {
+        AccountData data = this.getAccount(id);
+
+        if(data != null) {
+            try {
+
+                String sql = "UPDATE users SET muted = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setBoolean(1, muted);
+                statement.setLong(2, data.getId());
+                statement.execute();
+
+                return true;
+
+            } catch(SQLException ignored) {}
+        }
+
+        return false;
+    }
+
+    /**
+     * Update the banned state of an account
+     * @param id account ID
+     * @param banned banned state
+     * @return success
+     */
+    public boolean updateBanned(long id, boolean banned) {
+        AccountData data = this.getAccount(id);
+
+        if(data != null) {
+            try {
+
+                String sql = "UPDATE users SET muted = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setBoolean(1, banned);
+                statement.setLong(2, data.getId());
+                statement.execute();
+
+                return true;
+
+            } catch(SQLException ignored) {}
+        }
+
+        return false;
+    }
+
+    /**
      * Update level of an account
      * @param id Account ID
      * @param level new level
@@ -253,21 +305,46 @@ public class AccountSystem {
      * @return success
      */
     public boolean updateShopData(long id, JSONArray shopData) {
-            AccountData data = this.getAccount(id);
+        AccountData data = this.getAccount(id);
 
-            if(data != null) {
-                try {
+        if(data != null) {
+            try {
 
-                    String sql = "UPDATE users SET level = ? WHERE id = ?";
-                    PreparedStatement statement = this.database.prepareStatement(sql);
-                    statement.setString(1, shopData.toString());
-                    statement.setLong(2, data.getId());
-                    statement.execute();
+                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setString(1, shopData.toString());
+                statement.setLong(2, data.getId());
+                statement.execute();
 
-                    return true;
+                return true;
 
-                } catch (SQLException ignored) {}
-            }
+            } catch (SQLException ignored) {}
+        }
+
+        return false;
+    }
+
+    /**
+     * Resets shopData of an account
+     * @param id account ID
+     * @return success
+     */
+    public boolean resetShopData(long id) {
+        AccountData data = this.getAccount(id);
+
+        if(data != null) {
+            try {
+
+                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                PreparedStatement statement = this.database.prepareStatement(sql);
+                statement.setString(1, new JSONArray().toString());
+                statement.setLong(2, data.getId());
+                statement.execute();
+
+                return true;
+
+            } catch (SQLException ignored) {}
+        }
 
         return false;
     }
@@ -295,7 +372,7 @@ public class AccountSystem {
                         shopData = new JSONArray();
                     }
 
-                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getInt("level"), rs.getInt("balance"), shopData);
+                    return new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getBoolean("muted"), rs.getBoolean("banned"), rs.getInt("level"), rs.getInt("balance"), shopData);
                 }
             }
 
@@ -340,7 +417,7 @@ public class AccountSystem {
                     shopData = new JSONArray();
                 }
 
-                accounts.add(new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getInt("level"), rs.getInt("balance"), shopData));
+                accounts.add(new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getBoolean("muted"), rs.getBoolean("banned"), rs.getInt("level"), rs.getInt("balance"), shopData));
             }
         } catch(SQLException e) {
             SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQL Exception: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
@@ -367,6 +444,8 @@ public class AccountSystem {
                     "username VARCHAR(255)," +
                     "password VARCHAR(255)," +
                     "permission INTEGER NOT NULL DEFAULT 0," +
+                    "muted BOOLEAN NOT NULL DEFAULT false," +
+                    "banned BOOLEAN NOT NULL DEFAULT false," +
                     "level INTEGER NOT NULL DEFAULT 0," +
                     "balance INTEGER NOT NULL DEFAULT 0," +
                     "shopdata VARCHAR(255) NOT NULL DEFAULT '[]'" +
