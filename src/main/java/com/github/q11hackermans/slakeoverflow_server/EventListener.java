@@ -7,6 +7,7 @@ import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationSta
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
+import com.github.q11hackermans.slakeoverflow_server.shop.ShopItem;
 import net.jandie1505.connectionmanager.CMListenerAdapter;
 import net.jandie1505.connectionmanager.enums.PendingClientState;
 import net.jandie1505.connectionmanager.events.CMClientClosedEvent;
@@ -25,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class EventListener extends CMListenerAdapter {
@@ -269,6 +271,20 @@ public class EventListener extends CMListenerAdapter {
                             advancedSettings.put("player_count", SlakeoverflowServer.getServer().getPlayerCount());
                             advancedSettings.put("spectator_count", SlakeoverflowServer.getServer().getSpectatorCount());
                             response.put("server_stats", serverStats);
+
+                            JSONObject shopItems = new JSONObject();
+                            Map<Integer, ShopItem> shopItemMap = SlakeoverflowServer.getServer().getShopManager().getShopItems();
+                            for(int id : shopItemMap.keySet()) {
+                                ShopItem shopItem = shopItemMap.get(id);
+
+                                JSONObject item = new JSONObject();
+                                item.put("enabled", shopItem.isEnabled());
+                                item.put("required_level", shopItem.getRequiredLevel());
+                                item.put("price", shopItem.getPrice());
+
+                                shopItems.put(String.valueOf(id), item);
+                            }
+                            response.put("shop_items", shopItems);
 
                             connection.sendUTF(response.toString());
 
