@@ -236,7 +236,7 @@ public class AccountSystem {
         if(data != null) {
             try {
 
-                String sql = "UPDATE users SET muted = ? WHERE id = ?";
+                String sql = "UPDATE users SET banned = ? WHERE id = ?";
                 PreparedStatement statement = this.database.prepareStatement(sql);
                 statement.setBoolean(1, banned);
                 statement.setLong(2, data.getId());
@@ -319,7 +319,7 @@ public class AccountSystem {
         if(data != null) {
             try {
 
-                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                String sql = "UPDATE users SET shopdata = ? WHERE id = ?";
                 PreparedStatement statement = this.database.prepareStatement(sql);
                 statement.setString(1, shopData.toString());
                 statement.setLong(2, data.getId());
@@ -344,7 +344,7 @@ public class AccountSystem {
         if(data != null) {
             try {
 
-                String sql = "UPDATE users SET level = ? WHERE id = ?";
+                String sql = "UPDATE users SET shopdata = ? WHERE id = ?";
                 PreparedStatement statement = this.database.prepareStatement(sql);
                 statement.setString(1, new JSONArray().toString());
                 statement.setLong(2, data.getId());
