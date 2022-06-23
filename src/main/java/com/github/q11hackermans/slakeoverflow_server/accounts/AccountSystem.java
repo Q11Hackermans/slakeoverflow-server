@@ -280,20 +280,21 @@ public class AccountSystem {
 
     /**
      * Update balance of an account
-     * @param id Account ID
-     * @param level new balance
+     *
+     * @param id      Account ID
+     * @param balance new balance
      * @return success
      */
-    public boolean updateBalance(long id, int level) {
-        if(level >= 0) {
+    public boolean updateBalance(long id, int balance) {
+        if (balance >= 0) {
             AccountData data = this.getAccount(id);
 
-            if(data != null) {
+            if (data != null) {
                 try {
 
-                    String sql = "UPDATE users SET level = ? WHERE id = ?";
+                    String sql = "UPDATE users SET balance = ? WHERE id = ?";
                     PreparedStatement statement = this.database.prepareStatement(sql);
-                    statement.setInt(1, level);
+                    statement.setInt(1, balance);
                     statement.setLong(2, data.getId());
                     statement.execute();
 
