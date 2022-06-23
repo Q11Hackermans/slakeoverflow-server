@@ -48,11 +48,12 @@ public class ShopManager {
 
         if(account != null) {
             if(this.itemExists(itemId) && !account.getShopData().toList().contains(itemId)) {
-                boolean isEnabled = this.customShopIds.get(itemId).isEnabled();
-                int requiredLevel = this.customShopIds.get(itemId).getRequiredLevel();
-                int price = this.customShopIds.get(itemId).getPrice();
+                final Map<Integer, ShopItem> shopItems = getShopItems();
+                boolean isEnabled = shopItems.get(itemId).isEnabled();
+                int requiredLevel = shopItems.get(itemId).getRequiredLevel();
+                int price = shopItems.get(itemId).getPrice();
 
-                if(isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price && !this.getItemsFromAccount(account.getId()).contains(itemId)) {
+                if (isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price && !this.getItemsFromAccount(account.getId()).contains(itemId)) {
                     SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
                     this.addItemToAccount(account.getId(), itemId);
 
