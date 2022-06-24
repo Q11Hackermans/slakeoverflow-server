@@ -133,3 +133,53 @@ Logins also can be set via console with the `user login/logout` command. The acc
 If a game is running (not paused), all users which are in authentication state PLAYER will have their snake. In the snake, all data for this user for the current running game is saved. If a snake dies, it will get deleted. If `unauthenticate_player_on_death` is set to true, the player get unauthenticated automatically. Else the player remains in PLAYER auth state and will get a new snake automatically. The snakes can be managed by the `game modify snake` command (see game management).
 
 ## Config
+
+The configuration is used to configure the server.
+Config values can be set via the config.json file created on the first start of the server or via the config command in console.
+
+### Server configuration options
+
+#### server_name
+
+The name of the server. It will be send to the client when it requrests the server information.
+
+#### max_connections
+
+The limit of connections to the server.
+If the limit is reached and a new client tries to connect, the connection can be accepted within the next 10 seconds in console until it gets disconnected.
+
+#### auto_connection_accept
+
+If this option is enabled, new connections are automatically accepted.
+If this opton is disabled, new connections have to be accepted via console within 10 seconds after connecting. Else, the connection gets closed.
+
+#### allow_guests
+
+If this option is disabled, only clients which are logged in can authenticate as player or spectator.
+If this option is enabled, every client can authenticate even if it's not logged in.
+
+#### port
+
+The port the server runs on.
+
+#### allow_registration
+
+If this option is enabled, clients can register accounts.
+If not, the account registration is disabled.
+
+#### user_authentication
+
+If this is enabled, users (clients) can authenticate as player or spectator.
+If this is disabled, only admins and privileged users (ADMIN/MODERATOR) can authenticate and users can only be authenticated via console.
+
+#### allow_login
+
+If this option is disabled, users cannot log in (except admins and moderators).
+Together with also_disable_privileged_login and allow_registration, this enables/disables the account system.
+
+#### also_disable_privileged_login
+
+This option only works if allow_login is set to false.
+If this option is enabled and allow_login is disabled, even admins and moderators cannot login anymore.
+Use this option together with allow_registration and allow_login on false to completely disable the account system.
+

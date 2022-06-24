@@ -301,6 +301,17 @@ public class ChatSystem {
                             "account update username/password <value>\n" +
                             "account delete\n";
                 }
+            } else if (cmd[0].equalsIgnoreCase("help")) {
+                String returnString = "CHAT COMMANDS HELP:\n" +
+                        "help - show this page\n" +
+                        "account - manage your account\n" +
+                        "msg - send private messages\n";
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
+                    returnString = returnString + "admin - run any console commands via c";
+                }
+
+                return returnString;
             } else {
                 return "Unknown command";
             }
