@@ -217,6 +217,7 @@ Default: 2
 Same as ``max_players``, but only for the spectators.
 
 #### min_food_value, max_food_level
+Default: 1, 2
 
 If the snake eats food, its length will be increased by the food level.
 Food will be spawned with a level between ``min_food_value`` and ``max_food_value``.
@@ -269,7 +270,7 @@ Default: true
   
 If this is enabled, the snake speed boost can be used by pressing SPACE.
 If a snake uses the speed boost, it consumes its own body (length) while getting an acceleration.
-This means, that a multiplier (and not 1 anymore) gets subtracted from the snake's "move in score".
+This means, that a multiplier (and not 1 anymore) gets subtracted from the snake's "move in score" (explained in ``snake_speed_base``...).
 This multiplier increases by every consumed snake body unit.
 
 #### eat_own_snake
@@ -277,4 +278,3 @@ Default: true
 
 If this is enabled and a snake hits one of its body units with its head, the snake bodies behind this body unit are getting cut off.
 If this is disabled and a snake hits one of its body units with its head, the snake dies like it hits another snake's bodies.
-
