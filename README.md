@@ -278,3 +278,20 @@ Default: true
 
 If this is enabled and a snake hits one of its body units with its head, the snake bodies behind this body unit are getting cut off.
 If this is disabled and a snake hits one of its body units with its head, the snake dies like it hits another snake's bodies.
+
+### Advanced config options
+It is not recommended to change the advanced config options.
+It is also required to enable the advanced config options with the start argument ``-enableAdvancedConfigOptions=true``.
+
+#### advanced_override_server_tickrate
+To modify the tickrate using ``advanced_custom_server_tickrate`` and ``advanced_custom_server_tickrate_idle``, enable this option.
+
+#### advanced_custom_server_tickrate
+Default: 50
+  
+Set a custom server tickrate.
+This is the value in milliseconds to wait after a tick was completed.
+50 ms is a tickrate of 20 ticks/second.
+
+#### advanced_custom_server_tickrate_idle
+This is the same as the ``advanced_custom_server_tickrate``, but only if no game is running.
