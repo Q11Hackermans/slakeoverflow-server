@@ -47,7 +47,7 @@ public class ServerConfig {
         // SERVER OPTIONS
         this.port = 26677;
         this.autoConnectionAccept = true;
-        this.userAuthentication = false;
+        this.userAuthentication = true;
         this.maxConnections = 20;
         this.allowGuests = true;
         this.allowLogin = true;
