@@ -133,53 +133,148 @@ Logins also can be set via console with the `user login/logout` command. The acc
 If a game is running (not paused), all users which are in authentication state PLAYER will have their snake. In the snake, all data for this user for the current running game is saved. If a snake dies, it will get deleted. If `unauthenticate_player_on_death` is set to true, the player get unauthenticated automatically. Else the player remains in PLAYER auth state and will get a new snake automatically. The snakes can be managed by the `game modify snake` command (see game management).
 
 ## Config
-
 The configuration is used to configure the server.
 Config values can be set via the config.json file created on the first start of the server or via the config command in console.
 
 ### Server configuration options
 
 #### server_name
-
+Default: "Slakeoverflow-Server"
+  
 The name of the server. It will be send to the client when it requrests the server information.
 
 #### max_connections
-
+Default: 20
+  
 The limit of connections to the server.
 If the limit is reached and a new client tries to connect, the connection can be accepted within the next 10 seconds in console until it gets disconnected.
 
 #### auto_connection_accept
-
+Default: true
+  
 If this option is enabled, new connections are automatically accepted.
 If this opton is disabled, new connections have to be accepted via console within 10 seconds after connecting. Else, the connection gets closed.
 
 #### allow_guests
-
+Default: true
+  
 If this option is disabled, only clients which are logged in can authenticate as player or spectator.
 If this option is enabled, every client can authenticate even if it's not logged in.
 
 #### port
-
+Default: 26677
+  
 The port the server runs on.
 
 #### allow_registration
-
+Default: true
+  
 If this option is enabled, clients can register accounts.
 If not, the account registration is disabled.
 
 #### user_authentication
-
+Default: true
+  
 If this is enabled, users (clients) can authenticate as player or spectator.
 If this is disabled, only admins and privileged users (ADMIN/MODERATOR) can authenticate and users can only be authenticated via console.
 
 #### allow_login
-
+Default: true
+  
 If this option is disabled, users cannot log in (except admins and moderators).
-Together with also_disable_privileged_login and allow_registration, this enables/disables the account system.
+Together with ``also_disable_privileged_login`` and ``allow_registration``, this enables/disables the account system.
 
 #### also_disable_privileged_login
+Default: false
+  
+This option only works if allow_login is set to ``false``.
+If this option is enabled and ``allow_login`` is disabled, even admins and moderators cannot login anymore.
+Use this option together with ``allow_registration`` and ``allow_login`` on ``false`` to completely disable the account system.
 
-This option only works if allow_login is set to false.
-If this option is enabled and allow_login is disabled, even admins and moderators cannot login anymore.
-Use this option together with allow_registration and allow_login on false to completely disable the account system.
+#### unauthenticate_player_on_death
+Default: true
+  
+If this option is enabled, a user whose snake dies will be unauthenticated (back to main menu).
+If this option is disabled, the snake of this user will instantly respawn.
+
+#### print_debug_messages
+Default: false
+  
+If this option is enabled, the server will show optional debug messages.
+
+### Game configuration options
+
+#### max_players
+Default: 20
+  
+This is the count of the maximum player count (NOT CONNECTIONS!).
+Clients can still connect to the server, but they can't authenticate as player if the limit is reached.
+Privileged users can still authenticate, and users can still be authenticated by console.
+
+#### max_spectators
+Default: 2
+  
+Same as ``max_players``, but only for the spectators.
+
+#### min_food_value, max_food_level
+
+If the snake eats food, its length will be increased by the food level.
+Food will be spawned with a level between ``min_food_value`` and ``max_food_value``.
+
+#### default_snake_length
+Default: 2
+  
+The length a snake will be spawned with.
+
+#### snake_speed_base, snake_speed_modifier_value, snake_speed_modifier_bodycount
+Default: 2, 1, 5
+  
+The snake movement system technically counts down a "move in score".
+If the move in score is 0, it will be reset to the current snake speed and the snake will move.
+  
+The current snake speed is calculated with ``snake_speed_base + (snake_length / snake_speed_modifier_bodycount) * snake_speed_modifier_value`` (``snake_length`` is the current snake length).
+  
+You can understand this formula like that: Every snake has a speed of ``snake_speed_base``.
+Every ``snake_speed_modifier_bodycount`` bodies (= length), the snake speed will get ``snake_speed_modifier_value`` slower.
+  
+To only use the ``snake_speed_base`` as persistent speed, you can set ``snake_speed_modifier_value`` to 0.
+
+#### default_gamefield_size_x, default_gamefield_size_y
+Default: 100, 100
+  
+This is the gamefield size which is used if you start a game with ``game start default``.
+This is not so important because you also can start a game with ``game start custom <size_x> <size_y>``.
+
+#### default_item_despawn_time, item_superfood_despawn_time
+Default: 60, 120
+  
+This is the item despawn time.
+A default item despawns after ``default_item_despawn_time`` seconds, superfood (that what a snake drops if it dies) despawns after ``item_superfood_despawn_time`` seconds.
+Please note that the times are only seconds if the server has a normal server tickrate (20 ticks/second)
+
+#### enable_spectator
+Default: true
+  
+If this option is enabled, users can (be) authenticate(d) as spectator.
+If not, the spectator mode won't work.
+
+#### spectator_update_interval
+Default: 200
+  
+This is the time (in ticks) the spectator data will be updated.
+Please note that creating spectator data requires performance and a too low update interval leads to server lags.
+
+#### enable_snake_speed_boost
+Default: true
+  
+If this is enabled, the snake speed boost can be used by pressing SPACE.
+If a snake uses the speed boost, it consumes its own body (length) while getting an acceleration.
+This means, that a multiplier (and not 1 anymore) gets subtracted from the snake's "move in score".
+This multiplier increases by every consumed snake body unit.
+
+#### eat_own_snake
+Default: true
+
+If this is enabled and a snake hits one of its body units with its head, the snake bodies behind this body unit are getting cut off.
+If this is disabled and a snake hits one of its body units with its head, the snake dies like it hits another snake's bodies.
 
