@@ -1,7 +1,10 @@
 # Slakeoverflow Server Documentation
 
 ## What is Slakeoverflow?
-Slakeoverflow is a multiplayer snake game.  
+Slakeoverflow is a multiplayer snake game.
+  
+This is the server repository, the default client is [here](https://github.com/Q11Hackermans/slakeoverflow-client).
+  
 This documentation explains how to use the server.
 
 ## Game Management
