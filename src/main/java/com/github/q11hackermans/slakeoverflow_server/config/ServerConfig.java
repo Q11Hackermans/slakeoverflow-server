@@ -67,7 +67,7 @@ public class ServerConfig {
         this.defaultSnakeLength = 3;
         this.snakeSpeedBase = 2;
         this.snakeSpeedModifierValue = 1;
-        this.snakeSpeedModifierBodycount = 5;
+        this.snakeSpeedModifierBodycount = 25;
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
