@@ -72,8 +72,8 @@ public class GameSession {
             // SENDING PLAYERDATA TO SNAKES
             for (Snake snake : this.snakeList) {
                 if (snake.getConnection() != null) {
-                    snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
-                    //snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                    //snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                    snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
                 }
             }
 
@@ -359,6 +359,9 @@ public class GameSession {
 
     private String getSendablePlayerdataFixedFOV(Snake snake) {
         JSONObject playerData = new JSONObject();
+        playerData.put("cmd", "playerdata");
+        playerData.put("fovx", this.fovsizeX);
+        playerData.put("fovy", this.fovsizeY);
 
         int fovCountX = this.borderX / this.fovsizeX;
         int fovCountY = this.borderY / this.fovsizeY;
