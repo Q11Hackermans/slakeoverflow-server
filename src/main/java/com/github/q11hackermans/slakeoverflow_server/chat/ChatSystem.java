@@ -302,7 +302,7 @@ public class ChatSystem {
                             "account update username/password <value>\n" +
                             "account delete\n";
                 }
-            } else if (cmd[0].equalsIgnoreCase("fovbehavior")) {
+            } else if (cmd[0].equalsIgnoreCase("togglefov")) {
                 Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(commandExecutor);
                 if(snake != null) {
                     snake.setFixedFovPlayerdataSystem(!snake.isFixedFovPlayerdataSystem());
@@ -315,7 +315,7 @@ public class ChatSystem {
                         "help - show this page\n" +
                         "account - manage your account\n" +
                         "msg - send private messages\n" +
-                        "fovbehavior - switch between FOV scrolling/fixed mode";
+                        "togglefov - switch between FOV scrolling/fixed mode";
 
                 if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                     returnString = returnString + "admin - run any console commands via c";
