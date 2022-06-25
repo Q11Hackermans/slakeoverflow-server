@@ -273,7 +273,7 @@ public class SlakeoverflowServer {
      * This will create a new game with a specific size
      */
     public boolean setupGame(int sizeX, int sizeY, boolean paused) {
-        return this.setupGame(paused, sizeX, sizeY, 30, 20, 20, null, null);
+        return this.setupGame(paused, sizeX, sizeY, 60, 40, 20, null, null);
     }
 
     /**
