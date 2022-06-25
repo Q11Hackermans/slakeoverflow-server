@@ -72,7 +72,7 @@ public class ChatSystem {
     public void send(String message, boolean title, ServerConnection connection) {
         JSONObject msg = new JSONObject();
 
-        msg.put("cmd", message);
+        msg.put("cmd", "message");
         msg.put("title", title);
         msg.put("msg", message);
 
@@ -326,7 +326,7 @@ public class ChatSystem {
                         "msg - send private messages\n" +
                         "togglefov - switch between FOV scrolling/fixed mode";
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount() != null && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                     returnString = returnString + "admin - run any console commands via c";
                 }
 
