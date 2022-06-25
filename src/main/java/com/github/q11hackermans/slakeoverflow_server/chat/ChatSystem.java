@@ -199,10 +199,19 @@ public class ChatSystem {
                             }
 
                             AccountData receiver = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[1]);
-                            ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
 
-                            this.sendPrivateChatMessage(account.getUsername(), receiverConnection, messageString);
-                            return "YOU --> " + account.getUsername() + ":" + messageString;
+                            if(receiver != null) {
+                                ServerConnection receiverConnection = SlakeoverflowServer.getServer().getConnectionByAccountId(receiver.getId());
+
+                                if(receiverConnection != null) {
+                                    this.sendPrivateChatMessage(account.getUsername(), receiverConnection, messageString);
+                                    return "YOU --> " + account.getUsername() + ":" + messageString;
+                                } else {
+                                    return "User is not online";
+                                }
+                            } else {
+                                return "User does not exist";
+                            }
                         } else {
                             return "Usage: /msg <TO> <MESSAGE>";
                         }
