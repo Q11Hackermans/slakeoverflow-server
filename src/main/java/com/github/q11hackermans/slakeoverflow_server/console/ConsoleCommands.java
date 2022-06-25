@@ -951,6 +951,13 @@ public class ConsoleCommands {
                                     uuid = String.valueOf(snake.getConnection().getClientId());
                                 }
 
+                                String playerdataSystem;
+                                if(snake.isFixedFovPlayerdataSystem()) {
+                                    playerdataSystem = "FIXED_FOV (=true)";
+                                } else {
+                                    playerdataSystem = "SCROLLING_FOV (=false)";
+                                }
+
                                 return "SNAKE INFORMATION:\n" +
                                         "ID: " + SlakeoverflowServer.getServer().getGameSession().getSnakeId(snake) + "\n" +
                                         "UUID: " + uuid + "\n" +
@@ -959,7 +966,8 @@ public class ConsoleCommands {
                                         "Facing: " + snake.getFacing() + "\n" +
                                         "Freezed: " + snake.isFreezed() + "\n" +
                                         "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
-                                        "Body positions: " + bodyPositionString + "\n";
+                                        "Body positions: " + bodyPositionString + "\n" +
+                                        "FOV Behavior: " + playerdataSystem + "\n";
                             } else {
                                 return "This snake does not exist";
                             }
@@ -1096,6 +1104,13 @@ public class ConsoleCommands {
                                                 return "Set freeze snake to " + snake.isFreezed();
                                             } else {
                                                 return "USAGE: game modify snake <UUID/ID> freeze true/false";
+                                            }
+                                        } else if(cmd[4].equalsIgnoreCase("fovbehavior")) {
+                                            if(cmd.length == 6) {
+                                                snake.setFixedFovPlayerdataSystem(Boolean.parseBoolean(cmd[5]));
+                                                return "Set fovbehavior snake to " + snake.isFixedFovPlayerdataSystem();
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> fovbehavior true/false";
                                             }
                                         } else {
                                             return "Unknown action";

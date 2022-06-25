@@ -5,8 +5,6 @@ import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
-import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
-import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +28,7 @@ public class Snake implements GameObject {
     private boolean fastMove;
     private int fastMoveMultiplier;
     private boolean hasMoved;
+    private boolean fixedFovPlayerdataSystem;
 
     public Snake(ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions, GameSession gameSession) {
         this.connection = connection;
@@ -46,6 +45,7 @@ public class Snake implements GameObject {
         this.fastMove = false;
         this.fastMoveMultiplier = 1;
         this.hasMoved = false;
+        this.fixedFovPlayerdataSystem = false;
 
         if (bodyPositions != null) {
             this.bodyPositions.addAll(bodyPositions);
@@ -515,6 +515,14 @@ public class Snake implements GameObject {
         //    value = value + speedModifierValue;
         //}
         return value + (this.bodyPositions.size() / speedModifierBodycount) * speedModifierValue;
+    }
+
+    public boolean isFixedFovPlayerdataSystem() {
+        return this.fixedFovPlayerdataSystem;
+    }
+
+    public void setFixedFovPlayerdataSystem(boolean fixedFovPlayerdataSystem) {
+        this.fixedFovPlayerdataSystem = fixedFovPlayerdataSystem;
     }
 
     /**

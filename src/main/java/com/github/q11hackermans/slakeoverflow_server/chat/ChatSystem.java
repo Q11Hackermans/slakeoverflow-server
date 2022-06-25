@@ -5,6 +5,7 @@ import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleCommands;
 import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
+import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -301,11 +302,20 @@ public class ChatSystem {
                             "account update username/password <value>\n" +
                             "account delete\n";
                 }
+            } else if (cmd[0].equalsIgnoreCase("fovbehavior")) {
+                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(commandExecutor);
+                if(snake != null) {
+                    snake.setFixedFovPlayerdataSystem(!snake.isFixedFovPlayerdataSystem());
+                    return "Toggled FOV mode";
+                } else {
+                    return "You are not ingame";
+                }
             } else if (cmd[0].equalsIgnoreCase("help")) {
                 String returnString = "CHAT COMMANDS HELP:\n" +
                         "help - show this page\n" +
                         "account - manage your account\n" +
-                        "msg - send private messages\n";
+                        "msg - send private messages\n" +
+                        "fovbehavior - switch between FOV scrolling/fixed mode";
 
                 if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                     returnString = returnString + "admin - run any console commands via c";

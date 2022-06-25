@@ -72,8 +72,11 @@ public class GameSession {
             // SENDING PLAYERDATA TO SNAKES
             for (Snake snake : this.snakeList) {
                 if (snake.getConnection() != null) {
-                    snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
-                    //snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                    if(snake.isFixedFovPlayerdataSystem()) {
+                        snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                    } else {
+                        snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                    }
                 }
             }
 
