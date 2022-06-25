@@ -74,6 +74,7 @@ public class ConsoleCommands {
                 "blacklist: IP blacklist management\n" +
                 "game: Game management\n" +
                 "logger: Logging management\n" +
+                "shop: Item shop management\n" +
                 "info: Information" +
                 "Run the specific commands without arguments to show their help page.\n";
     }
@@ -243,6 +244,13 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
                         SlakeoverflowServer.getServer().getConfigManager().getConfig().setEatOwnSnake(Boolean.parseBoolean(cmd[3]));
                         return "Updated value eat_own_snake to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("snake_death_superfood_multiplier")) {
+                        try {
+                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeDeathSuperfoodMultiplier(Double.parseDouble(cmd[3]));
+                            return "Updated value snake_death_superfood_multiplier";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a value between 0.01 and 2";
+                        }
                     } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
                         return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
@@ -307,6 +315,8 @@ public class ConsoleCommands {
                         return "Value enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost();
                     } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
                         return "Value eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake();
+                    } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
+                        return "Value snake_death_superfood_multiplier: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier();
                     } else {
                         return "Unknown config option";
                     }
@@ -339,6 +349,7 @@ public class ConsoleCommands {
                         "spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval() + "\n" +
                         "enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() + "\n" +
                         "eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake() + "\n" +
+                        "snake_death_superfood_multiplier: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier() + "\n" +
                         "Advanced Settings:\n" +
                         "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +

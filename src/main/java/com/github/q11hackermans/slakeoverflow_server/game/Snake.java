@@ -519,13 +519,13 @@ public class Snake implements GameObject {
 
     /**
      * This method will kill the snake.
-     * After killing the snake, it cant be used anymore.
+     * After killing the snake, it can't be used anymore.
      */
     public void killSnake() {
         SlakeoverflowServer.getServer().getLogger().debug("GAME", "Killed snake " + gameSession.getSnakeId(this));
 
         this.alive = false;
-        this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * 0.3)), this.posx, this.posy);
+        this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier())), this.posx, this.posy);
 
         if (this.connection != null && this.connection.getAuthenticationState() == AuthenticationState.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
             this.connection.unauthenticate();

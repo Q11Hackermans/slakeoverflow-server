@@ -36,6 +36,7 @@ public class ServerConfig {
     private int spectatorUpdateInterval;
     private boolean enableSnakeSpeedBoost;
     private boolean eatOwnSnake;
+    private double snakeDeathSuperfoodMultiplier;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -77,6 +78,7 @@ public class ServerConfig {
         this.spectatorUpdateInterval = 200;
         this.enableSnakeSpeedBoost = true;
         this.eatOwnSnake = true;
+        this.snakeDeathSuperfoodMultiplier = 0.3;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -409,6 +411,22 @@ public class ServerConfig {
 
     public void setEnableAdminCommand(boolean enableAdminCommand) {
         this.enableAdminCommand = enableAdminCommand;
+    }
+
+    public double getSnakeDeathSuperfoodMultiplier() {
+        if(this.snakeDeathSuperfoodMultiplier <= 2 && this.snakeDeathSuperfoodMultiplier >= 0.01) {
+            return this.snakeDeathSuperfoodMultiplier;
+        } else {
+            return 0.3;
+        }
+    }
+
+    public void setSnakeDeathSuperfoodMultiplier(double snakeDeathSuperfoodMultiplier) {
+        if(snakeDeathSuperfoodMultiplier <= 2 && snakeDeathSuperfoodMultiplier >= 0.01) {
+            this.snakeDeathSuperfoodMultiplier = snakeDeathSuperfoodMultiplier;
+        } else {
+            throw new IllegalArgumentException("The value must be higher or equal than 0.01 and lower or equal than 2");
+        }
     }
 
     // ADVANCED
