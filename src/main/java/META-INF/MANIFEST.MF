@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: com.github.q11hackermans.slakeoverflow_server.SlakeoverflowS
+ erver
+

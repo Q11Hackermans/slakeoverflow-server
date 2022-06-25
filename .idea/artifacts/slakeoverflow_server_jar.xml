@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="slakeoverflow-server:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/slakeoverflow_server_jar</output-path>
+    <root id="archive" name="slakeoverflow-server.jar">
+      <element id="module-output" name="slakeoverflow-server" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/jandie1505/ConnectionManager/1.0.1/ConnectionManager-1.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/json/json/20220320/json-20220320.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
