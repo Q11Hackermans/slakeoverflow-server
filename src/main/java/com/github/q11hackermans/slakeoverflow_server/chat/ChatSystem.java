@@ -367,6 +367,7 @@ public class ChatSystem {
     // SOCIALSPY
 
     public void sendSocialSpy(String sender, String receiver, String message) {
+        SlakeoverflowServer.getServer().getLogger().info("[SOCIALSPY]", "[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message);
         for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
             if(connection.isSocialSpy()) {
                 this.send("[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message, false, connection);
