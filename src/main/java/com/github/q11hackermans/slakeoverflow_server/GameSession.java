@@ -72,8 +72,8 @@ public class GameSession {
             // SENDING PLAYERDATA TO SNAKES
             for (Snake snake : this.snakeList) {
                 if (snake.getConnection() != null) {
-                    //snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
-                    snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                    snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                    //snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
                 }
             }
 
@@ -363,8 +363,8 @@ public class GameSession {
         playerData.put("fovx", this.fovsizeX);
         playerData.put("fovy", this.fovsizeY);
 
-        int fovCountX = this.borderX / this.fovsizeX;
-        int fovCountY = this.borderY / this.fovsizeY;
+        int fovCountX = this.borderX / this.fovsizeX + 1;
+        int fovCountY = this.borderY / this.fovsizeY + 1;
 
         int fovX = -1;
         int currentFovPos1X = -1;
@@ -469,13 +469,13 @@ public class GameSession {
                     if (field instanceof Snake) {
                         Snake fieldSnake = (Snake) field;
                         if (field == snake) {
-                            if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
+                            if (Arrays.equals(fieldSnake.getPos(), new int[]{ix, iy})) {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(fieldSnake.getFacing()), fieldSnake.isHasMoved()));
                             } else {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OWN));
                             }
                         } else {
-                            if (Arrays.equals(field.getPos(), new int[]{ix, iy})) {
+                            if (Arrays.equals(fieldSnake.getPos(), new int[]{ix, iy})) {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOtherValue(fieldSnake.getFacing())));
                             } else {
                                 fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OTHER));
