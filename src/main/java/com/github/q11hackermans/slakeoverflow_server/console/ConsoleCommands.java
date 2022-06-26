@@ -255,6 +255,24 @@ public class ConsoleCommands {
                         return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
                         return "This option can't be changed while the server is running";
+                    } else if (cmd[2].equalsIgnoreCase("enable_chat")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableChat(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_chat to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("allow_guest_chat")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setAllowGuestChat(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value allow_guest_chat to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("enable_admin_command")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableAdminCommand(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_admin_command to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("print_chat_to_console")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setPrintChatToConsole(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value print_chat_to_console to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("print_chat_commands_to_console")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setPrintChatCommandsToConsole(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value print_chat_commands_to_console to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("verbose_chat_logs")) {
+                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setVerboseChatLogs(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value verbose_chat_logs to " + cmd[3];
                     } else {
                         return "Unknown config option";
                     }
@@ -262,6 +280,8 @@ public class ConsoleCommands {
                     return "Run command without arguments for help";
                 }
             } else if (cmd[1].equalsIgnoreCase("get")) {
+                return "Command not supported anymore. Use config list instead.";
+                /*
                 if (cmd.length == 3) {
                     if (cmd[2].equalsIgnoreCase("port")) {
                         return "Value port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort();
@@ -323,6 +343,8 @@ public class ConsoleCommands {
                 } else {
                     return "Run command without arguments for help";
                 }
+
+                 */
             } else if (cmd[1].equalsIgnoreCase("list")) {
                 return "CONFIG OPTIONS:\n" +
                         "Server Settings:\n" +
@@ -332,6 +354,12 @@ public class ConsoleCommands {
                         "user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication() + "\n" +
                         "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
                         "print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
+                        "enable_chat: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableChat() + "\n" +
+                        "allow_guest_chat: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuestChat() + "\n" +
+                        "enable_admin_command: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() + "\n" +
+                        "print_chat_to_console: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatToConsole() + "\n" +
+                        "print_chat_commands_to_console: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatCommandsToConsole() + "\n" +
+                        "verbose_chat_logs: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isVerboseChatLogs() + "\n" +
                         "Game Settings:\n" +
                         "max_players: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers() + "\n" +
                         "max_spectators: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxSpectators() + "\n" +

@@ -54,6 +54,12 @@ public class ConfigManager {
                     this.config.setAlsoDisablePrivilegedLogin(serverSettings.getBoolean("also_disable_privileged_login"));
                     this.config.setAllowRegistration(serverSettings.getBoolean("allow_registration"));
                     this.config.setServerName(serverSettings.getString("server_name"));
+                    this.config.setEnableChat(serverSettings.getBoolean("enable_chat"));
+                    this.config.setAllowGuestChat(serverSettings.getBoolean("allow_guest_chat"));
+                    this.config.setEnableAdminCommand(serverSettings.getBoolean("enable_admin_command"));
+                    this.config.setPrintChatToConsole(serverSettings.getBoolean("print_chat_to_console"));
+                    this.config.setPrintChatCommandsToConsole(serverSettings.getBoolean("print_chat_commands_to_console"));
+                    this.config.setVerboseChatLogs(serverSettings.getBoolean("verbose_chat_logs"));
 
                     JSONObject gameSettings = config.getJSONObject("game_settings");
                     this.config.setMaxPlayers(gameSettings.getInt("max_players"));
@@ -114,6 +120,12 @@ public class ConfigManager {
                 serverSettings.put("also_disable_privileged_login", this.config.isAlsoDisablePrivilegedLogin());
                 serverSettings.put("allow_registration", this.config.isAllowRegistration());
                 serverSettings.put("server_name", this.config.getServerName());
+                serverSettings.put("enable_chat", this.config.isEnableChat());
+                serverSettings.put("allow_guest_chat", this.config.isAllowGuestChat());
+                serverSettings.put("enable_admin_command", this.config.isEnableAdminCommand());
+                serverSettings.put("print_chat_to_console", this.config.isPrintChatToConsole());
+                serverSettings.put("print_chat_commands_to_console", this.config.isPrintChatCommandsToConsole());
+                serverSettings.put("verbose_chat_logs", this.config.isVerboseChatLogs());
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();

@@ -1,6 +1,5 @@
 package com.github.q11hackermans.slakeoverflow_server.config;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class ServerConfig {
@@ -19,6 +18,9 @@ public class ServerConfig {
     private boolean enableChat;
     private boolean allowGuestChat;
     private boolean enableAdminCommand;
+    private boolean printChatToConsole;
+    private boolean printChatCommandsToConsole;
+    private boolean verboseChatLogs;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -59,6 +61,9 @@ public class ServerConfig {
         this.enableChat = true;
         this.allowGuestChat = false;
         this.enableAdminCommand = true;
+        this.printChatToConsole = true;
+        this.printChatCommandsToConsole = true;
+        this.verboseChatLogs = false;
 
         // GAME OPTIONS
         this.maxPlayers = 10;
@@ -427,6 +432,30 @@ public class ServerConfig {
         } else {
             throw new IllegalArgumentException("The value must be higher or equal than 0.01 and lower or equal than 2");
         }
+    }
+
+    public boolean isPrintChatToConsole() {
+        return printChatToConsole;
+    }
+
+    public void setPrintChatToConsole(boolean printChatToConsole) {
+        this.printChatToConsole = printChatToConsole;
+    }
+
+    public boolean isPrintChatCommandsToConsole() {
+        return printChatCommandsToConsole;
+    }
+
+    public void setPrintChatCommandsToConsole(boolean printChatCommandsToConsole) {
+        this.printChatCommandsToConsole = printChatCommandsToConsole;
+    }
+
+    public boolean isVerboseChatLogs() {
+        return verboseChatLogs;
+    }
+
+    public void setVerboseChatLogs(boolean verboseChatLogs) {
+        this.verboseChatLogs = verboseChatLogs;
     }
 
     // ADVANCED
