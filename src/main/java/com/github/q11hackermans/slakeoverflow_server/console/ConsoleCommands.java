@@ -1621,7 +1621,7 @@ public class ConsoleCommands {
         if(cmd.length >= 2) {
             if(cmd[1].equalsIgnoreCase("write") && cmd.length >= 3) {
                 String message = "";
-                for(int i = 2; i < cmd.length - 1; i++) {
+                for(int i = 2; i < cmd.length; i++) {
                     message = message + cmd[i];
                 }
 
@@ -1630,7 +1630,7 @@ public class ConsoleCommands {
                 return "Message " + message + " sent to everyone";
             } else if (cmd[1].equalsIgnoreCase("broadcast") && cmd.length >= 3) {
                 String message = "";
-                for(int i = 2; i < cmd.length - 1; i++) {
+                for(int i = 2; i < cmd.length; i++) {
                     message = message + cmd[i];
                 }
 
@@ -1643,7 +1643,7 @@ public class ConsoleCommands {
 
                     if(connection != null) {
                         String message = "";
-                        for(int i = 3; i < cmd.length - 1; i++) {
+                        for(int i = 3; i < cmd.length; i++) {
                             message = message + cmd[i];
                         }
 
@@ -1661,7 +1661,7 @@ public class ConsoleCommands {
 
                 if(connection != null) {
                     String message = "";
-                    for(int i = 3; i < cmd.length - 1; i++) {
+                    for(int i = 3; i < cmd.length; i++) {
                         message = message + cmd[i];
                     }
 
