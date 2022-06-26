@@ -97,16 +97,38 @@ public class ChatSystem {
 
     // RECEIVING
     public void onChatEventReceived(ServerConnection connection, JSONObject message) {
+        if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isVerboseChatLogs()) {
+            SlakeoverflowServer.getServer().getLogger().info("CHAT", "[VERBOSE] " + connection.getClientId() + ": " + message.toString());
+        }
+
         if(message.has("msg")) {
             String msg = message.getString("msg");
 
             if(msg.startsWith("/")) {
 
-                this.send(this.chatCommand(connection, msg.replace("/", "").split(" ")), false, connection);
+                String[] command = msg.replace("/", "").split(" ");
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
+                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[COMMAND] [SEND] " + connection.getClientId() + ": " + Arrays.toString(command));
+                }
+
+                String result = this.chatCommand(connection, command);
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
+                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[COMMAND] [RESULT] " + connection.getClientId() + ": " + result);
+                }
+
+                this.send(result, false, connection);
 
             } else {
 
-                if(this.getChatEnabledCondition(connection)) {
+                boolean chatEnabledCondition = this.getChatEnabledCondition(connection);
+
+                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatToConsole()) {
+                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[PUBLIC] " + connection.getClientId() + "(message_sent= + " + chatEnabledCondition + "): " + msg);
+                }
+
+                if(chatEnabledCondition) {
                     AccountData account = connection.getAccount();
 
                     String accountName;
@@ -367,7 +389,6 @@ public class ChatSystem {
     // SOCIALSPY
 
     public void sendSocialSpy(String sender, String receiver, String message) {
-        SlakeoverflowServer.getServer().getLogger().info("[SOCIALSPY]", "[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message);
         for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
             if(connection.isSocialSpy()) {
                 this.send("[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message, false, connection);
