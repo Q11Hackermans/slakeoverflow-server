@@ -389,15 +389,18 @@ public class SlakeoverflowServer {
     /**
      * Get a connection with a specific account id
      * @param id Account ID
-     * @return ServerConnection (if exists), null (if not exists)
+     * @return List of ServerConnections
      */
-    public ServerConnection getConnectionByAccountId(long id) {
+    public List<ServerConnection> getConnectionsByAccountId(long id) {
+        List<ServerConnection> returnList = new ArrayList<>();
+
         for(ServerConnection connection : this.getConnectionList()) {
             if(connection.getAccountId() == id) {
-                return connection;
+                returnList.add(connection);
             }
         }
-        return null;
+
+        return List.copyOf(returnList);
     }
 
     /**
