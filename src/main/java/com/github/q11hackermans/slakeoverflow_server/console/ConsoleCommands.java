@@ -53,6 +53,8 @@ public class ConsoleCommands {
                         return accountCommand(cmd);
                     case "shop":
                         return shopCommand(cmd);
+                    case "chat":
+                        return chatCommand(cmd);
                     default:
                         return "Unknown command";
                 }
@@ -1612,6 +1614,73 @@ public class ConsoleCommands {
                     "shop removeItemsFromUser <accountId> <itemId>\n" +
                     "shop clearItemsFromUser <accountId>\n" +
                     "shop listItemsFromUser <accountId>\n";
+        }
+    }
+
+    public static String chatCommand(String[] cmd) {
+        if(cmd.length >= 2) {
+            if(cmd[1].equalsIgnoreCase("write") && cmd.length >= 3) {
+                String message = "";
+                for(int i = 2; i < cmd.length - 1; i++) {
+                    message = message + cmd[i];
+                }
+
+                SlakeoverflowServer.getServer().getChatSystem().adminMessage(message, false);
+
+                return "Message " + message + " sent to everyone";
+            } else if (cmd[1].equalsIgnoreCase("broadcast") && cmd.length >= 3) {
+                String message = "";
+                for(int i = 2; i < cmd.length - 1; i++) {
+                    message = message + cmd[i];
+                }
+
+                SlakeoverflowServer.getServer().getChatSystem().adminMessage(message, true);
+
+                return "Message " + message + " broadcasted to everyone";
+            } else if (cmd[1].equalsIgnoreCase("private") && cmd.length >= 4) {
+                try {
+                    ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                    if(connection != null) {
+                        String message = "";
+                        for(int i = 3; i < cmd.length - 1; i++) {
+                            message = message + cmd[i];
+                        }
+
+                        SlakeoverflowServer.getServer().getChatSystem().adminMessage(message, false, connection);
+
+                        return "Message " + message + " sent to " + connection.getClientId();
+                    } else {
+                        return "Connection not found";
+                    }
+                } catch (IllegalArgumentException e) {
+                    return "Wrong UUID format";
+                }
+            } else if (cmd[1].equalsIgnoreCase("privatebc") && cmd.length >= 4) {
+                ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                if(connection != null) {
+                    String message = "";
+                    for(int i = 3; i < cmd.length - 1; i++) {
+                        message = message + cmd[i];
+                    }
+
+                    SlakeoverflowServer.getServer().getChatSystem().adminMessage(message, true, connection);
+
+                    return "Message " + message + " broadcasted to " + connection.getClientId();
+                } else {
+                    return "Connection not found";
+                }
+            } else {
+                return "Run command without arguments for help";
+            }
+        } else {
+            return "CHAT COMMAND USAGE:\n" +
+                    "chat write <message>\n" +
+                    "chat broadcast <message>\n" +
+                    "chat private <user> <message>\n" +
+                    "chat privatebc <user> <message>\n" +
+                    "To moderate the chat, you can use config options and/or ban/mute users/accounts via user/account command\n";
         }
     }
 }

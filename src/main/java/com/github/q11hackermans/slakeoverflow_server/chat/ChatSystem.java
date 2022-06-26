@@ -36,6 +36,14 @@ public class ChatSystem {
         this.send("[MSG] " + from + " --> YOU: " + message, false, to);
     }
 
+    public void adminMessage(String message, boolean title) {
+        this.send("[ADMIN] " + message, title);
+    }
+
+    public void adminMessage(String message, boolean title, ServerConnection to) {
+        this.send("[ADMIN] " + message, title, to);
+    }
+
     public void sendAdminChat(String from, String message) {
         for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
             if(connection.getAccount() != null && connection.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
