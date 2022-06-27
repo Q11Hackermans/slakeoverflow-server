@@ -66,14 +66,14 @@ public class ServerConfig {
         this.verboseChatLogs = false;
 
         // GAME OPTIONS
-        this.maxPlayers = 10;
+        this.maxPlayers = 20;
         this.maxSpectators = 2;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
         this.snakeSpeedBase = 2;
         this.snakeSpeedModifierValue = 1;
-        this.snakeSpeedModifierBodycount = 25;
+        this.snakeSpeedModifierBodycount = 15;
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;

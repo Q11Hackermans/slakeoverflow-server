@@ -89,6 +89,7 @@ public class ConfigManager {
 
                     this.server.getLogger().info("CONFIG", "Config loaded");
                 } catch (JSONException e) {
+                    e.printStackTrace();
                     this.server.getLogger().warning("CONFIG", "Config file structure corrupt");
                     this.recreateConfig();
                 } catch (IllegalArgumentException e) {
@@ -117,7 +118,7 @@ public class ConfigManager {
                 serverSettings.put("user_authentication", this.config.isUserAuthentication());
                 serverSettings.put("max_connections", this.config.getMaxConnections());
                 serverSettings.put("unauthenticate_player_on_death", this.config.isUnauthenticatePlayerOnDeath());
-                serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages());
+                serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages()); // NOT IN SETUP ASSISTANT
                 serverSettings.put("allow_guests", this.config.isAllowGuests());
                 serverSettings.put("allow_login", this.config.isAllowLogin());
                 serverSettings.put("also_disable_privileged_login", this.config.isAlsoDisablePrivilegedLogin());
@@ -126,9 +127,9 @@ public class ConfigManager {
                 serverSettings.put("enable_chat", this.config.isEnableChat());
                 serverSettings.put("allow_guest_chat", this.config.isAllowGuestChat());
                 serverSettings.put("enable_admin_command", this.config.isEnableAdminCommand());
-                serverSettings.put("print_chat_to_console", this.config.isPrintChatToConsole());
-                serverSettings.put("print_chat_commands_to_console", this.config.isPrintChatCommandsToConsole());
-                serverSettings.put("verbose_chat_logs", this.config.isVerboseChatLogs());
+                serverSettings.put("print_chat_to_console", this.config.isPrintChatToConsole()); // NOT IN SETUP ASSISTANT
+                serverSettings.put("print_chat_commands_to_console", this.config.isPrintChatCommandsToConsole()); // NOT IN SETUP ASSISTANT
+                serverSettings.put("verbose_chat_logs", this.config.isVerboseChatLogs()); // NOT IN SETUP ASSISTANT
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();
@@ -151,9 +152,9 @@ public class ConfigManager {
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();
-                advancedSettings.put("advanced_override_server_tickrate", this.config.isOverrideServerTickrate());
-                advancedSettings.put("advanced_custom_server_tickrate", this.config.getCustomServerTickrate());
-                advancedSettings.put("advanced_custom_server_tickrate_idle", this.config.getCustomServerTickrateIdle());
+                advancedSettings.put("advanced_override_server_tickrate", this.config.isOverrideServerTickrate()); // NOT IN SETUP ASSISTANT
+                advancedSettings.put("advanced_custom_server_tickrate", this.config.getCustomServerTickrate()); // NOT IN SETUP ASSISTANT
+                advancedSettings.put("advanced_custom_server_tickrate_idle", this.config.getCustomServerTickrateIdle()); // NOT IN SETUP ASSISTANT
                 config.put("advanced_settings", advancedSettings);
 
                 FileWriter writer = new FileWriter(this.configFile);
