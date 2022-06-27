@@ -12,9 +12,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ConsoleLogger {
+
+    private final SlakeoverflowServer server;
     private JSONArray log;
 
-    public ConsoleLogger() {
+    public ConsoleLogger(SlakeoverflowServer server) {
+        this.server = server;
         this.log = new JSONArray();
     }
 
@@ -47,7 +50,7 @@ public class ConsoleLogger {
      * @param text   Logging text
      */
     public void debug(String module, String text) {
-        this.createLogEntry("DEBUG", module, text, SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages());
+        this.createLogEntry("DEBUG", module, text, this.server.getConfigManager().getConfig().isPrintDebugMessages());
     }
 
     // GET AND SAVE LOG
@@ -108,5 +111,9 @@ public class ConsoleLogger {
     private String getTimeString() {
         LocalDateTime time = LocalDateTime.now();
         return time.format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

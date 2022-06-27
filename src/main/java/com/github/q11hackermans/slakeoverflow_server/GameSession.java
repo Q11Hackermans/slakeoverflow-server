@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GameSession {
+
+    private final SlakeoverflowServer server;
     private final List<Snake> snakeList;
     private final List<Item> itemList;
     private final int borderX;
@@ -24,11 +26,13 @@ public class GameSession {
     private int nextItemDespawn;
     private int nextSpectatorUpdate;
 
-    public GameSession(int x, int y) {
-        this(x, y, 30, 20, 20, null, null);
+    public GameSession(SlakeoverflowServer server, int x, int y) {
+        this(server, x, y, 60, 40, 20, null, null);
     }
 
-    public GameSession(int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
+    public GameSession(SlakeoverflowServer server, int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
+        this.server = server;
+
         this.snakeList = new ArrayList<>();
         this.itemList = new ArrayList<>();
 
@@ -43,7 +47,7 @@ public class GameSession {
 
         if (snakeDataList != null) {
             for (SnakeData snakeData : snakeDataList) {
-                this.snakeList.add(new Snake(snakeData.getConnection(), snakeData.getPosx(), snakeData.getPosy(), snakeData.getFacing(), snakeData.getBodyPositions(), this));
+                this.snakeList.add(new Snake(this, snakeData.getConnection(), snakeData.getPosx(), snakeData.getPosy(), snakeData.getFacing(), snakeData.getBodyPositions()));
             }
         }
         if (itemList != null) {
@@ -53,7 +57,7 @@ public class GameSession {
 
     // TICK
     public void tick() {
-        if (SlakeoverflowServer.getServer().getGameSession() == this) {
+        if (this.server.getGameSession() == this) {
             // CHECK IF SNAKE IS ALIVE
             this.checkSnakes();
 
@@ -72,7 +76,11 @@ public class GameSession {
             // SENDING PLAYERDATA TO SNAKES
             for (Snake snake : this.snakeList) {
                 if (snake.getConnection() != null) {
-                    snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                    if(snake.isFixedFovPlayerdataSystem()) {
+                        snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                    } else {
+                        snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
+                    }
                 }
             }
 
@@ -94,13 +102,13 @@ public class GameSession {
             // TICK 3
             this.onTick3();
 
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator()) {
+            if(this.server.getConfigManager().getConfig().isEnableSpectator()) {
                 if(this.nextSpectatorUpdate <= 0) {
-                    this.nextSpectatorUpdate = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
+                    this.nextSpectatorUpdate = this.server.getConfigManager().getConfig().getSpectatorUpdateInterval();
 
                     String spectatorData = this.getSendableSpectatorData();
 
-                    for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+                    for(ServerConnection connection : this.server.getConnectionList()) {
                         if(connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                             connection.sendUTF(spectatorData);
                         }
@@ -143,7 +151,7 @@ public class GameSession {
 
             if (posX > -1 && posY > -1 && isFree(posX, posY)) {
                 synchronized (this.itemList) {
-                    this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
+                    this.itemList.add(new Food(this, posX, posY, new Random().nextInt(this.server.getConfigManager().getConfig().getMaxFoodValue() - this.server.getConfigManager().getConfig().getMinFoodValue()) + this.server.getConfigManager().getConfig().getMinFoodValue()));
                 }
             }
         }
@@ -159,7 +167,7 @@ public class GameSession {
     public void spawnSuperFoodAt(int value, int posX, int posY) {
         if (isFree(posX, posY)) {
             synchronized (this.itemList) {
-                this.itemList.add(new SuperFood(posX, posY, value));
+                this.itemList.add(new SuperFood(this, posX, posY, value));
             }
         }
     }
@@ -211,18 +219,18 @@ public class GameSession {
     }
 
     private void addNewSnakes() {
-        for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+        for (ServerConnection connection : this.server.getConnectionList()) {
             if (connection.isConnected() && connection.getAuthenticationState() == AuthenticationState.PLAYER && this.getSnakeOfConnection(connection) == null) {
                 int posX = this.randomPosX();
                 int posY = this.randomPosY();
 
-                int length = SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
+                int length = this.server.getConfigManager().getConfig().getDefaultSnakeLength();
 
                 int count = 3;
                 boolean success = false;
                 while (count > 0) {
                     if (this.isAreaFree(posX, posY, length * 2)) {
-                        this.snakeList.add(new Snake(connection, posX, posY, Direction.NORTH, length, this));
+                        this.snakeList.add(new Snake(this, connection, posX, posY, Direction.NORTH, length));
                         count = 0;
                         success = true;
                         break;
@@ -247,13 +255,13 @@ public class GameSession {
     private String getSendablePlayerData(Snake snake, boolean relative) {
         JSONObject playerData = new JSONObject();
         playerData.put("cmd", "playerdata");
-        playerData.put("fovx", this.fovsizeX);
-        playerData.put("fovy", this.fovsizeY);
+        playerData.put("fovx", this.fovsizeX/2);
+        playerData.put("fovy", this.fovsizeY/2);
 
         JSONArray fields = new JSONArray();
 
-        int minY = snake.getPosY() - this.fovsizeY;
-        int maxY = snake.getPosY() + this.fovsizeY;
+        int minY = snake.getPosY() - (this.fovsizeY/2);
+        int maxY = snake.getPosY() + (this.fovsizeY/2);
 
         if (minY < 0) {
             minY = 0;
@@ -262,6 +270,17 @@ public class GameSession {
             maxY = this.borderY;
         }
 
+        int minX = snake.getPosX() - (this.fovsizeX/2);
+        int maxX = snake.getPosX() + (this.fovsizeX/2);
+
+        if (minX < 0) {
+            minX = 0;
+        }
+        if (maxX > this.borderX) {
+            maxX = this.borderX;
+        }
+
+        /*
         int relativey = 0;
         for (int iy = minY; iy <= maxY; iy++) {
             int yvalue;
@@ -271,8 +290,8 @@ public class GameSession {
                 yvalue = iy;
             }
 
-            int minX = snake.getPosX() - this.fovsizeX;
-            int maxX = snake.getPosX() + this.fovsizeX;
+            int minX = snake.getPosX() - (this.fovsizeX/2);
+            int maxX = snake.getPosX() + (this.fovsizeX/2);
 
             if (minX < 0) {
                 minX = 0;
@@ -336,10 +355,161 @@ public class GameSession {
             relativey++;
         }
 
-        playerData.put("fields", fields);
+         */
+
+        playerData.put("fields", this.getFields(minY, maxY, minX, maxX, true, snake));
         playerData.put("relative", relative);
+        playerData.put("fixed_fov", false);
 
         return playerData.toString();
+    }
+
+    private String getSendablePlayerdataFixedFOV(Snake snake) {
+        JSONObject playerData = new JSONObject();
+        playerData.put("cmd", "playerdata");
+        playerData.put("fovx", this.fovsizeX);
+        playerData.put("fovy", this.fovsizeY);
+
+        int fovCountX = this.borderX / this.fovsizeX + 1;
+        int fovCountY = this.borderY / this.fovsizeY + 1;
+
+        int fovX = -1;
+        int currentFovPos1X = -1;
+        int currentFovPos2X = -1;
+
+        for(int i = 0; i < fovCountX; i++) {
+            int fovPos1 = this.fovsizeX * i;
+            int fovPos2 = fovPos1 + this.fovsizeX;
+
+            if(snake.getPosX() >= fovPos1 && snake.getPosX() < fovPos2) {
+                fovX = i;
+                currentFovPos1X = fovPos1;
+                currentFovPos2X = fovPos2;
+                break;
+            }
+        }
+
+        if(currentFovPos1X < 0 || currentFovPos2X < 0) {
+            return playerData.toString();
+        }
+
+        int fovY = -1;
+        int currentFovPos1Y = -1;
+        int currentFovPos2Y = -1;
+
+        for(int i = 0; i < fovCountY; i++) {
+            int fovPos1 = this.fovsizeY * i;
+            int fovPos2 = fovPos1 + this.fovsizeY;
+
+            if(snake.getPosY() >= fovPos1 && snake.getPosY() < fovPos2) {
+                fovY = i;
+                currentFovPos1Y = fovPos1;
+                currentFovPos2Y = fovPos2;
+                break;
+            }
+        }
+
+        if(currentFovPos1Y < 0 || currentFovPos2Y < 0) {
+            return playerData.toString();
+        }
+
+        int minY = currentFovPos1Y;
+        int maxY = currentFovPos2Y;
+
+        if(minY < 0) {
+            minY = 0;
+        }
+
+        if(maxY > this.borderY) {
+            maxY = this.borderY;
+        }
+
+        int minX = currentFovPos1X;
+        int maxX = currentFovPos2X;
+
+        if(minX < 0) {
+            minX = 0;
+        }
+
+        if(maxX > this.borderX) {
+            maxX = this.borderX;
+        }
+
+        playerData.put("fields", this.getFields(minY, maxY, minX, maxX, true, snake));
+        playerData.put("relative", true);
+        playerData.put("fixed_fov", true);
+
+        return playerData.toString();
+    }
+
+    private JSONArray getFields(int minY, int maxY, int minX, int maxX, boolean relative, Snake snake) {
+        JSONArray fields = new JSONArray();
+
+        int relativey = 0;
+        for (int iy = minY; iy <= maxY; iy++) {
+            int yvalue;
+            if (relative) {
+                yvalue = relativey;
+            } else {
+                yvalue = iy;
+            }
+
+            int relativex = 0;
+            for (int ix = minX; ix <= maxX; ix++) {
+                int xvalue;
+                if (relative) {
+                    xvalue = relativex;
+                } else {
+                    xvalue = ix;
+                }
+
+                if (ix == 0) {
+                    fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.BORDER));
+                } else if (ix == this.borderX) {
+                    fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.BORDER));
+                } else if (iy == 0) {
+                    fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.BORDER));
+                } else if (iy == this.borderY) {
+                    fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.BORDER));
+                } else {
+                    GameObject field = this.getField(ix, iy);
+                    if (field instanceof Snake) {
+                        Snake fieldSnake = (Snake) field;
+                        if (field == snake) {
+                            if (Arrays.equals(fieldSnake.getPos(), new int[]{ix, iy})) {
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOwnValue(fieldSnake.getFacing()), fieldSnake.isHasMoved()));
+                            } else {
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OWN));
+                            }
+                        } else {
+                            if (Arrays.equals(fieldSnake.getPos(), new int[]{ix, iy})) {
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.getPlayerHeadOtherValue(fieldSnake.getFacing())));
+                            } else {
+                                fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.PLAYER_BODY_OTHER));
+                            }
+                        }
+                    } else if (field instanceof Item) {
+                        if (field instanceof Food) {
+                            fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.ITEM_FOOD));
+                        } else if (field instanceof SuperFood) {
+                            fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.ITEM_SUPER_FOOD));
+                        } else {
+                            // DO NOTHING
+                            //fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.ITEM_UNKNOWN));
+                        }
+                    } else {
+                        // DO NOTHING
+                        //fields.put(this.createCoordsJSONArray(xvalue, yvalue, FieldState.EMPTY));
+                    }
+                }
+
+                relativex++;
+            }
+
+            relativey++;
+        }
+
+        return fields;
     }
 
     /**
@@ -565,7 +735,7 @@ public class GameSession {
 
         if (lowerBound >= upperBound) {
             // IllegalArgumentException e = new IllegalArgumentException("The upper bound is smaller than the lower bound");
-            // SlakeoverflowServer.getServer().getLogger().debug("RANDOM-INT-GENERATOR", "Exception: " + e);
+            // this.server.getLogger().debug("RANDOM-INT-GENERATOR", "Exception: " + e);
             upperBound = lowerBound;
         }
         return new Random().nextInt((upperBound - lowerBound) + 1) + lowerBound;
@@ -763,6 +933,10 @@ public class GameSession {
         savegame.put("items", items);
 
         return savegame;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 
     // EXTENDS

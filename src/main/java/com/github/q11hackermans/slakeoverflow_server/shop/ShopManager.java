@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ShopManager {
+
+    private final SlakeoverflowServer server;
     private final Map<Integer, ShopItem> customShopIds;
 
-    public ShopManager() {
+    public ShopManager(SlakeoverflowServer server) {
+        this.server = server;
         this.customShopIds = new HashMap<>();
     }
 
@@ -24,7 +27,7 @@ public class ShopManager {
      * @param itemId item id
      */
     public void addItemToAccount(long accountId, int itemId) {
-        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+        AccountData account = this.server.getAccountSystem().getAccount(accountId);
 
         if(account != null) {
             JSONArray shopData = account.getShopData();
@@ -33,7 +36,7 @@ public class ShopManager {
                 shopData.put(itemId);
             }
 
-            SlakeoverflowServer.getServer().getAccountSystem().updateShopData(account.getId(), shopData);
+            this.server.getAccountSystem().updateShopData(account.getId(), shopData);
         }
     }
 
@@ -44,7 +47,7 @@ public class ShopManager {
      * @return success
      */
     public boolean purchaseItem(long accountId, int itemId) {
-        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+        AccountData account = this.server.getAccountSystem().getAccount(accountId);
 
         if(account != null) {
             if(this.itemExists(itemId) && !account.getShopData().toList().contains(itemId)) {
@@ -54,7 +57,7 @@ public class ShopManager {
                 int price = shopItems.get(itemId).getPrice();
 
                 if (isEnabled && account.getLevel() >= requiredLevel && account.getBalance() >= price && !this.getItemsFromAccount(account.getId()).contains(itemId)) {
-                    SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
+                    this.server.getAccountSystem().updateBalance(account.getId(), account.getBalance() - price);
                     this.addItemToAccount(account.getId(), itemId);
 
                     return true;
@@ -71,7 +74,7 @@ public class ShopManager {
      * @param itemId item id
      */
     public void removeItemFromAccount(long accountId, int itemId) {
-        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+        AccountData account = this.server.getAccountSystem().getAccount(accountId);
 
         if(account != null) {
             JSONArray shopData = account.getShopData();
@@ -80,7 +83,7 @@ public class ShopManager {
                 shopData.remove(itemId);
             }
 
-            SlakeoverflowServer.getServer().getAccountSystem().updateShopData(account.getId(), shopData);
+            this.server.getAccountSystem().updateShopData(account.getId(), shopData);
         }
     }
 
@@ -89,10 +92,10 @@ public class ShopManager {
      * @param accountId account id
      */
     public void clearItemsFromAccount(long accountId) {
-        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+        AccountData account = this.server.getAccountSystem().getAccount(accountId);
 
         if(account != null) {
-            SlakeoverflowServer.getServer().getAccountSystem().updateShopData(account.getId(), new JSONArray());
+            this.server.getAccountSystem().updateShopData(account.getId(), new JSONArray());
         }
     }
 
@@ -104,7 +107,7 @@ public class ShopManager {
     public List<Integer> getItemsFromAccount(long accountId) {
         List<Integer> returnList = new ArrayList<>();
 
-        AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(accountId);
+        AccountData account = this.server.getAccountSystem().getAccount(accountId);
 
         if(account != null) {
             for(Object o : account.getShopData()) {
@@ -167,5 +170,9 @@ public class ShopManager {
         returnMap.putAll(this.getPersistentShopItems());
         returnMap.putAll(this.getCustomShopItems());
         return returnMap;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

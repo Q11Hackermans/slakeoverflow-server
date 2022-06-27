@@ -1,5 +1,6 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
+import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 
 /**
@@ -9,8 +10,8 @@ public class SuperFood extends Item {
 
     private final int value;
 
-    public SuperFood(int posx, int posy, int value) {
-        super(posx, posy, SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime());
+    public SuperFood(GameSession gameSession, int posx, int posy, int value) {
+        super(gameSession, posx, posy, gameSession.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime());
         this.value = value;
     }
 

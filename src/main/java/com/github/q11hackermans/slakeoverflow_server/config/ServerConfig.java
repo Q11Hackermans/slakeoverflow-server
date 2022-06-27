@@ -1,6 +1,5 @@
 package com.github.q11hackermans.slakeoverflow_server.config;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class ServerConfig {
@@ -19,6 +18,9 @@ public class ServerConfig {
     private boolean enableChat;
     private boolean allowGuestChat;
     private boolean enableAdminCommand;
+    private boolean printChatToConsole;
+    private boolean printChatCommandsToConsole;
+    private boolean verboseChatLogs;
     // GAME OPTIONS
     private int maxPlayers;
     private int maxSpectators;
@@ -36,6 +38,7 @@ public class ServerConfig {
     private int spectatorUpdateInterval;
     private boolean enableSnakeSpeedBoost;
     private boolean eatOwnSnake;
+    private double snakeDeathSuperfoodMultiplier;
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -58,16 +61,19 @@ public class ServerConfig {
         this.enableChat = true;
         this.allowGuestChat = false;
         this.enableAdminCommand = true;
+        this.printChatToConsole = true;
+        this.printChatCommandsToConsole = true;
+        this.verboseChatLogs = false;
 
         // GAME OPTIONS
-        this.maxPlayers = 10;
+        this.maxPlayers = 20;
         this.maxSpectators = 2;
         this.minFoodValue = 1;
         this.maxFoodValue = 2;
         this.defaultSnakeLength = 3;
         this.snakeSpeedBase = 2;
         this.snakeSpeedModifierValue = 1;
-        this.snakeSpeedModifierBodycount = 25;
+        this.snakeSpeedModifierBodycount = 15;
         this.defaultGameFieldSizeX = 100;
         this.defaultGameFieldSizeY = 100;
         this.unauthenticatePlayerOnDeath = true;
@@ -77,6 +83,7 @@ public class ServerConfig {
         this.spectatorUpdateInterval = 200;
         this.enableSnakeSpeedBoost = true;
         this.eatOwnSnake = true;
+        this.snakeDeathSuperfoodMultiplier = 0.3;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -409,6 +416,46 @@ public class ServerConfig {
 
     public void setEnableAdminCommand(boolean enableAdminCommand) {
         this.enableAdminCommand = enableAdminCommand;
+    }
+
+    public double getSnakeDeathSuperfoodMultiplier() {
+        if(this.snakeDeathSuperfoodMultiplier <= 2 && this.snakeDeathSuperfoodMultiplier >= 0.01) {
+            return this.snakeDeathSuperfoodMultiplier;
+        } else {
+            return 0.3;
+        }
+    }
+
+    public void setSnakeDeathSuperfoodMultiplier(double snakeDeathSuperfoodMultiplier) {
+        if(snakeDeathSuperfoodMultiplier <= 2 && snakeDeathSuperfoodMultiplier >= 0.01) {
+            this.snakeDeathSuperfoodMultiplier = snakeDeathSuperfoodMultiplier;
+        } else {
+            throw new IllegalArgumentException("The value must be higher or equal than 0.01 and lower or equal than 2");
+        }
+    }
+
+    public boolean isPrintChatToConsole() {
+        return printChatToConsole;
+    }
+
+    public void setPrintChatToConsole(boolean printChatToConsole) {
+        this.printChatToConsole = printChatToConsole;
+    }
+
+    public boolean isPrintChatCommandsToConsole() {
+        return printChatCommandsToConsole;
+    }
+
+    public void setPrintChatCommandsToConsole(boolean printChatCommandsToConsole) {
+        this.printChatCommandsToConsole = printChatCommandsToConsole;
+    }
+
+    public boolean isVerboseChatLogs() {
+        return verboseChatLogs;
+    }
+
+    public void setVerboseChatLogs(boolean verboseChatLogs) {
+        this.verboseChatLogs = verboseChatLogs;
     }
 
     // ADVANCED

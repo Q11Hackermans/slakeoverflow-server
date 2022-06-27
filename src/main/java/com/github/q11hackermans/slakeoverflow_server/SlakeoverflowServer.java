@@ -21,6 +21,7 @@ import net.jandie1505.connectionmanager.utilities.dataiostreamhandler.DataIOType
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
@@ -77,13 +78,13 @@ public class SlakeoverflowServer {
         System.out.println(getASCIISignature());
 
         // CONSOLE
-        this.logger = new ConsoleLogger();
+        this.logger = new ConsoleLogger(this);
         this.logger.info("INIT", "Server init");
-        this.console = new ServerConsole(this.logger);
+        this.console = new ServerConsole(this, this.logger);
         this.console.start();
 
         // CONFIG
-        this.configManager = new ConfigManager(advancedConfigOptions, !defaultConfigValues);
+        this.configManager = new ConfigManager(this, advancedConfigOptions, !defaultConfigValues);
         if (!defaultConfigValues) {
             this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
             this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
@@ -95,13 +96,13 @@ public class SlakeoverflowServer {
 
         // CONNECTION MANAGER
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
-        this.connectionhandler.addListener(new EventListener());
-        this.connectionhandler.addGlobalListener(new EventListener());
+        this.connectionhandler.addListener(new EventListener(this));
+        this.connectionhandler.addGlobalListener(new EventListener(this));
         this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.MULTI_STREAM_HANDLER_CONSUMING);
-        this.dataIOManager.addEventListener(new EventListener());
+        this.dataIOManager.addEventListener(new EventListener(this));
 
         // ACCOUNT SYSTEM
-        this.accountSystem = new AccountSystem();
+        this.accountSystem = new AccountSystem(this);
 
         // GAME SESSION
         this.gameState = GameState.STOPPED;
@@ -115,10 +116,10 @@ public class SlakeoverflowServer {
         this.ipBlacklist = new ArrayList<>();
 
         // CHAT SYSTEM
-        this.chatSystem = new ChatSystem();
+        this.chatSystem = new ChatSystem(this);
 
         // SHOP SYSTEM
-        this.shopManager = new ShopManager();
+        this.shopManager = new ShopManager(this);
 
         // MISC
         this.alreadyStopping = false;
@@ -245,7 +246,7 @@ public class SlakeoverflowServer {
     public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
         if (this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
             this.gameState = GameState.PREPARING;
-            this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
+            this.game = new GameSession(this, sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
 
             if (paused) {
                 this.gameState = GameState.PAUSED;
@@ -273,7 +274,7 @@ public class SlakeoverflowServer {
      * This will create a new game with a specific size
      */
     public boolean setupGame(int sizeX, int sizeY, boolean paused) {
-        return this.setupGame(paused, sizeX, sizeY, 30, 20, 20, null, null);
+        return this.setupGame(paused, sizeX, sizeY, 60, 40, 20, null, null);
     }
 
     /**
@@ -389,15 +390,18 @@ public class SlakeoverflowServer {
     /**
      * Get a connection with a specific account id
      * @param id Account ID
-     * @return ServerConnection (if exists), null (if not exists)
+     * @return List of ServerConnections
      */
-    public ServerConnection getConnectionByAccountId(long id) {
+    public List<ServerConnection> getConnectionsByAccountId(long id) {
+        List<ServerConnection> returnList = new ArrayList<>();
+
         for(ServerConnection connection : this.getConnectionList()) {
             if(connection.getAccountId() == id) {
-                return connection;
+                returnList.add(connection);
             }
         }
-        return null;
+
+        return List.copyOf(returnList);
     }
 
     /**
@@ -649,7 +653,7 @@ public class SlakeoverflowServer {
 
         for (CMSClient cmsClient : this.connectionhandler.getClientList()) {
             if (!this.containsConnection(cmsClient.getUniqueId())) {
-                this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
+                this.connectionList.add(new ServerConnection(this, cmsClient.getUniqueId()));
             }
         }
 
@@ -663,7 +667,7 @@ public class SlakeoverflowServer {
             }
 
             if(connection.getAccountId() != -1) {
-                AccountData account = SlakeoverflowServer.getServer().accountSystem.getAccount(connection.getAccountId());
+                AccountData account = this.accountSystem.getAccount(connection.getAccountId());
 
                 if(account == null) {
                     connection.logout();
@@ -719,8 +723,8 @@ public class SlakeoverflowServer {
             AccountData account = connection.getAccount();
 
             boolean isBanned = connection.isBanned();
-            boolean isUserAuthentication = SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
-            boolean isAllowGuests = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuests();
+            boolean isUserAuthentication = this.getConfigManager().getConfig().isUserAuthentication();
+            boolean isAllowGuests = this.getConfigManager().getConfig().isAllowGuests();
             boolean isUser;
             boolean isAdmin;
             if(account != null) {
@@ -1004,6 +1008,367 @@ public class SlakeoverflowServer {
             waitTime = 30;
         }
 
+        boolean forceSkipSetupAssistant = false;
+        forceSkipSetupAssistant = Boolean.parseBoolean(startArguments.get("forceSkipSetupAssistant"));
+
+        if(!forceSkipSetupAssistant) {
+            File file = new File(System.getProperty("user.dir"), "config.json");
+
+            if(!file.exists()) {
+                System.out.println("----------------------------------------\n" +
+                        "SLAKEOVERFLOW SERVER SETUP ASSISTANT\n" +
+                        "\n" +
+                        "This tool is for a easier configuration of the server.\n" +
+                        "It will be triggered if no config file exists.\n" +
+                        "To disable it, you can use the \"-forceSkipSetupAssistant=true\" start argument.\n");
+
+                JSONObject jsonConfig = new JSONObject();
+                JSONObject serverSettings = new JSONObject();
+                JSONObject gameSettings = new JSONObject();
+                JSONObject advancedSettings = new JSONObject();
+                Scanner scanner = new Scanner(System.in);
+
+                serverSettings.put("print_chat_to_console", true);
+                serverSettings.put("print_chat_commands_to_console", true);
+                serverSettings.put("verbose_chat_logs", false);
+                serverSettings.put("print_debug_messages", false);
+
+                int attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("On which port should the server run? (int, Default: 26677)");
+                    try {
+                        serverSettings.put("port", Integer.parseInt(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                System.out.println("What is the name of the server? (String, Default: \"Slakeoverflow-Server\")");
+                serverSettings.put("server_name", scanner.nextLine());
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("How many clients should be able to connect to the server simultaneously? (int, Default: 20)");
+                    try {
+                        serverSettings.put("max_connections", Integer.parseInt(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("How many connected clients should be able to play the game at the same time? (int, Default: 20)");
+                    try {
+                        gameSettings.put("max_players", Integer.parseInt(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("How many connected clients should be able to spectate the game at the same time? (int, Default: 2)\n" +
+                            "Please note that the spectator feature is currently unsupported in the official client.");
+                    try {
+                        gameSettings.put("max_spectators", Integer.parseInt(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Should the server automatically accept all connection requests (if disabled, each connection request in the console must be accepted within 10 seconds, otherwise the connection will be terminated afterwards)? (boolean, Default: true)");
+                    try {
+                        serverSettings.put("auto_connection_accept", Boolean.parseBoolean(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Should connected users themselves be able to join the game or become spectators (If disabled you have to define each user as a player, spectator or nothing via the Console)? (boolean, Default: true)");
+                    try {
+                        serverSettings.put("user_authentication", Boolean.parseBoolean(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Should players return to the lobby menu when they die (When disabled players respawn directly after death again)? (boolean, Default: true)");
+                    try {
+                        serverSettings.put("unauthenticate_player_on_death", Boolean.parseBoolean(scanner.nextLine()));
+                        attempts = 3;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Should the account system be activated? (boolean, Default: true)");
+                    try {
+                        boolean enableAccountSystem = Boolean.parseBoolean(scanner.nextLine());
+
+                        serverSettings.put("allow_login", enableAccountSystem);
+                        serverSettings.put("allow_registration", enableAccountSystem);
+                        serverSettings.put("also_disable_privileged_login", !enableAccountSystem);
+                        attempts = 3;
+
+                        if(enableAccountSystem) {
+                            int attempts2 = 0;
+                            while (attempts2 < 3) {
+                                System.out.println("Should unregistered players also be able to play the game? (boolean, Default: true)");
+                                try {
+                                    serverSettings.put("allow_guests", Boolean.parseBoolean(scanner.nextLine()));
+                                    attempts2 = 3;
+                                } catch (IllegalArgumentException e) {
+                                    System.out.println("Wrong input");
+                                }
+                                if(attempts2 == 2) {
+                                    System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                                    System.exit(-5);
+                                } else {
+                                    attempts2++;
+                                }
+                            }
+
+                            attempts2 = 0;
+                            while (attempts2 < 3) {
+                                System.out.println("Should the admin command be enabled in the chat (this command can be executed only by admins and it allows to execute console commands in the chat)? (boolean, Default: false)");
+                                try {
+                                    serverSettings.put("enable_admin_command", Boolean.parseBoolean(scanner.nextLine()));
+                                    attempts2 = 3;
+                                } catch (IllegalArgumentException e) {
+                                    System.out.println("Wrong input");
+                                }
+                                if(attempts2 == 2) {
+                                    System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                                    System.exit(-5);
+                                } else {
+                                    attempts2++;
+                                }
+                            }
+                        } else {
+                            serverSettings.put("allow_guests", true);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Should the chat be activated? (boolean, Default: true)");
+                    try {
+                        boolean enableChat = Boolean.parseBoolean(scanner.nextLine());
+
+                        serverSettings.put("enable_chat", enableChat);
+                        attempts = 3;
+
+                        if(enableChat) {
+                            int attempts2 = 0;
+                            while (attempts2 < 3) {
+                                System.out.println("Should unregistered players also be allowed to use the chat? (boolean, Default: false)");
+                                try {
+                                    serverSettings.put("allow_guest_chat", Boolean.parseBoolean(scanner.nextLine()));
+                                    attempts2 = 3;
+                                } catch (IllegalArgumentException e) {
+                                    System.out.println("Wrong input");
+                                }
+                                if(attempts2 == 2) {
+                                    System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                                    System.exit(-5);
+                                } else {
+                                    attempts2++;
+                                }
+                            }
+                        } else {
+                            serverSettings.put("allow_guest_chat", false);
+                        }
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                attempts = 0;
+                while (attempts < 3) {
+                    System.out.println("Which preset should be loaded for the GameSettings? (Available choices: DEFAULT, ULTRA_SLOW, SLOW, FAST, ULTRA_FAST");
+                    String inputString = scanner.nextLine();
+
+                    gameSettings.put("default_gamefield_size_x", 100);
+                    gameSettings.put("default_gamefield_size_y", 100);
+                    gameSettings.put("enable_spectator", true);
+                    gameSettings.put("spectator_update_interval", 200);
+
+                    if(inputString.equalsIgnoreCase("DEFAULT")) {
+                        gameSettings.put("min_food_value", 1);
+                        gameSettings.put("max_food_value", 2);
+                        gameSettings.put("snake_speed_base", 2);
+                        gameSettings.put("snake_speed_modifier_value", 1);
+                        gameSettings.put("snake_speed_modifier_bodycount", 15);
+                        gameSettings.put("default_item_despawn_time", 60);
+                        gameSettings.put("item_superfood_despawn_time", 120);
+                        gameSettings.put("enable_snake_speed_boost", true);
+                        gameSettings.put("eat_own_snake", true);
+                        gameSettings.put("snake_death_superfood_multiplier", 0.3);
+                        attempts = 3;
+                    } else if (inputString.equalsIgnoreCase("ULTRA_SLOW")) {
+                        gameSettings.put("min_food_value", 1);
+                        gameSettings.put("max_food_value", 1);
+                        gameSettings.put("snake_speed_base", 4);
+                        gameSettings.put("snake_speed_modifier_value", 1);
+                        gameSettings.put("snake_speed_modifier_bodycount", 5);
+                        gameSettings.put("default_item_despawn_time", 120);
+                        gameSettings.put("item_superfood_despawn_time", 240);
+                        gameSettings.put("enable_snake_speed_boost", false);
+                        gameSettings.put("eat_own_snake", false);
+                        gameSettings.put("snake_death_superfood_multiplier", 0.1);
+                        attempts = 3;
+                    } else if(inputString.equalsIgnoreCase("SLOW")) {
+                        gameSettings.put("min_food_value", 1);
+                        gameSettings.put("max_food_value", 1);
+                        gameSettings.put("snake_speed_base", 2);
+                        gameSettings.put("snake_speed_modifier_value", 1);
+                        gameSettings.put("snake_speed_modifier_bodycount", 10);
+                        gameSettings.put("default_item_despawn_time", 60);
+                        gameSettings.put("item_superfood_despawn_time", 120);
+                        gameSettings.put("enable_snake_speed_boost", false);
+                        gameSettings.put("eat_own_snake", false);
+                        gameSettings.put("snake_death_superfood_multiplier", 0.25);
+                        attempts = 3;
+                    } else if(inputString.equalsIgnoreCase("FAST")) {
+                        gameSettings.put("min_food_value", 1);
+                        gameSettings.put("max_food_value", 5);
+                        gameSettings.put("snake_speed_base", 2);
+                        gameSettings.put("snake_speed_modifier_value", 1);
+                        gameSettings.put("snake_speed_modifier_bodycount", 25);
+                        gameSettings.put("default_item_despawn_time", 60);
+                        gameSettings.put("item_superfood_despawn_time", 120);
+                        gameSettings.put("enable_snake_speed_boost", true);
+                        gameSettings.put("eat_own_snake", true);
+                        gameSettings.put("snake_death_superfood_multiplier", 0.5);
+                        attempts = 3;
+                    } else if(inputString.equalsIgnoreCase("ULTRA_FAST")) {
+                        gameSettings.put("min_food_value", 5);
+                        gameSettings.put("max_food_value", 10);
+                        gameSettings.put("snake_speed_base", 1);
+                        gameSettings.put("snake_speed_modifier_value", 1);
+                        gameSettings.put("snake_speed_modifier_bodycount", 30);
+                        gameSettings.put("default_item_despawn_time", 30);
+                        gameSettings.put("item_superfood_despawn_time", 60);
+                        gameSettings.put("enable_snake_speed_boost", true);
+                        gameSettings.put("eat_own_snake", true);
+                        gameSettings.put("snake_death_superfood_multiplier", 1);
+                        attempts = 3;
+                    } else {
+                        System.out.println("Wrong input");
+                    }
+                    if(attempts == 2) {
+                        System.out.println("Duplicated wrong input. Use start argument -forceSkipSetupAssistant=true to disable the setup assistant.");
+                        System.exit(-5);
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                System.out.println("Setting up config file...");
+
+                advancedSettings.put("advanced_override_server_tickrate", false);
+                advancedSettings.put("advanced_custom_server_tickrate", 50);
+                advancedSettings.put("advanced_custom_server_tickrate_idle", 950);
+
+                jsonConfig.put("server_settings", serverSettings);
+                jsonConfig.put("game_settings", gameSettings);
+                jsonConfig.put("advanced_settings", advancedSettings);
+
+                try {
+                    file.createNewFile();
+
+                    FileWriter writer = new FileWriter(file);
+                    writer.write(jsonConfig.toString(4));
+                    writer.flush();
+                    writer.close();
+
+                    System.out.println("Wrote config file. Continuing...");
+
+                    if (waitTime < 10) {
+                        waitTime = 10;
+                    }
+                } catch (IOException e) {
+                    System.out.println("Could not create config file.");
+                    System.exit(-5);
+                }
+
+                System.out.println("----------------------------------------\n");
+            }
+        }
+
         boolean advancedOptions = false;
         advancedOptions = Boolean.parseBoolean(startArguments.get("enableAdvancedConfigOptions"));
         if (advancedOptions) {
@@ -1033,6 +1398,13 @@ public class SlakeoverflowServer {
         new SlakeoverflowServer(advancedOptions, defaultConfigValues);
     }
 
+    /**
+     * This is a way to globally get the server instance.
+     * THIS IS NOT SUPPORTED ANYMORE!
+     * @return SlakeoverflowServer
+     * @deprecated DO NOT USE THIS ANYMORE!
+     */
+    @Deprecated
     public static SlakeoverflowServer getServer() {
         return server;
     }

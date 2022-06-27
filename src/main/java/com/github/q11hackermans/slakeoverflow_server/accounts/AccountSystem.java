@@ -15,11 +15,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AccountSystem {
+
+    private final SlakeoverflowServer server;
     private final File databaseFile;
     private Connection database;
 
     // CONSTRUCTOR
-    public AccountSystem() {
+    public AccountSystem(SlakeoverflowServer server) {
+        this.server = server;
+
         this.databaseFile = new File(System.getProperty("user.dir"), "database.db");
 
         this.connect();
@@ -429,7 +433,7 @@ public class AccountSystem {
                 accounts.add(new AccountData(rs.getLong("id"), rs.getString("username"), rs.getString("password"), rs.getInt("permission"), rs.getBoolean("muted"), rs.getBoolean("banned"), rs.getInt("level"), rs.getInt("balance"), shopData));
             }
         } catch(SQLException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQL Exception: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
+            this.server.getLogger().warning("ACCOUNTS", "SQL Exception: " + e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
         }
 
         return accounts;
@@ -446,7 +450,7 @@ public class AccountSystem {
             }
 
             database = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
-            SlakeoverflowServer.getServer().getLogger().info("ACCOUNTS", "SQLite connection established");
+            this.server.getLogger().info("ACCOUNTS", "SQLite connection established");
 
             String createUsersTable = "CREATE TABLE IF NOT EXISTS users (" +
                     "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
@@ -465,9 +469,9 @@ public class AccountSystem {
             return true;
 
         } catch(IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQLite connection failed, I/O error");
+            this.server.getLogger().warning("ACCOUNTS", "SQLite connection failed, I/O error");
         } catch(SQLException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("ACCOUNTS", "SQLite connection failed, SQL error");
+            this.server.getLogger().warning("ACCOUNTS", "SQLite connection failed, SQL error");
         }
         return false;
     }
@@ -486,5 +490,9 @@ public class AccountSystem {
             return builder.toString();
         } catch(NoSuchAlgorithmException ignored) {}
         return "";
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

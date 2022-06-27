@@ -26,33 +26,35 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 public class ConsoleCommands {
-    public static String run(String[] cmd) {
+    public static String run(SlakeoverflowServer server, String[] cmd) {
         try {
             if (cmd.length >= 1) {
                 switch (cmd[0]) {
                     case "stop":
-                        SlakeoverflowServer.getServer().stop();
+                        server.stop();
                         return "Shutting down";
                     case "help":
                         return helpCommand();
                     case "config":
-                        return configCommand(cmd);
+                        return configCommand(server, cmd);
                     case "connection":
-                        return connectionCommand(cmd);
+                        return connectionCommand(server, cmd);
                     case "user":
-                        return userCommand(cmd);
+                        return userCommand(server, cmd);
                     case "blacklist":
-                        return blacklistCommand(cmd);
+                        return blacklistCommand(server, cmd);
                     case "game":
-                        return gameCommand(cmd);
+                        return gameCommand(server, cmd);
                     case "logger":
-                        return loggerCommand(cmd);
+                        return loggerCommand(server, cmd);
                     case "info":
-                        return infoCommand();
+                        return infoCommand(server);
                     case "account":
-                        return accountCommand(cmd);
+                        return accountCommand(server, cmd);
                     case "shop":
-                        return shopCommand(cmd);
+                        return shopCommand(server, cmd);
+                    case "chat":
+                        return chatCommand(server, cmd);
                     default:
                         return "Unknown command";
                 }
@@ -74,39 +76,40 @@ public class ConsoleCommands {
                 "blacklist: IP blacklist management\n" +
                 "game: Game management\n" +
                 "logger: Logging management\n" +
+                "shop: Item shop management\n" +
                 "info: Information" +
                 "Run the specific commands without arguments to show their help page.\n";
     }
 
-    private static String configCommand(String[] cmd) {
+    private static String configCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             if (cmd[1].equalsIgnoreCase("set")) {
                 if (cmd.length == 4) {
                     if (cmd[2].equalsIgnoreCase("port")) {
                         return "Cannot set port while the server is running!";
                     } else if (cmd[2].equalsIgnoreCase("auto_connection_accept")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setAutoConnectionAccept(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setAutoConnectionAccept(Boolean.parseBoolean(cmd[3]));
                         return "Updated value auto_connection_accept to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setUserAuthentication(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setUserAuthentication(Boolean.parseBoolean(cmd[3]));
                         return "Updated value user_authentication to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("max_connections")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxConnections(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setMaxConnections(Integer.parseInt(cmd[3]));
                             return "Updated value max_connections";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("max_players")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxPlayers(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setMaxPlayers(Integer.parseInt(cmd[3]));
                             return "Updated value max_connections";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("max_spectators")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxSpectators(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setMaxSpectators(Integer.parseInt(cmd[3]));
                             return "Updated value max_connections";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
@@ -115,7 +118,7 @@ public class ConsoleCommands {
                         try {
                             int minFoodValue = Integer.parseInt(cmd[3]);
                             if (minFoodValue >= 1 && minFoodValue <= 10) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setMinFoodValue(minFoodValue);
+                                server.getConfigManager().getConfig().setMinFoodValue(minFoodValue);
                                 return "Updated value min_food_value to " + minFoodValue;
                             } else {
                                 return "You can only set an int value in range 1-10";
@@ -127,7 +130,7 @@ public class ConsoleCommands {
                         try {
                             int maxFoodValue = Integer.parseInt(cmd[3]);
                             if (maxFoodValue >= 1 && maxFoodValue <= 10) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setMaxFoodValue(maxFoodValue);
+                                server.getConfigManager().getConfig().setMaxFoodValue(maxFoodValue);
                                 return "Updated value max_food_value to " + maxFoodValue;
                             } else {
                                 return "You can only set an int value in range 1-10";
@@ -139,7 +142,7 @@ public class ConsoleCommands {
                         try {
                             int defaultSnakeLength = Integer.parseInt(cmd[3]);
                             if (defaultSnakeLength >= 1 && defaultSnakeLength <= 10) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setDefaultSnakeLength(defaultSnakeLength);
+                                server.getConfigManager().getConfig().setDefaultSnakeLength(defaultSnakeLength);
                                 return "Updated value default_snake_length to " + defaultSnakeLength;
                             } else {
                                 return "You can only set an int value in range 1-10";
@@ -151,7 +154,7 @@ public class ConsoleCommands {
                         try {
                             int snakeSpeedBase = Integer.parseInt(cmd[3]);
                             if (snakeSpeedBase > 0) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedBase(snakeSpeedBase);
+                                server.getConfigManager().getConfig().setSnakeSpeedBase(snakeSpeedBase);
                                 return "Updated value snake_speed_base";
                             } else {
                                 return "You can only set a positive int value";
@@ -163,7 +166,7 @@ public class ConsoleCommands {
                         try {
                             int snakeSpeedModifierValue = Integer.parseInt(cmd[3]);
                             if (snakeSpeedModifierValue >= 0) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierValue(snakeSpeedModifierValue);
+                                server.getConfigManager().getConfig().setSnakeSpeedModifierValue(snakeSpeedModifierValue);
                                 return "Updated value snake_speed_modifier_value";
                             } else {
                                 return "You can only set a positive (or 0) int value";
@@ -175,7 +178,7 @@ public class ConsoleCommands {
                         try {
                             int snakeSpeedModifierBodycount = Integer.parseInt(cmd[3]);
                             if (snakeSpeedModifierBodycount > 0) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(snakeSpeedModifierBodycount);
+                                server.getConfigManager().getConfig().setSnakeSpeedModifierBodycount(snakeSpeedModifierBodycount);
                                 return "Updated value snake_speed_modifier_bodycount";
                             } else {
                                 return "You can only set a positive int value";
@@ -187,7 +190,7 @@ public class ConsoleCommands {
                         try {
                             int defaultGameFiendSizeX = Integer.parseInt(cmd[3]);
                             if (defaultGameFiendSizeX >= 50) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeX);
+                                server.getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeX);
                                 return "Updated value default_gamefield_size_x";
                             } else {
                                 return "You can only set a positive int value (50 or higher)";
@@ -199,7 +202,7 @@ public class ConsoleCommands {
                         try {
                             int defaultGameFiendSizeY = Integer.parseInt(cmd[3]);
                             if (defaultGameFiendSizeY >= 50) {
-                                SlakeoverflowServer.getServer().getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeY);
+                                server.getConfigManager().getConfig().setSnakeSpeedModifierBodycount(defaultGameFiendSizeY);
                                 return "Updated value default_gamefield_size_y";
                             } else {
                                 return "You can only set a positive int value (50 or higher)";
@@ -209,44 +212,69 @@ public class ConsoleCommands {
                         }
                     } else if (cmd[2].equalsIgnoreCase("default_item_despawn_time")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setItemDefaultDespawnTime(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setItemDefaultDespawnTime(Integer.parseInt(cmd[3]));
                             return "Updated value default_item_despawn_time";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value (50 or higher)";
                         }
                     } else if (cmd[2].equalsIgnoreCase("item_superfood_despawn_time")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setItemSuperFoodDespawnTime(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setItemSuperFoodDespawnTime(Integer.parseInt(cmd[3]));
                             return "Updated value item_superfood_despawn_time";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setUnauthenticatePlayerOnDeath(Boolean.parseBoolean(cmd[3]));
                         return "Updated value unauthenticate_player_on_death to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("print_debug_messages")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setPrintDebugMessages(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setPrintDebugMessages(Boolean.parseBoolean(cmd[3]));
                         return "Updated value print_debug_messages to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("enable_spectator")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableSpectator(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setEnableSpectator(Boolean.parseBoolean(cmd[3]));
                         return "Updated value enable_spectator to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("spectator_update_interval")) {
                         try {
-                            SlakeoverflowServer.getServer().getConfigManager().getConfig().setSpectatorUpdateInterval(Integer.parseInt(cmd[3]));
+                            server.getConfigManager().getConfig().setSpectatorUpdateInterval(Integer.parseInt(cmd[3]));
                             return "Updated value spectator_update_interval";
                         } catch (IllegalArgumentException e) {
                             return "You can only set a positive int value";
                         }
                     } else if (cmd[2].equalsIgnoreCase("enable_snake_speed_boost")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEnableSnakeSpeedBoost(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setEnableSnakeSpeedBoost(Boolean.parseBoolean(cmd[3]));
                         return "Updated value enable_snake_speed_boost to " + cmd[3];
                     } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
-                        SlakeoverflowServer.getServer().getConfigManager().getConfig().setEatOwnSnake(Boolean.parseBoolean(cmd[3]));
+                        server.getConfigManager().getConfig().setEatOwnSnake(Boolean.parseBoolean(cmd[3]));
                         return "Updated value eat_own_snake to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("snake_death_superfood_multiplier")) {
+                        try {
+                            server.getConfigManager().getConfig().setSnakeDeathSuperfoodMultiplier(Double.parseDouble(cmd[3]));
+                            return "Updated value snake_death_superfood_multiplier";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a value between 0.01 and 2";
+                        }
                     } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
                         return "This option can only be enabled with the start argument enableAdvancedConfigOptions";
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate") || cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
                         return "This option can't be changed while the server is running";
+                    } else if (cmd[2].equalsIgnoreCase("enable_chat")) {
+                        server.getConfigManager().getConfig().setEnableChat(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_chat to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("allow_guest_chat")) {
+                        server.getConfigManager().getConfig().setAllowGuestChat(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value allow_guest_chat to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("enable_admin_command")) {
+                        server.getConfigManager().getConfig().setEnableAdminCommand(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value enable_admin_command to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("print_chat_to_console")) {
+                        server.getConfigManager().getConfig().setPrintChatToConsole(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value print_chat_to_console to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("print_chat_commands_to_console")) {
+                        server.getConfigManager().getConfig().setPrintChatCommandsToConsole(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value print_chat_commands_to_console to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("verbose_chat_logs")) {
+                        server.getConfigManager().getConfig().setVerboseChatLogs(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value verbose_chat_logs to " + cmd[3];
                     } else {
                         return "Unknown config option";
                     }
@@ -254,101 +282,114 @@ public class ConsoleCommands {
                     return "Run command without arguments for help";
                 }
             } else if (cmd[1].equalsIgnoreCase("get")) {
+                return "Command not supported anymore. Use config list instead.";
+                /*
                 if (cmd.length == 3) {
                     if (cmd[2].equalsIgnoreCase("port")) {
-                        return "Value port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort();
+                        return "Value port: " + server.getConfigManager().getConfig().getPort();
                     } else if (cmd[2].equalsIgnoreCase("max_connections")) {
-                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections();
+                        return "Value max_connections: " + server.getConfigManager().getConfig().getMaxConnections();
                     } else if (cmd[2].equalsIgnoreCase("max_players")) {
-                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers();
+                        return "Value max_connections: " + server.getConfigManager().getConfig().getMaxPlayers();
                     } else if (cmd[2].equalsIgnoreCase("max_spectators")) {
-                        return "Value max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxSpectators();
+                        return "Value max_connections: " + server.getConfigManager().getConfig().getMaxSpectators();
                     } else if (cmd[2].equalsIgnoreCase("auto_connection_accept")) {
-                        return "Value auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept();
+                        return "Value auto_connection_accept: " + server.getConfigManager().getConfig().isAutoConnectionAccept();
                     } else if (cmd[2].equalsIgnoreCase("user_authentication")) {
-                        return "Value user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
+                        return "Value user_authentication: " + server.getConfigManager().getConfig().isUserAuthentication();
                     } else if (cmd[2].equalsIgnoreCase("min_food_value")) {
-                        return "Value min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue();
+                        return "Value min_food_value: " + server.getConfigManager().getConfig().getMinFoodValue();
                     } else if (cmd[2].equalsIgnoreCase("max_food_value")) {
-                        return "Value max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue();
+                        return "Value max_food_value: " + server.getConfigManager().getConfig().getMaxFoodValue();
                     } else if (cmd[2].equalsIgnoreCase("default_snake_length")) {
-                        return "Value default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
+                        return "Value default_snake_length: " + server.getConfigManager().getConfig().getDefaultSnakeLength();
                     } else if (cmd[2].equalsIgnoreCase("snake_speed_base")) {
-                        return "Value snake_speed_base: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+                        return "Value snake_speed_base: " + server.getConfigManager().getConfig().getSnakeSpeedBase();
                     } else if (cmd[2].equalsIgnoreCase("snake_speed_modifier_value")) {
-                        return "Value snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
+                        return "Value snake_speed_modifier_value: " + server.getConfigManager().getConfig().getSnakeSpeedModifierValue();
                     } else if (cmd[2].equalsIgnoreCase("snake_speed_modifier_bodycount")) {
-                        return "Value snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+                        return "Value snake_speed_modifier_bodycount: " + server.getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
                     } else if (cmd[2].equalsIgnoreCase("enable_spectator")) {
-                        return "Value enable_spectator: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator();
+                        return "Value enable_spectator: " + server.getConfigManager().getConfig().isEnableSpectator();
                     } else if (cmd[2].equalsIgnoreCase("spectator_update_interval")) {
-                        return "Value spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
+                        return "Value spectator_update_interval: " + server.getConfigManager().getConfig().getSpectatorUpdateInterval();
                     } else if (cmd[2].equalsIgnoreCase("enable_advanced_options")) {
-                        return "Value enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled();
+                        return "Value enable_advanced_options: " + server.getConfigManager().getConfig().isAdvancedOptionsEnabled();
                     } else if (cmd[2].equalsIgnoreCase("advanced_override_server_tickrate")) {
-                        return "Value advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate();
+                        return "Value advanced_override_server_tickrate: " + server.getConfigManager().getConfig().isOverrideServerTickrate();
                     } else if (cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate")) {
-                        return "Value advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate();
+                        return "Value advanced_custom_server_tickrate: " + server.getConfigManager().getConfig().getCustomServerTickrate();
                     } else if (cmd[2].equalsIgnoreCase("advanced_custom_server_tickrate_idle")) {
-                        return "Value advanced_custom_server_tickrate_idle: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrateIdle();
+                        return "Value advanced_custom_server_tickrate_idle: " + server.getConfigManager().getConfig().getCustomServerTickrateIdle();
                     } else if (cmd[2].equalsIgnoreCase("default_gamefield_size_x")) {
-                        return "Value default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX();
+                        return "Value default_gamefield_size_x: " + server.getConfigManager().getConfig().getDefaultGameFieldSizeX();
                     } else if (cmd[2].equalsIgnoreCase("default_gamefield_size_y")) {
-                        return "Value default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY();
+                        return "Value default_gamefield_size_y: " + server.getConfigManager().getConfig().getDefaultGameFieldSizeY();
                     } else if (cmd[2].equalsIgnoreCase("unauthenticate_player_on_death")) {
-                        return "Value unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath();
+                        return "Value unauthenticate_player_on_death: " + server.getConfigManager().getConfig().isUnauthenticatePlayerOnDeath();
                     } else if (cmd[2].equalsIgnoreCase("print_debug_messages")) {
-                        return "Value print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages();
+                        return "Value print_debug_messages: " + server.getConfigManager().getConfig().isPrintDebugMessages();
                     } else if (cmd[2].equalsIgnoreCase("default_item_despawn_time")) {
-                        return "Value default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime();
+                        return "Value default_item_despawn_time: " + server.getConfigManager().getConfig().getItemDefaultDespawnTime();
                     } else if (cmd[2].equalsIgnoreCase("item_superfood_despawn_time")) {
-                        return "Value item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime();
+                        return "Value item_superfood_despawn_time: " + server.getConfigManager().getConfig().getItemSuperFoodDespawnTime();
                     } else if (cmd[2].equalsIgnoreCase("enable_snake_speed_boost")) {
-                        return "Value enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost();
+                        return "Value enable_snake_speed_boost: " + server.getConfigManager().getConfig().isEnableSnakeSpeedBoost();
                     } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
-                        return "Value eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake();
+                        return "Value eat_own_snake: " + server.getConfigManager().getConfig().isEatOwnSnake();
+                    } else if (cmd[2].equalsIgnoreCase("eat_own_snake")) {
+                        return "Value snake_death_superfood_multiplier: " + server.getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier();
                     } else {
                         return "Unknown config option";
                     }
                 } else {
                     return "Run command without arguments for help";
                 }
+
+                 */
             } else if (cmd[1].equalsIgnoreCase("list")) {
                 return "CONFIG OPTIONS:\n" +
                         "Server Settings:\n" +
-                        "port: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getPort() + "\n" +
-                        "max_connections: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections() + "\n" +
-                        "auto_connection_accept: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept() + "\n" +
-                        "user_authentication: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication() + "\n" +
-                        "unauthenticate_player_on_death: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
-                        "print_debug_messages: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
+                        "port: " + server.getConfigManager().getConfig().getPort() + "\n" +
+                        "max_connections: " + server.getConfigManager().getConfig().getMaxConnections() + "\n" +
+                        "auto_connection_accept: " + server.getConfigManager().getConfig().isAutoConnectionAccept() + "\n" +
+                        "user_authentication: " + server.getConfigManager().getConfig().isUserAuthentication() + "\n" +
+                        "unauthenticate_player_on_death: " + server.getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
+                        "print_debug_messages: " + server.getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
+                        "enable_chat: " + server.getConfigManager().getConfig().isEnableChat() + "\n" +
+                        "allow_guest_chat: " + server.getConfigManager().getConfig().isAllowGuestChat() + "\n" +
+                        "enable_admin_command: " + server.getConfigManager().getConfig().isEnableAdminCommand() + "\n" +
+                        "print_chat_to_console: " + server.getConfigManager().getConfig().isPrintChatToConsole() + "\n" +
+                        "print_chat_commands_to_console: " + server.getConfigManager().getConfig().isPrintChatCommandsToConsole() + "\n" +
+                        "verbose_chat_logs: " + server.getConfigManager().getConfig().isVerboseChatLogs() + "\n" +
                         "Game Settings:\n" +
-                        "max_players: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxPlayers() + "\n" +
-                        "max_spectators: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxSpectators() + "\n" +
-                        "min_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue() + "\n" +
-                        "max_food_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() + "\n" +
-                        "default_snake_length: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength() + "\n" +
-                        "snake_speed_base: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase() + "\n" +
-                        "snake_speed_modifier_value: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue() + "\n" +
-                        "snake_speed_modifier_bodycount: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount() + "\n" +
-                        "default_gamefield_size_x: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeX() + "\n" +
-                        "default_gamefield_size_y: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
-                        "default_item_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime() + "\n" +
-                        "item_superfood_despawn_time: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemSuperFoodDespawnTime() + "\n" +
-                        "enable_spectator: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator() + "\n" +
-                        "spectator_update_interval: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval() + "\n" +
-                        "enable_snake_speed_boost: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() + "\n" +
-                        "eat_own_snake: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake() + "\n" +
+                        "max_players: " + server.getConfigManager().getConfig().getMaxPlayers() + "\n" +
+                        "max_spectators: " + server.getConfigManager().getConfig().getMaxSpectators() + "\n" +
+                        "min_food_value: " + server.getConfigManager().getConfig().getMinFoodValue() + "\n" +
+                        "max_food_value: " + server.getConfigManager().getConfig().getMaxFoodValue() + "\n" +
+                        "default_snake_length: " + server.getConfigManager().getConfig().getDefaultSnakeLength() + "\n" +
+                        "snake_speed_base: " + server.getConfigManager().getConfig().getSnakeSpeedBase() + "\n" +
+                        "snake_speed_modifier_value: " + server.getConfigManager().getConfig().getSnakeSpeedModifierValue() + "\n" +
+                        "snake_speed_modifier_bodycount: " + server.getConfigManager().getConfig().getSnakeSpeedModifierBodycount() + "\n" +
+                        "default_gamefield_size_x: " + server.getConfigManager().getConfig().getDefaultGameFieldSizeX() + "\n" +
+                        "default_gamefield_size_y: " + server.getConfigManager().getConfig().getDefaultGameFieldSizeY() + "\n" +
+                        "default_item_despawn_time: " + server.getConfigManager().getConfig().getItemDefaultDespawnTime() + "\n" +
+                        "item_superfood_despawn_time: " + server.getConfigManager().getConfig().getItemSuperFoodDespawnTime() + "\n" +
+                        "enable_spectator: " + server.getConfigManager().getConfig().isEnableSpectator() + "\n" +
+                        "spectator_update_interval: " + server.getConfigManager().getConfig().getSpectatorUpdateInterval() + "\n" +
+                        "enable_snake_speed_boost: " + server.getConfigManager().getConfig().isEnableSnakeSpeedBoost() + "\n" +
+                        "eat_own_snake: " + server.getConfigManager().getConfig().isEatOwnSnake() + "\n" +
+                        "snake_death_superfood_multiplier: " + server.getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier() + "\n" +
                         "Advanced Settings:\n" +
-                        "enable_advanced_options: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
-                        "advanced_override_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
-                        "advanced_custom_server_tickrate: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrate() + "\n" +
-                        "advanced_custom_server_tickrate_idle: " + SlakeoverflowServer.getServer().getConfigManager().getConfig().getCustomServerTickrateIdle() + "\n";
+                        "enable_advanced_options: " + server.getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
+                        "advanced_override_server_tickrate: " + server.getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +
+                        "advanced_custom_server_tickrate: " + server.getConfigManager().getConfig().getCustomServerTickrate() + "\n" +
+                        "advanced_custom_server_tickrate_idle: " + server.getConfigManager().getConfig().getCustomServerTickrateIdle() + "\n";
             } else if(cmd[1].equalsIgnoreCase("load") || cmd[1].equalsIgnoreCase("reload")) {
-                SlakeoverflowServer.getServer().getConfigManager().reloadConfig();
+                server.getConfigManager().reloadConfig();
                 return "Sent config load command";
             } else if(cmd[1].equalsIgnoreCase("write")) {
-                SlakeoverflowServer.getServer().getConfigManager().recreateConfig();
+                server.getConfigManager().recreateConfig();
                 return "Sent write config command";
             } else {
                 return "Run command without arguments for help";
@@ -363,30 +404,30 @@ public class ConsoleCommands {
         }
     }
 
-    private static String connectionCommand(String[] cmd) {
+    private static String connectionCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             switch (cmd[1]) {
                 case "list": {
                     String returnString = "CONNECTIONS:\n";
-                    returnString = returnString + connectionCommandGetEstablishedConnectionList();
-                    returnString = returnString + connectionCommandPendingConnectionList();
+                    returnString = returnString + connectionCommandGetEstablishedConnectionList(server);
+                    returnString = returnString + connectionCommandPendingConnectionList(server);
                     return returnString;
                 }
                 case "list-established":
-                    return connectionCommandGetEstablishedConnectionList();
+                    return connectionCommandGetEstablishedConnectionList(server);
                 case "list-pending":
-                    return connectionCommandPendingConnectionList();
+                    return connectionCommandPendingConnectionList(server);
                 case "info":
                     if (cmd.length == 3) {
                         try {
                             UUID uuid = UUID.fromString(cmd[2]);
-                            CMSClient client = SlakeoverflowServer.getServer().getConnectionhandler().getClientById(uuid);
+                            CMSClient client = server.getConnectionhandler().getClientById(uuid);
 
                             if (client != null) {
                                 String returnString = "CONNECTION INFO:\n";
                                 returnString = returnString + "UUID: " + uuid + "\n";
                                 returnString = returnString + "IP: " + client.getIP() + "\n";
-                                ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(uuid);
+                                ServerConnection connection = server.getConnectionByUUID(uuid);
                                 if (connection != null) {
                                     returnString = returnString + "SERVERCONNECTION: AVAIL (" + AuthenticationState.toString(connection.getAuthenticationState()) + ")\n";
                                 } else {
@@ -406,7 +447,7 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             UUID uuid = UUID.fromString(cmd[2]);
-                            CMSClient client = SlakeoverflowServer.getServer().getConnectionhandler().getClientById(uuid);
+                            CMSClient client = server.getConnectionhandler().getClientById(uuid);
 
                             if (client != null) {
                                 client.close();
@@ -424,7 +465,7 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             UUID uuid = UUID.fromString(cmd[2]);
-                            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+                            CMSPendingClient pendingClient = server.getConnectionhandler().getPendingConnections().get(uuid);
 
                             if (pendingClient != null) {
                                 pendingClient.setState(PendingClientState.ACCEPTED);
@@ -442,7 +483,7 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             UUID uuid = UUID.fromString(cmd[2]);
-                            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+                            CMSPendingClient pendingClient = server.getConnectionhandler().getPendingConnections().get(uuid);
 
                             if (pendingClient != null) {
                                 pendingClient.setState(PendingClientState.DENIED);
@@ -471,30 +512,30 @@ public class ConsoleCommands {
         }
     }
 
-    private static String connectionCommandGetEstablishedConnectionList() {
+    private static String connectionCommandGetEstablishedConnectionList(SlakeoverflowServer server) {
         String returnString = "ESTABLISHED CONNECTIONS:\n";
-        for (UUID uuid : SlakeoverflowServer.getServer().getConnectionhandler().getClients().keySet()) {
-            CMSClient cmsClient = SlakeoverflowServer.getServer().getConnectionhandler().getClients().get(uuid);
+        for (UUID uuid : server.getConnectionhandler().getClients().keySet()) {
+            CMSClient cmsClient = server.getConnectionhandler().getClients().get(uuid);
             returnString = returnString + uuid + " " + cmsClient.getIP() + "\n";
         }
         return returnString;
     }
 
-    private static String connectionCommandPendingConnectionList() {
+    private static String connectionCommandPendingConnectionList(SlakeoverflowServer server) {
         String returnString = "PENDING CONNECTIONS:\n";
-        for (UUID uuid : SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().keySet()) {
-            CMSPendingClient pendingClient = SlakeoverflowServer.getServer().getConnectionhandler().getPendingConnections().get(uuid);
+        for (UUID uuid : server.getConnectionhandler().getPendingConnections().keySet()) {
+            CMSPendingClient pendingClient = server.getConnectionhandler().getPendingConnections().get(uuid);
             returnString = returnString + uuid + " " + pendingClient.getState() + " " + pendingClient.getSocket().getInetAddress() + "\n";
         }
         return returnString;
     }
 
-    private static String userCommand(String[] cmd) {
+    private static String userCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             switch (cmd[1]) {
                 case "list": {
                     String returnString = "USER LIST (UUID, AUTH STATE, ACCOUNT ID, MUTED, BANNED):\n";
-                    for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+                    for (ServerConnection connection : server.getConnectionList()) {
                         returnString = returnString + connection.getClientId() + " " + AuthenticationState.toString(connection.getAuthenticationState()) + " " + connection.getAccountId() + " " + connection.isMuted() + " " + connection.isBanned() + "\n";
                     }
                     return returnString;
@@ -502,7 +543,7 @@ public class ConsoleCommands {
                 case "info":
                     if (cmd.length == 3) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
 
                             if (connection != null) {
 
@@ -550,7 +591,7 @@ public class ConsoleCommands {
                 case "auth":
                     if (cmd.length == 4) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
                             if (connection != null) {
                                 if (cmd[3].equalsIgnoreCase("player")) {
                                     connection.authenticateAsPlayer();
@@ -573,7 +614,7 @@ public class ConsoleCommands {
                 case "unauth":
                     if (cmd.length == 3) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
                             if (connection != null) {
                                 connection.unauthenticate();
                                 return "Connection unauthenticated";
@@ -589,9 +630,9 @@ public class ConsoleCommands {
                 case "login":
                     if(cmd.length == 4) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
                             if (connection != null) {
-                                AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[3]));
+                                AccountData account = server.getAccountSystem().getAccount(Long.parseLong(cmd[3]));
 
                                 if(account != null) {
                                     connection.login(account.getId());
@@ -610,7 +651,7 @@ public class ConsoleCommands {
                     }
                 case "logout":
                     try {
-                        ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                        ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
                         if (connection != null) {
                             connection.logout();
                             return "Logged out user " + connection.getClientId();
@@ -623,7 +664,7 @@ public class ConsoleCommands {
                 case "ban":
                     if(cmd.length == 4) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
 
                             if(connection != null) {
                                 connection.setBanned(Boolean.parseBoolean(cmd[3]));
@@ -640,7 +681,7 @@ public class ConsoleCommands {
                 case "mute":
                     if(cmd.length == 4) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
 
                             if(connection != null) {
                                 connection.setMuted(Boolean.parseBoolean(cmd[3]));
@@ -658,7 +699,7 @@ public class ConsoleCommands {
                 case "socialspy":
                     if(cmd.length == 4) {
                         try {
-                            ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[2]));
+                            ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
 
                             if(connection != null) {
                                 connection.setSocialSpy(Boolean.parseBoolean(cmd[3]));
@@ -689,12 +730,12 @@ public class ConsoleCommands {
         }
     }
 
-    private static String blacklistCommand(String[] cmd) {
+    private static String blacklistCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             switch (cmd[1]) {
                 case "list":
                     String returnString = "BLACKLIST:\n";
-                    for (InetAddress ip : SlakeoverflowServer.getServer().getIpBlacklist()) {
+                    for (InetAddress ip : server.getIpBlacklist()) {
                         returnString = returnString + ip.toString() + "\n";
                     }
                     return returnString;
@@ -702,7 +743,7 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             InetAddress inetAddress = InetAddress.getByName(cmd[2]);
-                            SlakeoverflowServer.getServer().addIpToBlacklist(inetAddress);
+                            server.addIpToBlacklist(inetAddress);
                             return "Added IP to blacklist";
                         } catch (UnknownHostException e) {
                             return "Please enter a valid IP address";
@@ -714,7 +755,7 @@ public class ConsoleCommands {
                     if (cmd.length == 3) {
                         try {
                             InetAddress inetAddress = InetAddress.getByName(cmd[2]);
-                            SlakeoverflowServer.getServer().removeIpFromBlacklist(inetAddress);
+                            server.removeIpFromBlacklist(inetAddress);
                             return "Removed IP from blacklist";
                         } catch (UnknownHostException e) {
                             return "Please enter a valid IP address";
@@ -723,7 +764,7 @@ public class ConsoleCommands {
                         return "blacklist add <IP>";
                     }
                 case "clear":
-                    SlakeoverflowServer.getServer().clearIpBlacklist();
+                    server.clearIpBlacklist();
                     return "Cleared IP blacklist";
                 default:
                     return "Run command without arguments for help";
@@ -737,15 +778,15 @@ public class ConsoleCommands {
         }
     }
 
-    private static String gameCommand(String[] cmd) {
+    private static String gameCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             if (cmd[1].equalsIgnoreCase("start")) {
                 if (cmd.length >= 3) {
                     if (cmd[2].equalsIgnoreCase("default") && cmd.length == 3) {
-                        SlakeoverflowServer.getServer().setupGameDefault();
+                        server.setupGameDefault();
                         return "Set up game with default settings";
                     } else if (cmd[2].equalsIgnoreCase("automatic") && cmd.length == 3) {
-                        SlakeoverflowServer.getServer().setupGameAutomatically();
+                        server.setupGameAutomatically();
                         return "Set up game with player count based settings";
                     } else if (cmd[2].equalsIgnoreCase("custom") && (cmd.length == 5 || cmd.length == 6)) {
                         boolean paused;
@@ -760,7 +801,7 @@ public class ConsoleCommands {
                             int sizey = Integer.parseInt(cmd[3]);
 
                             if (sizex > 10 && sizey > 10) {
-                                SlakeoverflowServer.getServer().setupGame(sizex, sizey, paused);
+                                server.setupGame(sizex, sizey, paused);
                                 return "Set up game with custom settings";
                             } else {
                                 return "Both values have to be 10 or more";
@@ -801,11 +842,11 @@ public class ConsoleCommands {
                                 JSONObject item = (JSONObject) itemObject;
 
                                 if (item.getString("description").equalsIgnoreCase("FOOD")) {
-                                    itemList.add(new Food(item.getInt("x"), item.getInt("y"), item.getInt("food_value")));
+                                    itemList.add(new Food(server.getGameSession(), item.getInt("x"), item.getInt("y"), item.getInt("food_value")));
                                 } else if (item.getString("description").equalsIgnoreCase("SUPERFOOD")) {
-                                    itemList.add(new Food(item.getInt("x"), item.getInt("y"), item.getInt("superfood_value")));
+                                    itemList.add(new Food(server.getGameSession(), item.getInt("x"), item.getInt("y"), item.getInt("superfood_value")));
                                 } else {
-                                    itemList.add(new Item(item.getInt("x"), item.getInt("y")) {
+                                    itemList.add(new Item(server.getGameSession(), item.getInt("x"), item.getInt("y")) {
                                         @Override
                                         public String getDescription() {
                                             return "UNKNOWN_ITEM_FROM_SAVEGAME";
@@ -814,7 +855,7 @@ public class ConsoleCommands {
                                 }
                             }
 
-                            if (SlakeoverflowServer.getServer().setupGame(true, settings.getInt("border_x"), settings.getInt("border_y"), settings.getInt("fovsize_x"), settings.getInt("fovsize_y"), settings.getInt("next_item_despawn"), snakeDataList, itemList)) {
+                            if (server.setupGame(true, settings.getInt("border_x"), settings.getInt("border_y"), settings.getInt("fovsize_x"), settings.getInt("fovsize_y"), settings.getInt("next_item_despawn"), snakeDataList, itemList)) {
                                 return "Game was setup from savegame data. You can resume it with game resume (you need to assign new connections to the snakes before to prevent them to be deleted before you start).";
                             } else {
                                 return "Game was not setup";
@@ -833,31 +874,31 @@ public class ConsoleCommands {
                             "game start savegame <SAVEGAME DATA>\n";
                 }
             } else if (cmd[1].equalsIgnoreCase("stop")) {
-                if (SlakeoverflowServer.getServer().stopGame()) {
+                if (server.stopGame()) {
                     return "Stopped game";
                 } else {
                     return "No game running";
                 }
             } else if (cmd[1].equalsIgnoreCase("pause")) {
-                if (SlakeoverflowServer.getServer().pauseGame()) {
+                if (server.pauseGame()) {
                     return "Paused game";
                 } else {
                     return "Game is not running";
                 }
             } else if (cmd[1].equalsIgnoreCase("resume")) {
-                if (SlakeoverflowServer.getServer().resumeGame()) {
+                if (server.resumeGame()) {
                     return "Resumed game";
                 } else {
                     return "Game is not paused";
                 }
             } else if (cmd[1].equalsIgnoreCase("info")) {
-                if (SlakeoverflowServer.getServer().isGameAvail()) {
+                if (server.isGameAvail()) {
                     String returnString = "GAME INFORMATION:\n" +
-                            "Game state: " + GameState.getString(SlakeoverflowServer.getServer().getGameState()) + " (" + SlakeoverflowServer.getServer().getGameState() + "), MTICKS: " + SlakeoverflowServer.getServer().getManualTicks() + "\n";
+                            "Game state: " + GameState.getString(server.getGameState()) + " (" + server.getGameState() + "), MTICKS: " + server.getManualTicks() + "\n";
                     try {
-                        returnString = returnString + "Players: " + SlakeoverflowServer.getServer().getGameSession().getSnakeList().size() + "\n" +
-                                "Items: " + SlakeoverflowServer.getServer().getGameSession().getItemList().size() + "\n" +
-                                "World border: x=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[0] + " y=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[1] + "\n";
+                        returnString = returnString + "Players: " + server.getGameSession().getSnakeList().size() + "\n" +
+                                "Items: " + server.getGameSession().getItemList().size() + "\n" +
+                                "World border: x=" + server.getGameSession().getBorder()[0] + " y=" + server.getGameSession().getBorder()[1] + "\n";
                     } catch (Exception e) {
                         returnString = returnString + "ERROR: " + Arrays.toString(e.getStackTrace());
                     }
@@ -866,21 +907,21 @@ public class ConsoleCommands {
                     return "Currently is no game running";
                 }
             } else if (cmd[1].equalsIgnoreCase("getsave")) {
-                if (SlakeoverflowServer.getServer().isGameAvail()) {
-                    return "SAVE STRING: " + SlakeoverflowServer.getServer().getGameSession().getSaveString().toString() + "\n";
+                if (server.isGameAvail()) {
+                    return "SAVE STRING: " + server.getGameSession().getSaveString().toString() + "\n";
                 } else {
                     return "Currently is no game running";
                 }
             } else if (cmd[1].equalsIgnoreCase("mcontrol")) {
-                if (SlakeoverflowServer.getServer().isGameAvail()) {
+                if (server.isGameAvail()) {
                     if (cmd.length >= 3) {
                         if (cmd[2].equalsIgnoreCase("runtick")) {
-                            SlakeoverflowServer.getServer().addManualTicks(1);
+                            server.addManualTicks(1);
                             return "Running 1 tick";
                         } else if (cmd[2].equalsIgnoreCase("runticks")) {
                             if (cmd.length == 4) {
                                 try {
-                                    SlakeoverflowServer.getServer().addManualTicks(Integer.parseInt(cmd[3]));
+                                    server.addManualTicks(Integer.parseInt(cmd[3]));
                                     return "Running " + cmd[3] + " ticks";
                                 } catch (NumberFormatException e) {
                                     return "Please specify a valid int value";
@@ -889,7 +930,7 @@ public class ConsoleCommands {
                                 return "Usage: mcontrol runticks <count> - Run a specific amount of ticks";
                             }
                         } else if (cmd[2].equalsIgnoreCase("stop") || cmd[2].equalsIgnoreCase("clear") || cmd[2].equalsIgnoreCase("remove")) {
-                            SlakeoverflowServer.getServer().resetManualTicks();
+                            server.resetManualTicks();
                             return "Cleared manual ticks";
                         } else {
                             return "Run command without arguments for help";
@@ -904,11 +945,11 @@ public class ConsoleCommands {
                     return "Currently is no game running";
                 }
             } else if (cmd[1].equalsIgnoreCase("get")) {
-                if (SlakeoverflowServer.getServer().isGameAvail()) {
+                if (server.isGameAvail()) {
                     if (cmd.length >= 3) {
                         if (cmd[2].equalsIgnoreCase("snakes")) {
                             String returnString = "SNAKES (ID UUID X Y LENGTH FREEZED ALIVE):\n";
-                            List<Snake> snakeList = SlakeoverflowServer.getServer().getGameSession().getSnakeList();
+                            List<Snake> snakeList = server.getGameSession().getSnakeList();
                             for (int i = 0; i < snakeList.size(); i++) {
                                 Snake snake = snakeList.get(i);
                                 if (snake.getConnection() != null) {
@@ -921,10 +962,10 @@ public class ConsoleCommands {
                         } else if (cmd[2].equalsIgnoreCase("snake") && cmd.length == 4) {
                             Snake snake;
                             try {
-                                snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
+                                snake = server.getGameSession().getSnakeOfConnection(server.getConnectionByUUID(UUID.fromString(cmd[3])));
                             } catch (IllegalArgumentException e) {
                                 try {
-                                    snake = SlakeoverflowServer.getServer().getGameSession().getSnake(Integer.parseInt(cmd[3]));
+                                    snake = server.getGameSession().getSnake(Integer.parseInt(cmd[3]));
                                 } catch (IllegalArgumentException e2) {
                                     return "Please specify a valid connection UUID or snake id";
                                 }
@@ -940,21 +981,29 @@ public class ConsoleCommands {
                                     uuid = String.valueOf(snake.getConnection().getClientId());
                                 }
 
+                                String playerdataSystem;
+                                if(snake.isFixedFovPlayerdataSystem()) {
+                                    playerdataSystem = "FIXED_FOV (=true)";
+                                } else {
+                                    playerdataSystem = "SCROLLING_FOV (=false)";
+                                }
+
                                 return "SNAKE INFORMATION:\n" +
-                                        "ID: " + SlakeoverflowServer.getServer().getGameSession().getSnakeId(snake) + "\n" +
+                                        "ID: " + server.getGameSession().getSnakeId(snake) + "\n" +
                                         "UUID: " + uuid + "\n" +
                                         "Position: x=" + snake.getPosX() + ", y=" + snake.getPosY() + "\n" +
                                         "Length: " + snake.getLength() + "\n" +
                                         "Facing: " + snake.getFacing() + "\n" +
                                         "Freezed: " + snake.isFreezed() + "\n" +
                                         "Move in: " + snake.getMoveIn() + " (" + snake.calcMoveIn() + ")\n" +
-                                        "Body positions: " + bodyPositionString + "\n";
+                                        "Body positions: " + bodyPositionString + "\n" +
+                                        "FOV Behavior: " + playerdataSystem + "\n";
                             } else {
                                 return "This snake does not exist";
                             }
                         } else if (cmd[2].equalsIgnoreCase("items")) {
                             String returnString = "ITEMS (ID X Y DESPAWN OTHER):\n";
-                            List<Item> itemList = SlakeoverflowServer.getServer().getGameSession().getItemList();
+                            List<Item> itemList = server.getGameSession().getItemList();
                             for (int i = 0; i < itemList.size(); i++) {
                                 Item item = itemList.get(i);
                                 returnString = returnString + i + " " + item.getDescription() + " X" + item.getPosX() + " Y" + item.getPosY() + " D" + item.getDespawnTime() + " ";
@@ -967,9 +1016,9 @@ public class ConsoleCommands {
                             }
                             return returnString;
                         } else if (cmd[2].equalsIgnoreCase("border")) {
-                            return "Worldborder: x1=-1, y1=-1, x2= " + SlakeoverflowServer.getServer().getGameSession().getBorder()[0] + ", y2=" + SlakeoverflowServer.getServer().getGameSession().getBorder()[1];
+                            return "Worldborder: x1=-1, y1=-1, x2= " + server.getGameSession().getBorder()[0] + ", y2=" + server.getGameSession().getBorder()[1];
                         } else if (cmd[2].equalsIgnoreCase("fov")) {
-                            return "Player FOV: x=" + SlakeoverflowServer.getServer().getGameSession().getPlayerFOV()[0] + ", y=" + SlakeoverflowServer.getServer().getGameSession().getPlayerFOV()[1];
+                            return "Player FOV: x=" + server.getGameSession().getPlayerFOV()[0] + ", y=" + server.getGameSession().getPlayerFOV()[1];
                         } else {
                             return "Value not found";
                         }
@@ -985,17 +1034,17 @@ public class ConsoleCommands {
                     return "No game available";
                 }
             } else if (cmd[1].equalsIgnoreCase("modify")) {
-                if (SlakeoverflowServer.getServer().isGameAvail()) {
+                if (server.isGameAvail()) {
                     if (cmd.length >= 3) {
                         if (cmd[2].equalsIgnoreCase("snake")) {
                             if (cmd.length >= 4) {
                                 Snake snake;
 
                                 try {
-                                    snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[3])));
+                                    snake = server.getGameSession().getSnakeOfConnection(server.getConnectionByUUID(UUID.fromString(cmd[3])));
                                 } catch (IllegalArgumentException e) {
                                     try {
-                                        snake = SlakeoverflowServer.getServer().getGameSession().getSnake(Integer.parseInt(cmd[3]));
+                                        snake = server.getGameSession().getSnake(Integer.parseInt(cmd[3]));
                                     } catch (IllegalArgumentException e2) {
                                         return "Please specify a valid connection UUID or snake id";
                                     }
@@ -1064,7 +1113,7 @@ public class ConsoleCommands {
                                                 ServerConnection connection = null;
 
                                                 try {
-                                                    connection = SlakeoverflowServer.getServer().getConnectionByUUID(UUID.fromString(cmd[5]));
+                                                    connection = server.getConnectionByUUID(UUID.fromString(cmd[5]));
                                                 } catch (IllegalArgumentException ignored) {
                                                 }
 
@@ -1086,6 +1135,13 @@ public class ConsoleCommands {
                                             } else {
                                                 return "USAGE: game modify snake <UUID/ID> freeze true/false";
                                             }
+                                        } else if(cmd[4].equalsIgnoreCase("fovbehavior")) {
+                                            if(cmd.length == 6) {
+                                                snake.setFixedFovPlayerdataSystem(Boolean.parseBoolean(cmd[5]));
+                                                return "Set fovbehavior snake to " + snake.isFixedFovPlayerdataSystem();
+                                            } else {
+                                                return "USAGE: game modify snake <UUID/ID> fovbehavior true/false";
+                                            }
                                         } else {
                                             return "Unknown action";
                                         }
@@ -1103,13 +1159,13 @@ public class ConsoleCommands {
                             if (cmd.length >= 4) {
                                 try {
                                     int itemIndex = Integer.parseInt(cmd[3]);
-                                    Item item = SlakeoverflowServer.getServer().getGameSession().getItemList().get(itemIndex);
+                                    Item item = server.getGameSession().getItemList().get(itemIndex);
 
                                     if (item != null) {
 
                                         if (cmd.length >= 5) {
                                             if (cmd[4].equalsIgnoreCase("kill")) {
-                                                SlakeoverflowServer.getServer().getGameSession().killItem(itemIndex);
+                                                server.getGameSession().killItem(itemIndex);
                                                 return "Killed item";
                                             } else if (cmd[4].equalsIgnoreCase("position")) {
                                                 if (cmd.length == 7) {
@@ -1153,7 +1209,7 @@ public class ConsoleCommands {
                             }
                         } else if (cmd[2].equalsIgnoreCase("items")) {
                             if (cmd.length == 4 && cmd[3].equalsIgnoreCase("kill")) {
-                                SlakeoverflowServer.getServer().getGameSession().killItems();
+                                server.getGameSession().killItems();
                                 return "Killed items";
                             } else {
                                 return "Value not found";
@@ -1197,13 +1253,13 @@ public class ConsoleCommands {
         }
     }
 
-    public static String loggerCommand(String[] cmd) {
+    public static String loggerCommand(SlakeoverflowServer server, String[] cmd) {
         if (cmd.length >= 2) {
             if (cmd[1].equalsIgnoreCase("list")) {
                 String returnString = "LOG:\n";
 
                 int index = 0;
-                for (Object logEntryObject : SlakeoverflowServer.getServer().getLogger().getLog()) {
+                for (Object logEntryObject : server.getLogger().getLog()) {
                     JSONObject logEntry = (JSONObject) logEntryObject;
 
                     returnString = returnString + index + " " + logEntry.getString("time") + " " + logEntry.getString("type") + " " + logEntry.getString("module") + "\n";
@@ -1214,7 +1270,7 @@ public class ConsoleCommands {
                 try {
                     if (cmd.length == 3) {
                         int index = Integer.parseInt(cmd[2]);
-                        JSONObject logEntry = SlakeoverflowServer.getServer().getLogger().getLog().getJSONObject(index);
+                        JSONObject logEntry = server.getLogger().getLog().getJSONObject(index);
                         return "LOG ENTRY:\n" +
                                 "ID: " + index + "\n" +
                                 "Time: " + logEntry.getString("time") + "\n" +
@@ -1234,7 +1290,7 @@ public class ConsoleCommands {
                     try {
                         File file = new File(System.getProperty("user.dir"), cmd[2]);
                         if (!file.exists()) {
-                            SlakeoverflowServer.getServer().getLogger().saveLog(file, false);
+                            server.getLogger().saveLog(file, false);
                             return "File was written";
                         } else {
                             return "File does already exist";
@@ -1256,27 +1312,27 @@ public class ConsoleCommands {
         }
     }
 
-    private static String infoCommand() {
+    private static String infoCommand(SlakeoverflowServer server) {
         return "SERVER INFO:\n" +
-                "Tick rate: " + SlakeoverflowServer.getServer().getTickRate() + " (counter=" + SlakeoverflowServer.getServer().getTickThreadCounter() + ", should be 20)" + "\n" +
+                "Tick rate: " + server.getTickRate() + " (counter=" + server.getTickThreadCounter() + ", should be 20)" + "\n" +
                 "Used memory: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + "MB / " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + "MB\n" +
-                "Manager Thread: " + SlakeoverflowServer.getServer().isManagerThreadAlive() + " " + SlakeoverflowServer.getServer().getManagerThreadState() + "\n" +
-                "Tick Thread: " + SlakeoverflowServer.getServer().isTickThreadAlive() + " " + SlakeoverflowServer.getServer().getTickThreadState() + "\n" +
-                "Times Thread: " + SlakeoverflowServer.getServer().isTimesThreadAlive() + " " + SlakeoverflowServer.getServer().getTimesThreadState() + "\n";
+                "Manager Thread: " + server.isManagerThreadAlive() + " " + server.getManagerThreadState() + "\n" +
+                "Tick Thread: " + server.isTickThreadAlive() + " " + server.getTickThreadState() + "\n" +
+                "Times Thread: " + server.isTimesThreadAlive() + " " + server.getTimesThreadState() + "\n";
     }
 
-    private static String accountCommand(String[] cmd) {
+    private static String accountCommand(SlakeoverflowServer server, String[] cmd) {
         if(cmd.length >= 2) {
             if(cmd[1].equalsIgnoreCase("create")) {
                 if(cmd.length == 3) {
-                    long id = SlakeoverflowServer.getServer().getAccountSystem().createAccount(cmd[2], null);
+                    long id = server.getAccountSystem().createAccount(cmd[2], null);
                     if(id > -1) {
                         return "Account created with id " + id;
                     } else {
                         return "Account could not be created";
                     }
                 } else if(cmd.length == 4) {
-                    long id = SlakeoverflowServer.getServer().getAccountSystem().createAccount(cmd[2], cmd[3]);
+                    long id = server.getAccountSystem().createAccount(cmd[2], cmd[3]);
                     if(id > -1) {
                         return "Account created with id " + id;
                     } else {
@@ -1287,7 +1343,7 @@ public class ConsoleCommands {
                 }
             } else if(cmd[1].equalsIgnoreCase("delete")) {
                 if(cmd.length == 3) {
-                    if(SlakeoverflowServer.getServer().getAccountSystem().deleteAccount(Long.parseLong(cmd[2]))) {
+                    if(server.getAccountSystem().deleteAccount(Long.parseLong(cmd[2]))) {
                         return "Account deleted";
                     } else {
                         return "Account could not be deleted";
@@ -1297,7 +1353,7 @@ public class ConsoleCommands {
                 }
             } else if(cmd[1].equalsIgnoreCase("info")) {
                 if(cmd.length == 3) {
-                    AccountData accountData = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
+                    AccountData accountData = server.getAccountSystem().getAccount(Long.parseLong(cmd[2]));
 
                     if(accountData != null) {
                         String password;
@@ -1325,7 +1381,7 @@ public class ConsoleCommands {
                     return "Usage: account info <ID>";
                 }
             } else if(cmd[1].equalsIgnoreCase("list")) {
-                List<AccountData> accountDataList = SlakeoverflowServer.getServer().getAccountSystem().getAccounts();
+                List<AccountData> accountDataList = server.getAccountSystem().getAccounts();
 
                 int count = 0;
                 String returnString = "REGISTERED ACCOUNTS:\n";
@@ -1344,56 +1400,56 @@ public class ConsoleCommands {
                 return returnString;
             } else if(cmd[1].equalsIgnoreCase("update")) {
                 if(cmd.length == 5) {
-                    AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Long.parseLong(cmd[2]));
+                    AccountData account = server.getAccountSystem().getAccount(Long.parseLong(cmd[2]));
 
                     if(account != null) {
 
                         try {
                             if(cmd[3].equalsIgnoreCase("username")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[4])) {
+                                if(server.getAccountSystem().updateUsername(account.getId(), cmd[4])) {
                                     return "Updated username";
                                 } else {
                                     return "Username not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("password")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[4])) {
+                                if(server.getAccountSystem().updatePassword(account.getId(), cmd[4])) {
                                     return "Updated password";
                                 } else {
                                     return "Password not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("permission")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                if(server.getAccountSystem().updatePermissionLevel(account.getId(), Integer.parseInt(cmd[4]))) {
                                     return "Updated permission level";
                                 } else {
                                     return "Permission level was not updated";
                                 }
                             } else if (cmd[3].equalsIgnoreCase("ban")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBanned(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                if(server.getAccountSystem().updateBanned(account.getId(), Boolean.parseBoolean(cmd[4]))) {
                                     return "Updated banned state to " + Boolean.parseBoolean(cmd[4]);
                                 } else {
                                     return "Banned state was not updated";
                                 }
                             } else if (cmd[3].equalsIgnoreCase("mute")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateMuted(account.getId(), Boolean.parseBoolean(cmd[4]))) {
+                                if(server.getAccountSystem().updateMuted(account.getId(), Boolean.parseBoolean(cmd[4]))) {
                                     return "Updated muted state to " + Boolean.parseBoolean(cmd[4]);
                                 } else {
                                     return "Muted state was not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("level")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateLevel(account.getId(), Integer.parseInt(cmd[4]))) {
+                                if(server.getAccountSystem().updateLevel(account.getId(), Integer.parseInt(cmd[4]))) {
                                     return "Updated level";
                                 } else {
                                     return "Level was not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("balance")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateBalance(account.getId(), Integer.parseInt(cmd[4]))) {
+                                if(server.getAccountSystem().updateBalance(account.getId(), Integer.parseInt(cmd[4]))) {
                                     return "Updated balance";
                                 } else {
                                     return "Balance was not updated";
                                 }
                             } else if(cmd[3].equalsIgnoreCase("shopdata")) {
                                 if(cmd[4].equalsIgnoreCase("reset")) {
-                                    if(SlakeoverflowServer.getServer().getAccountSystem().resetShopData(account.getId())) {
+                                    if(server.getAccountSystem().resetShopData(account.getId())) {
                                         return "Shop data was reset";
                                     } else {
                                         return "Shop data was not reset";
@@ -1416,7 +1472,7 @@ public class ConsoleCommands {
                 }
             } else if(cmd[1].equalsIgnoreCase("getid")) {
                 if(cmd.length == 3) {
-                    AccountData accountData = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                    AccountData accountData = server.getAccountSystem().getAccount(cmd[2]);
 
                     if(accountData != null) {
                         return "Account ID of " + accountData.getUsername() + ": " + accountData.getId();
@@ -1440,14 +1496,14 @@ public class ConsoleCommands {
         }
     }
 
-    public static String shopCommand(String[] cmd) {
+    public static String shopCommand(SlakeoverflowServer server, String[] cmd) {
         if(cmd.length >= 2) {
 
             if(cmd[1].equalsIgnoreCase("list")) {
                 String returnString = "SHOP ITEMS (ID, PRICE):\n";
 
-                Map<Integer, ShopItem> persistentItems = SlakeoverflowServer.getServer().getShopManager().getPersistentShopItems();
-                Map<Integer, ShopItem> customItems = SlakeoverflowServer.getServer().getShopManager().getCustomShopItems();
+                Map<Integer, ShopItem> persistentItems = server.getShopManager().getPersistentShopItems();
+                Map<Integer, ShopItem> customItems = server.getShopManager().getCustomShopItems();
 
                 for(int id : persistentItems.keySet()) {
                     returnString = returnString + id + " " + persistentItems.get(id).isEnabled() + " " + persistentItems.get(id).getRequiredLevel() + " " + persistentItems.get(id).getPrice() + " " + "PERSISTENT" +  "\n";
@@ -1465,13 +1521,13 @@ public class ConsoleCommands {
                     AccountData account;
 
                     try {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                        account = server.getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
                     } catch (NumberFormatException e) {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                        account = server.getAccountSystem().getAccount(cmd[2]);
                     }
 
                     if(account != null) {
-                        SlakeoverflowServer.getServer().getShopManager().addItemToAccount(account.getId(), Integer.parseInt(cmd[3]));
+                        server.getShopManager().addItemToAccount(account.getId(), Integer.parseInt(cmd[3]));
                         return "Item added (if it exist)";
                     } else {
                         return "Account not found";
@@ -1484,13 +1540,13 @@ public class ConsoleCommands {
                     AccountData account;
 
                     try {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                        account = server.getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
                     } catch (NumberFormatException e) {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                        account = server.getAccountSystem().getAccount(cmd[2]);
                     }
 
                     if(account != null) {
-                        SlakeoverflowServer.getServer().getShopManager().removeItemFromAccount(account.getId(), Integer.parseInt(cmd[3]));
+                        server.getShopManager().removeItemFromAccount(account.getId(), Integer.parseInt(cmd[3]));
                         return "Item removed (if it exists)";
                     } else {
                         return "Account not found";
@@ -1503,13 +1559,13 @@ public class ConsoleCommands {
                     AccountData account;
 
                     try {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                        account = server.getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
                     } catch (NumberFormatException e) {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                        account = server.getAccountSystem().getAccount(cmd[2]);
                     }
 
                     if(account != null) {
-                        SlakeoverflowServer.getServer().getShopManager().clearItemsFromAccount(account.getId());
+                        server.getShopManager().clearItemsFromAccount(account.getId());
                         return "Items cleared";
                     } else {
                         return "Account not found";
@@ -1522,13 +1578,13 @@ public class ConsoleCommands {
                     AccountData account;
 
                     try {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
+                        account = server.getAccountSystem().getAccount(Integer.parseInt(cmd[2]));
                     } catch (NumberFormatException e) {
-                        account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]);
+                        account = server.getAccountSystem().getAccount(cmd[2]);
                     }
 
                     if(account != null) {
-                        List<Integer> items = SlakeoverflowServer.getServer().getShopManager().getItemsFromAccount(account.getId());
+                        List<Integer> items = server.getShopManager().getItemsFromAccount(account.getId());
 
                         String returnString = "ITEMS OF ACCOUNT " + account.getId() + ":\n";
 
@@ -1558,6 +1614,73 @@ public class ConsoleCommands {
                     "shop removeItemsFromUser <accountId> <itemId>\n" +
                     "shop clearItemsFromUser <accountId>\n" +
                     "shop listItemsFromUser <accountId>\n";
+        }
+    }
+
+    public static String chatCommand(SlakeoverflowServer server, String[] cmd) {
+        if(cmd.length >= 2) {
+            if(cmd[1].equalsIgnoreCase("write") && cmd.length >= 3) {
+                String message = "";
+                for(int i = 2; i < cmd.length; i++) {
+                    message = message + cmd[i];
+                }
+
+                server.getChatSystem().adminMessage(message, false);
+
+                return "Message " + message + " sent to everyone";
+            } else if (cmd[1].equalsIgnoreCase("broadcast") && cmd.length >= 3) {
+                String message = "";
+                for(int i = 2; i < cmd.length; i++) {
+                    message = message + cmd[i];
+                }
+
+                server.getChatSystem().adminMessage(message, true);
+
+                return "Message " + message + " broadcasted to everyone";
+            } else if (cmd[1].equalsIgnoreCase("private") && cmd.length >= 4) {
+                try {
+                    ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                    if(connection != null) {
+                        String message = "";
+                        for(int i = 3; i < cmd.length; i++) {
+                            message = message + cmd[i];
+                        }
+
+                        server.getChatSystem().adminMessage(message, false, connection);
+
+                        return "Message " + message + " sent to " + connection.getClientId();
+                    } else {
+                        return "Connection not found";
+                    }
+                } catch (IllegalArgumentException e) {
+                    return "Wrong UUID format";
+                }
+            } else if (cmd[1].equalsIgnoreCase("privatebc") && cmd.length >= 4) {
+                ServerConnection connection = server.getConnectionByUUID(UUID.fromString(cmd[2]));
+
+                if(connection != null) {
+                    String message = "";
+                    for(int i = 3; i < cmd.length; i++) {
+                        message = message + cmd[i];
+                    }
+
+                    server.getChatSystem().adminMessage(message, true, connection);
+
+                    return "Message " + message + " broadcasted to " + connection.getClientId();
+                } else {
+                    return "Connection not found";
+                }
+            } else {
+                return "Run command without arguments for help";
+            }
+        } else {
+            return "CHAT COMMAND USAGE:\n" +
+                    "chat write <message>\n" +
+                    "chat broadcast <message>\n" +
+                    "chat private <user> <message>\n" +
+                    "chat privatebc <user> <message>\n" +
+                    "To moderate the chat, you can use config options and/or ban/mute users/accounts via user/account command\n";
         }
     }
 }

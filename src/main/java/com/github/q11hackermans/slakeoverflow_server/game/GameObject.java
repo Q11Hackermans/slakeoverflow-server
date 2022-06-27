@@ -1,5 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
+import com.github.q11hackermans.slakeoverflow_server.GameSession;
+
 public interface GameObject {
     /**
      * This method should return the X and Y position of the GameObject.
@@ -12,4 +14,6 @@ public interface GameObject {
     int getPosX();
 
     int getPosY();
+
+    GameSession getGameSession();
 }

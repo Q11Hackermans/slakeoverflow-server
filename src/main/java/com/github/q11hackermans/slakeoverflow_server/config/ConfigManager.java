@@ -7,10 +7,13 @@ import org.json.JSONObject;
 import java.io.*;
 
 public class ConfigManager {
+
+    private final SlakeoverflowServer server;
     private final File configFile;
     private final ServerConfig config;
 
-    public ConfigManager(boolean advancedOptionsEnabled, boolean loadConfigFile) {
+    public ConfigManager(SlakeoverflowServer server, boolean advancedOptionsEnabled, boolean loadConfigFile) {
+        this.server = server;
         this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
@@ -54,6 +57,12 @@ public class ConfigManager {
                     this.config.setAlsoDisablePrivilegedLogin(serverSettings.getBoolean("also_disable_privileged_login"));
                     this.config.setAllowRegistration(serverSettings.getBoolean("allow_registration"));
                     this.config.setServerName(serverSettings.getString("server_name"));
+                    this.config.setEnableChat(serverSettings.getBoolean("enable_chat"));
+                    this.config.setAllowGuestChat(serverSettings.getBoolean("allow_guest_chat"));
+                    this.config.setEnableAdminCommand(serverSettings.getBoolean("enable_admin_command"));
+                    this.config.setPrintChatToConsole(serverSettings.getBoolean("print_chat_to_console"));
+                    this.config.setPrintChatCommandsToConsole(serverSettings.getBoolean("print_chat_commands_to_console"));
+                    this.config.setVerboseChatLogs(serverSettings.getBoolean("verbose_chat_logs"));
 
                     JSONObject gameSettings = config.getJSONObject("game_settings");
                     this.config.setMaxPlayers(gameSettings.getInt("max_players"));
@@ -71,23 +80,25 @@ public class ConfigManager {
                     this.config.setSpectatorUpdateInterval(gameSettings.getInt("spectator_update_interval"));
                     this.config.setEnableSnakeSpeedBoost(gameSettings.getBoolean("enable_snake_speed_boost"));
                     this.config.setEatOwnSnake(gameSettings.getBoolean("eat_own_snake"));
+                    this.config.setSnakeDeathSuperfoodMultiplier(gameSettings.getDouble("snake_death_superfood_multiplier"));
 
                     JSONObject advancedSettings = config.getJSONObject("advanced_settings");
                     this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
                     this.config.setCustomServerTickrate(advancedSettings.getInt("advanced_custom_server_tickrate"));
                     this.config.setCustomServerTickrateIdle(advancedSettings.getInt("advanced_custom_server_tickrate_idle"));
 
-                    SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
+                    this.server.getLogger().info("CONFIG", "Config loaded");
                 } catch (JSONException e) {
-                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file structure corrupt");
+                    e.printStackTrace();
+                    this.server.getLogger().warning("CONFIG", "Config file structure corrupt");
                     this.recreateConfig();
                 } catch (IllegalArgumentException e) {
-                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file values corrupt");
+                    this.server.getLogger().warning("CONFIG", "Config file values corrupt");
                     this.recreateConfig();
                 }
             }
         } catch (IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
+            this.server.getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
         }
     }
 
@@ -107,12 +118,18 @@ public class ConfigManager {
                 serverSettings.put("user_authentication", this.config.isUserAuthentication());
                 serverSettings.put("max_connections", this.config.getMaxConnections());
                 serverSettings.put("unauthenticate_player_on_death", this.config.isUnauthenticatePlayerOnDeath());
-                serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages());
+                serverSettings.put("print_debug_messages", this.config.isPrintDebugMessages()); // NOT IN SETUP ASSISTANT
                 serverSettings.put("allow_guests", this.config.isAllowGuests());
                 serverSettings.put("allow_login", this.config.isAllowLogin());
                 serverSettings.put("also_disable_privileged_login", this.config.isAlsoDisablePrivilegedLogin());
                 serverSettings.put("allow_registration", this.config.isAllowRegistration());
                 serverSettings.put("server_name", this.config.getServerName());
+                serverSettings.put("enable_chat", this.config.isEnableChat());
+                serverSettings.put("allow_guest_chat", this.config.isAllowGuestChat());
+                serverSettings.put("enable_admin_command", this.config.isEnableAdminCommand());
+                serverSettings.put("print_chat_to_console", this.config.isPrintChatToConsole()); // NOT IN SETUP ASSISTANT
+                serverSettings.put("print_chat_commands_to_console", this.config.isPrintChatCommandsToConsole()); // NOT IN SETUP ASSISTANT
+                serverSettings.put("verbose_chat_logs", this.config.isVerboseChatLogs()); // NOT IN SETUP ASSISTANT
                 config.put("server_settings", serverSettings);
 
                 JSONObject gameSettings = new JSONObject();
@@ -131,12 +148,13 @@ public class ConfigManager {
                 gameSettings.put("spectator_update_interval", this.config.getSpectatorUpdateInterval());
                 gameSettings.put("enable_snake_speed_boost", this.config.isEnableSnakeSpeedBoost());
                 gameSettings.put("eat_own_snake", this.config.isEatOwnSnake());
+                gameSettings.put("snake_death_superfood_multiplier", this.config.getSnakeDeathSuperfoodMultiplier());
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();
-                advancedSettings.put("advanced_override_server_tickrate", this.config.isOverrideServerTickrate());
-                advancedSettings.put("advanced_custom_server_tickrate", this.config.getCustomServerTickrate());
-                advancedSettings.put("advanced_custom_server_tickrate_idle", this.config.getCustomServerTickrateIdle());
+                advancedSettings.put("advanced_override_server_tickrate", this.config.isOverrideServerTickrate()); // NOT IN SETUP ASSISTANT
+                advancedSettings.put("advanced_custom_server_tickrate", this.config.getCustomServerTickrate()); // NOT IN SETUP ASSISTANT
+                advancedSettings.put("advanced_custom_server_tickrate_idle", this.config.getCustomServerTickrateIdle()); // NOT IN SETUP ASSISTANT
                 config.put("advanced_settings", advancedSettings);
 
                 FileWriter writer = new FileWriter(this.configFile);
@@ -144,14 +162,18 @@ public class ConfigManager {
                 writer.flush();
                 writer.close();
 
-                SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config created");
+                this.server.getLogger().info("CONFIG", "Config created");
             }
         } catch (IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
+            this.server.getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
         }
     }
 
     public ServerConfig getConfig() {
         return this.config;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }
