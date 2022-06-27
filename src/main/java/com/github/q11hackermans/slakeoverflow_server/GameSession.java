@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GameSession {
+
+    private final SlakeoverflowServer server;
     private final List<Snake> snakeList;
     private final List<Item> itemList;
     private final int borderX;
@@ -24,11 +26,13 @@ public class GameSession {
     private int nextItemDespawn;
     private int nextSpectatorUpdate;
 
-    public GameSession(int x, int y) {
-        this(x, y, 60, 40, 20, null, null);
+    public GameSession(SlakeoverflowServer server, int x, int y) {
+        this(server, x, y, 60, 40, 20, null, null);
     }
 
-    public GameSession(int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
+    public GameSession(SlakeoverflowServer server, int x, int y, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
+        this.server = server;
+
         this.snakeList = new ArrayList<>();
         this.itemList = new ArrayList<>();
 
@@ -43,7 +47,7 @@ public class GameSession {
 
         if (snakeDataList != null) {
             for (SnakeData snakeData : snakeDataList) {
-                this.snakeList.add(new Snake(snakeData.getConnection(), snakeData.getPosx(), snakeData.getPosy(), snakeData.getFacing(), snakeData.getBodyPositions(), this));
+                this.snakeList.add(new Snake(this, snakeData.getConnection(), snakeData.getPosx(), snakeData.getPosy(), snakeData.getFacing(), snakeData.getBodyPositions()));
             }
         }
         if (itemList != null) {
@@ -53,7 +57,7 @@ public class GameSession {
 
     // TICK
     public void tick() {
-        if (SlakeoverflowServer.getServer().getGameSession() == this) {
+        if (this.server.getGameSession() == this) {
             // CHECK IF SNAKE IS ALIVE
             this.checkSnakes();
 
@@ -98,13 +102,13 @@ public class GameSession {
             // TICK 3
             this.onTick3();
 
-            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSpectator()) {
+            if(this.server.getConfigManager().getConfig().isEnableSpectator()) {
                 if(this.nextSpectatorUpdate <= 0) {
-                    this.nextSpectatorUpdate = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSpectatorUpdateInterval();
+                    this.nextSpectatorUpdate = this.server.getConfigManager().getConfig().getSpectatorUpdateInterval();
 
                     String spectatorData = this.getSendableSpectatorData();
 
-                    for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+                    for(ServerConnection connection : this.server.getConnectionList()) {
                         if(connection.getAuthenticationState() == AuthenticationState.SPECTATOR) {
                             connection.sendUTF(spectatorData);
                         }
@@ -147,7 +151,7 @@ public class GameSession {
 
             if (posX > -1 && posY > -1 && isFree(posX, posY)) {
                 synchronized (this.itemList) {
-                    this.itemList.add(new Food(posX, posY, new Random().nextInt(SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxFoodValue() - SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()) + SlakeoverflowServer.getServer().getConfigManager().getConfig().getMinFoodValue()));
+                    this.itemList.add(new Food(this, posX, posY, new Random().nextInt(this.server.getConfigManager().getConfig().getMaxFoodValue() - this.server.getConfigManager().getConfig().getMinFoodValue()) + this.server.getConfigManager().getConfig().getMinFoodValue()));
                 }
             }
         }
@@ -163,7 +167,7 @@ public class GameSession {
     public void spawnSuperFoodAt(int value, int posX, int posY) {
         if (isFree(posX, posY)) {
             synchronized (this.itemList) {
-                this.itemList.add(new SuperFood(posX, posY, value));
+                this.itemList.add(new SuperFood(this, posX, posY, value));
             }
         }
     }
@@ -215,18 +219,18 @@ public class GameSession {
     }
 
     private void addNewSnakes() {
-        for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+        for (ServerConnection connection : this.server.getConnectionList()) {
             if (connection.isConnected() && connection.getAuthenticationState() == AuthenticationState.PLAYER && this.getSnakeOfConnection(connection) == null) {
                 int posX = this.randomPosX();
                 int posY = this.randomPosY();
 
-                int length = SlakeoverflowServer.getServer().getConfigManager().getConfig().getDefaultSnakeLength();
+                int length = this.server.getConfigManager().getConfig().getDefaultSnakeLength();
 
                 int count = 3;
                 boolean success = false;
                 while (count > 0) {
                     if (this.isAreaFree(posX, posY, length * 2)) {
-                        this.snakeList.add(new Snake(connection, posX, posY, Direction.NORTH, length, this));
+                        this.snakeList.add(new Snake(this, connection, posX, posY, Direction.NORTH, length));
                         count = 0;
                         success = true;
                         break;
@@ -731,7 +735,7 @@ public class GameSession {
 
         if (lowerBound >= upperBound) {
             // IllegalArgumentException e = new IllegalArgumentException("The upper bound is smaller than the lower bound");
-            // SlakeoverflowServer.getServer().getLogger().debug("RANDOM-INT-GENERATOR", "Exception: " + e);
+            // this.server.getLogger().debug("RANDOM-INT-GENERATOR", "Exception: " + e);
             upperBound = lowerBound;
         }
         return new Random().nextInt((upperBound - lowerBound) + 1) + lowerBound;
@@ -929,6 +933,10 @@ public class GameSession {
         savegame.put("items", items);
 
         return savegame;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 
     // EXTENDS

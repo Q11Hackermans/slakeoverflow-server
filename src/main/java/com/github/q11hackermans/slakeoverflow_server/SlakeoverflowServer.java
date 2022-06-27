@@ -77,13 +77,13 @@ public class SlakeoverflowServer {
         System.out.println(getASCIISignature());
 
         // CONSOLE
-        this.logger = new ConsoleLogger();
+        this.logger = new ConsoleLogger(this);
         this.logger.info("INIT", "Server init");
-        this.console = new ServerConsole(this.logger);
+        this.console = new ServerConsole(this, this.logger);
         this.console.start();
 
         // CONFIG
-        this.configManager = new ConfigManager(advancedConfigOptions, !defaultConfigValues);
+        this.configManager = new ConfigManager(this, advancedConfigOptions, !defaultConfigValues);
         if (!defaultConfigValues) {
             this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
             this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
@@ -95,13 +95,13 @@ public class SlakeoverflowServer {
 
         // CONNECTION MANAGER
         this.connectionhandler = new CMSServer(this.configManager.getConfig().getPort());
-        this.connectionhandler.addListener(new EventListener());
-        this.connectionhandler.addGlobalListener(new EventListener());
+        this.connectionhandler.addListener(new EventListener(this));
+        this.connectionhandler.addGlobalListener(new EventListener(this));
         this.dataIOManager = new DataIOManager(this.connectionhandler, DataIOType.UTF, DataIOStreamType.MULTI_STREAM_HANDLER_CONSUMING);
-        this.dataIOManager.addEventListener(new EventListener());
+        this.dataIOManager.addEventListener(new EventListener(this));
 
         // ACCOUNT SYSTEM
-        this.accountSystem = new AccountSystem();
+        this.accountSystem = new AccountSystem(this);
 
         // GAME SESSION
         this.gameState = GameState.STOPPED;
@@ -115,10 +115,10 @@ public class SlakeoverflowServer {
         this.ipBlacklist = new ArrayList<>();
 
         // CHAT SYSTEM
-        this.chatSystem = new ChatSystem();
+        this.chatSystem = new ChatSystem(this);
 
         // SHOP SYSTEM
-        this.shopManager = new ShopManager();
+        this.shopManager = new ShopManager(this);
 
         // MISC
         this.alreadyStopping = false;
@@ -245,7 +245,7 @@ public class SlakeoverflowServer {
     public boolean setupGame(boolean paused, int sizeX, int sizeY, int fovsizeX, int fovsizeY, int nextItemDespawn, List<SnakeData> snakeDataList, List<Item> itemList) {
         if (this.gameState == GameState.STOPPED && sizeX > 10 && sizeY > 10 && fovsizeX > 10 && fovsizeY > 10) {
             this.gameState = GameState.PREPARING;
-            this.game = new GameSession(sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
+            this.game = new GameSession(this, sizeX, sizeY, fovsizeX, fovsizeY, nextItemDespawn, snakeDataList, itemList);
 
             if (paused) {
                 this.gameState = GameState.PAUSED;
@@ -652,7 +652,7 @@ public class SlakeoverflowServer {
 
         for (CMSClient cmsClient : this.connectionhandler.getClientList()) {
             if (!this.containsConnection(cmsClient.getUniqueId())) {
-                this.connectionList.add(new ServerConnection(cmsClient.getUniqueId()));
+                this.connectionList.add(new ServerConnection(this, cmsClient.getUniqueId()));
             }
         }
 
@@ -666,7 +666,7 @@ public class SlakeoverflowServer {
             }
 
             if(connection.getAccountId() != -1) {
-                AccountData account = SlakeoverflowServer.getServer().accountSystem.getAccount(connection.getAccountId());
+                AccountData account = this.accountSystem.getAccount(connection.getAccountId());
 
                 if(account == null) {
                     connection.logout();
@@ -722,8 +722,8 @@ public class SlakeoverflowServer {
             AccountData account = connection.getAccount();
 
             boolean isBanned = connection.isBanned();
-            boolean isUserAuthentication = SlakeoverflowServer.getServer().getConfigManager().getConfig().isUserAuthentication();
-            boolean isAllowGuests = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuests();
+            boolean isUserAuthentication = this.getConfigManager().getConfig().isUserAuthentication();
+            boolean isAllowGuests = this.getConfigManager().getConfig().isAllowGuests();
             boolean isUser;
             boolean isAdmin;
             if(account != null) {
@@ -1036,6 +1036,13 @@ public class SlakeoverflowServer {
         new SlakeoverflowServer(advancedOptions, defaultConfigValues);
     }
 
+    /**
+     * This is a way to globally get the server instance.
+     * THIS IS NOT SUPPORTED ANYMORE!
+     * @return SlakeoverflowServer
+     * @deprecated DO NOT USE THIS ANYMORE!
+     */
+    @Deprecated
     public static SlakeoverflowServer getServer() {
         return server;
     }

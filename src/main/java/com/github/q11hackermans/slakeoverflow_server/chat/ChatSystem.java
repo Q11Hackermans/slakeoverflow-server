@@ -14,9 +14,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ChatSystem {
+
+    private final SlakeoverflowServer server;
     private final JSONArray log;
 
-    public ChatSystem() {
+    public ChatSystem(SlakeoverflowServer server) {
+        this.server = server;
         this.log = new JSONArray();
     }
 
@@ -45,7 +48,7 @@ public class ChatSystem {
     }
 
     public void sendAdminChat(String from, String message) {
-        for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+        for(ServerConnection connection : this.server.getConnectionList()) {
             if(connection.getAccount() != null && connection.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                 this.send("[AC] " + from + ": " + message, false, connection);
             }
@@ -72,7 +75,7 @@ public class ChatSystem {
         }
 
         this.addLogEntry(type, "@everyone", message);
-        for (ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+        for (ServerConnection connection : this.server.getConnectionList()) {
             connection.sendUTF(msg.toString());
         }
     }
@@ -105,8 +108,8 @@ public class ChatSystem {
 
     // RECEIVING
     public void onChatEventReceived(ServerConnection connection, JSONObject message) {
-        if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isVerboseChatLogs()) {
-            SlakeoverflowServer.getServer().getLogger().info("CHAT", "[VERBOSE] " + connection.getClientId() + ": " + message.toString());
+        if(this.server.getConfigManager().getConfig().isVerboseChatLogs()) {
+            this.server.getLogger().info("CHAT", "[VERBOSE] " + connection.getClientId() + ": " + message.toString());
         }
 
         if(message.has("msg")) {
@@ -116,14 +119,14 @@ public class ChatSystem {
 
                 String[] command = msg.replace("/", "").split(" ");
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
-                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[COMMAND] [SEND] " + connection.getClientId() + ": " + Arrays.toString(command));
+                if(this.server.getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
+                    this.server.getLogger().info("CHAT", "[COMMAND] [SEND] " + connection.getClientId() + ": " + Arrays.toString(command));
                 }
 
                 String result = this.chatCommand(connection, command);
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
-                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[COMMAND] [RESULT] " + connection.getClientId() + ": " + result);
+                if(this.server.getConfigManager().getConfig().isPrintChatCommandsToConsole()) {
+                    this.server.getLogger().info("CHAT", "[COMMAND] [RESULT] " + connection.getClientId() + ": " + result);
                 }
 
                 this.send(result, false, connection);
@@ -132,8 +135,8 @@ public class ChatSystem {
 
                 boolean chatEnabledCondition = this.getChatEnabledCondition(connection);
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isPrintChatToConsole()) {
-                    SlakeoverflowServer.getServer().getLogger().info("CHAT", "[PUBLIC] " + connection.getClientId() + "(message_sent= + " + chatEnabledCondition + "): " + msg);
+                if(this.server.getConfigManager().getConfig().isPrintChatToConsole()) {
+                    this.server.getLogger().info("CHAT", "[PUBLIC] " + connection.getClientId() + "(message_sent= + " + chatEnabledCondition + "): " + msg);
                 }
 
                 if(chatEnabledCondition) {
@@ -173,7 +176,7 @@ public class ChatSystem {
 
         if(cmd.length >= 1) {
 
-            if(cmd[0].equalsIgnoreCase("admin") && SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand()) {
+            if(cmd[0].equalsIgnoreCase("admin") && this.server.getConfigManager().getConfig().isEnableAdminCommand()) {
                 if(account != null) {
                     if(account.getPermissionLevel() == AccountPermissionLevel.ADMIN) {
 
@@ -185,27 +188,27 @@ public class ChatSystem {
                             }
 
                             if(cmd[1].equalsIgnoreCase("config")) {
-                                return ConsoleCommands.run(this.createCmdArray("config", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("config", args));
                             } else if(cmd[1].equalsIgnoreCase("connection")) {
-                                return ConsoleCommands.run(this.createCmdArray("connection", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("connection", args));
                             } else if(cmd[1].equalsIgnoreCase("user")) {
-                                return ConsoleCommands.run(this.createCmdArray("user", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("user", args));
                             } else if(cmd[1].equalsIgnoreCase("account")) {
-                                return ConsoleCommands.run(this.createCmdArray("account", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("account", args));
                             } else if(cmd[1].equalsIgnoreCase("blacklist")) {
-                                return ConsoleCommands.run(this.createCmdArray("blacklist", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("blacklist", args));
                             } else if(cmd[1].equalsIgnoreCase("game")) {
-                                return ConsoleCommands.run(this.createCmdArray("game", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("game", args));
                             } else if(cmd[1].equalsIgnoreCase("logger")) {
-                                return ConsoleCommands.run(this.createCmdArray("logger", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("logger", args));
                             } else if(cmd[1].equalsIgnoreCase("info")) {
-                                return ConsoleCommands.run(this.createCmdArray("info", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("info", args));
                             } else if(cmd[1].equalsIgnoreCase("stop")) {
-                                return ConsoleCommands.run(this.createCmdArray("stop", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("stop", args));
                             } else if(cmd[1].equalsIgnoreCase("help")) {
-                                return ConsoleCommands.run(this.createCmdArray("help", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("help", args));
                             } else if(cmd[1].equalsIgnoreCase("shop")) {
-                                return ConsoleCommands.run(this.createCmdArray("shop", args));
+                                return ConsoleCommands.run(this.server, this.createCmdArray("shop", args));
                             } else {
                                 return "Use /admin help for a list of commands";
                             }
@@ -228,10 +231,10 @@ public class ChatSystem {
                                 messageString = messageString + " " + cmd[i];
                             }
 
-                            AccountData receiver = SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[1]);
+                            AccountData receiver = this.server.getAccountSystem().getAccount(cmd[1]);
 
                             if(receiver != null) {
-                                List<ServerConnection> receiverConnections = SlakeoverflowServer.getServer().getConnectionsByAccountId(receiver.getId());
+                                List<ServerConnection> receiverConnections = this.server.getConnectionsByAccountId(receiver.getId());
 
                                 for(ServerConnection receiverConnection : receiverConnections) {
                                     if(receiverConnection != null) {
@@ -261,7 +264,7 @@ public class ChatSystem {
                 if(cmd.length >= 2) {
                     if(cmd[1].equalsIgnoreCase("login") && cmd.length == 4) {
                         if(account == null) {
-                            if(SlakeoverflowServer.getServer().loginConnection(commandExecutor.getClientId(), SlakeoverflowServer.getServer().getAccountSystem().getAccount(cmd[2]).getId(), cmd[3], false)) {
+                            if(this.server.loginConnection(commandExecutor.getClientId(), this.server.getAccountSystem().getAccount(cmd[2]).getId(), cmd[3], false)) {
                                 return "Login successful";
                             } else {
                                 return "Login failed";
@@ -271,7 +274,7 @@ public class ChatSystem {
                         }
                     } else if(cmd[1].equalsIgnoreCase("logout")) {
                         if(account != null) {
-                            if(SlakeoverflowServer.getServer().logoutConnection(commandExecutor.getClientId(), false)) {
+                            if(this.server.logoutConnection(commandExecutor.getClientId(), false)) {
                                 return "Logout successful";
                             } else {
                                 return "Logout failed";
@@ -304,13 +307,13 @@ public class ChatSystem {
                     } else if (cmd[1].equalsIgnoreCase("update") && cmd.length == 4) {
                         if(account != null) {
                             if(cmd[2].equalsIgnoreCase("username")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updateUsername(account.getId(), cmd[3])) {
+                                if(this.server.getAccountSystem().updateUsername(account.getId(), cmd[3])) {
                                     return "Updated username";
                                 } else {
                                     return "Username change failed";
                                 }
                             } else if(cmd[2].equalsIgnoreCase("password")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().updatePassword(account.getId(), cmd[3])) {
+                                if(this.server.getAccountSystem().updatePassword(account.getId(), cmd[3])) {
                                     return "Updated password";
                                 } else {
                                     return "Username change failed";
@@ -324,7 +327,7 @@ public class ChatSystem {
                     } else if(cmd[1].equalsIgnoreCase("delete")) {
                         if(account != null) {
                             if(cmd.length == 3 && cmd[2].equals("ISwearIKnowWhatImDoing")) {
-                                if(SlakeoverflowServer.getServer().getAccountSystem().deleteAccount(account.getId())) {
+                                if(this.server.getAccountSystem().deleteAccount(account.getId())) {
                                     commandExecutor.logout();
                                     return "Your account was deleted and you was logged out";
                                 } else {
@@ -348,7 +351,7 @@ public class ChatSystem {
                             "account delete\n";
                 }
             } else if (cmd[0].equalsIgnoreCase("togglefov")) {
-                Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(commandExecutor);
+                Snake snake = this.server.getGameSession().getSnakeOfConnection(commandExecutor);
                 if(snake != null) {
                     snake.setFixedFovPlayerdataSystem(!snake.isFixedFovPlayerdataSystem());
                     return "Toggled FOV mode";
@@ -362,7 +365,7 @@ public class ChatSystem {
                         "msg - send private messages\n" +
                         "togglefov - switch between FOV scrolling/fixed mode";
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount() != null && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
+                if(this.server.getConfigManager().getConfig().isEnableAdminCommand() && commandExecutor.getAccount() != null && commandExecutor.getAccount().getPermissionLevel() == AccountPermissionLevel.ADMIN) {
                     returnString = returnString + "admin - run any console commands via c";
                 }
 
@@ -403,7 +406,7 @@ public class ChatSystem {
     // SOCIALSPY
 
     public void sendSocialSpy(String sender, String receiver, String message) {
-        for(ServerConnection connection : SlakeoverflowServer.getServer().getConnectionList()) {
+        for(ServerConnection connection : this.server.getConnectionList()) {
             if(connection.isSocialSpy()) {
                 this.send("[SOCIALSPY] [" + sender + " --> " + receiver + "] " + message, false, connection);
             }
@@ -418,8 +421,8 @@ public class ChatSystem {
 
     private boolean getChatEnabledCondition(ServerConnection connection) {
         boolean isPunished = connection.isBanned() || connection.isMuted();
-        boolean chatEnabled = SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableChat();
-        boolean guestChat = SlakeoverflowServer.getServer().getConfigManager().getConfig().isAllowGuestChat();
+        boolean chatEnabled = this.server.getConfigManager().getConfig().isEnableChat();
+        boolean guestChat = this.server.getConfigManager().getConfig().isAllowGuestChat();
         AccountData account = connection.getAccount();
         boolean isAdmin = (account != null && (account.getPermissionLevel() == AccountPermissionLevel.MODERATOR || account.getPermissionLevel() == AccountPermissionLevel.ADMIN));
         boolean isUser = (account != null);
@@ -447,5 +450,9 @@ public class ChatSystem {
 
     public JSONArray getLog() {
         return this.log;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

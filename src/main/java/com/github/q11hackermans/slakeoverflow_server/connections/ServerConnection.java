@@ -11,14 +11,17 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class ServerConnection {
-    private UUID clientId;
+
+    private final SlakeoverflowServer server;
+    private final UUID clientId;
     private int authenticationState;
     private long accountId;
     private boolean muted;
     private boolean banned;
     private boolean socialSpy;
 
-    public ServerConnection(UUID clientId) {
+    public ServerConnection(SlakeoverflowServer server, UUID clientId) {
+        this.server = server;
         this.clientId = clientId;
         this.authenticationState = AuthenticationState.UNAUTHENTICATED;
         this.accountId = -1;
@@ -34,7 +37,7 @@ public class ServerConnection {
      */
     public void authenticateAsPlayer() {
         this.authenticationState = AuthenticationState.PLAYER;
-        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as player");
+        this.server.getLogger().info("USERS", "Connection " + this.clientId + " authenticated as player");
     }
 
     /**
@@ -42,7 +45,7 @@ public class ServerConnection {
      */
     public void authenticateAsSpectator() {
         this.authenticationState = AuthenticationState.SPECTATOR;
-        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " authenticated as spectator");
+        this.server.getLogger().info("USERS", "Connection " + this.clientId + " authenticated as spectator");
     }
 
     /**
@@ -50,7 +53,7 @@ public class ServerConnection {
      */
     public void unauthenticate() {
         this.authenticationState = AuthenticationState.UNAUTHENTICATED;
-        SlakeoverflowServer.getServer().getLogger().info("USERS", "Connection " + this.clientId + " unauthenticated");
+        this.server.getLogger().info("USERS", "Connection " + this.clientId + " unauthenticated");
     }
 
     // ACCOUNT SYSTEM
@@ -69,7 +72,7 @@ public class ServerConnection {
 
     // CONNECTION
     public boolean isConnected() {
-        return SlakeoverflowServer.getServer().getConnectionList().contains(this);
+        return this.server.getConnectionList().contains(this);
     }
 
     // PUNISHMENTS
@@ -116,7 +119,7 @@ public class ServerConnection {
      * @return CMSClient (if available) or null (if not available or an error occurs
      */
     public CMSClient getClient() {
-        return SlakeoverflowServer.getServer().getConnectionhandler().getClientById(this.clientId);
+        return this.server.getConnectionhandler().getClientById(this.clientId);
     }
 
     /**
@@ -125,7 +128,7 @@ public class ServerConnection {
      * @return DataIOStreamHandler (if available) or null (if not available or an error occurs
      */
     public DataIOStreamHandler getDataIOStreamHandler() {
-        return SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(this.clientId);
+        return this.server.getDataIOManager().getHandlerByClientUUID(this.clientId);
     }
 
     /**
@@ -133,7 +136,7 @@ public class ServerConnection {
      * @return AccountData
      */
     public AccountData getAccount() {
-        return SlakeoverflowServer.getServer().getAccountSystem().getAccount(this.accountId);
+        return this.server.getAccountSystem().getAccount(this.accountId);
     }
 
     /**
@@ -205,6 +208,10 @@ public class ServerConnection {
         }
     }
 
+    public SlakeoverflowServer getServer() {
+        return this.server;
+    }
+
     // SEND DATA
 
     /**
@@ -219,7 +226,7 @@ public class ServerConnection {
                 this.getDataIOStreamHandler().writeUTF(text);
                 return true;
             } catch (IOException e) {
-                SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Error while sending data to " + this.getClientId());
+                this.server.getLogger().warning("CONNECTION", "Error while sending data to " + this.getClientId());
                 this.getClient().close();
                 return false;
             }

@@ -11,8 +11,8 @@ import java.util.List;
 
 public class Snake implements GameObject {
     // MANAGEMENT
+    private final GameSession gameSession;
     private ServerConnection connection;
-    private GameSession gameSession;
     // MOVEMENT
     private int speed;
     private int posx;
@@ -30,7 +30,8 @@ public class Snake implements GameObject {
     private boolean hasMoved;
     private boolean fixedFovPlayerdataSystem;
 
-    public Snake(ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions, GameSession gameSession) {
+    public Snake(GameSession gameSession, ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions) {
+        this.gameSession = gameSession;
         this.connection = connection;
         this.bodyPositions = new ArrayList<>();
         this.posx = x;
@@ -38,7 +39,6 @@ public class Snake implements GameObject {
         this.facing = facing;
         this.newFacing = facing;
         this.newFacingUpdated = false;
-        this.gameSession = gameSession;
         this.alive = true;
         this.freezed = false;
         this.moveIn = 0;
@@ -52,8 +52,8 @@ public class Snake implements GameObject {
         }
     }
 
-    public Snake(ServerConnection connection, int x, int y, int facing, int length, GameSession session) {
-        this(connection, x, y, facing, null, session);
+    public Snake(GameSession gameSession, ServerConnection connection, int x, int y, int facing, int length) {
+        this(gameSession, connection, x, y, facing, null);
 
         // set start length body positions
         if (this.facing == Direction.NORTH) {
@@ -253,7 +253,7 @@ public class Snake implements GameObject {
 
                 this.moveIn = this.calcMoveIn();
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
+                if(this.getGameSession().getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
                     this.removeBody(1);
                 }
 
@@ -262,7 +262,7 @@ public class Snake implements GameObject {
                 this.hasMoved = true;
             } else {
 
-                if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
+                if(this.getGameSession().getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.fastMove) {
                     if((this.moveIn -= this.fastMoveMultiplier) >= 0) {
                         this.moveIn -= this.fastMoveMultiplier;
                     } else {
@@ -328,7 +328,7 @@ public class Snake implements GameObject {
             if (this.facing != Direction.SOUTH) {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy - 1);
                 if (newHeadField == this) {
-                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                    if(this.getGameSession().getServer().getConfigManager().getConfig().isEatOwnSnake()) {
                         int bodyId = this.getPosBodyID(this.posx, this.posy - 1);
                         while (bodyId < (bodyPositions.size() - 1)) {
                             bodyPositions.remove(bodyId);
@@ -359,7 +359,7 @@ public class Snake implements GameObject {
             if (this.facing != Direction.WEST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx + 1, this.posy);
                 if (newHeadField == this) {
-                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                    if(this.getGameSession().getServer().getConfigManager().getConfig().isEatOwnSnake()) {
                         int bodyId = this.getPosBodyID(this.posx + 1, this.posy);
                         while (bodyId < (bodyPositions.size() - 1)) {
                             bodyPositions.remove(bodyId);
@@ -390,7 +390,7 @@ public class Snake implements GameObject {
             if (this.facing != Direction.NORTH) {
                 GameObject newHeadField = this.gameSession.getField(this.posx, this.posy + 1);
                 if (newHeadField == this) {
-                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                    if(this.getGameSession().getServer().getConfigManager().getConfig().isEatOwnSnake()) {
                         int bodyId = this.getPosBodyID(this.posx, this.posy + 1);
                         while (bodyId < (bodyPositions.size() - 1)) {
                             bodyPositions.remove(bodyId);
@@ -421,7 +421,7 @@ public class Snake implements GameObject {
             if (this.facing != Direction.EAST) {
                 GameObject newHeadField = this.gameSession.getField(this.posx - 1, this.posy);
                 if (newHeadField == this) {
-                    if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEatOwnSnake()) {
+                    if(this.getGameSession().getServer().getConfigManager().getConfig().isEatOwnSnake()) {
                         int bodyId = this.getPosBodyID(this.posx - 1, this.posy);
                         while (bodyId < (bodyPositions.size() - 1)) {
                             bodyPositions.remove(bodyId);
@@ -503,14 +503,14 @@ public class Snake implements GameObject {
     }
 
     public int calcMoveIn() {
-        int speedModifierValue = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
-        int speedModifierBodycount = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
+        int speedModifierValue = this.getGameSession().getServer().getConfigManager().getConfig().getSnakeSpeedModifierValue();
+        int speedModifierBodycount = this.getGameSession().getServer().getConfigManager().getConfig().getSnakeSpeedModifierBodycount();
 
         if (speedModifierBodycount <= 0) {
             speedModifierBodycount = 1;
         }
 
-        int value = SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeSpeedBase();
+        int value = this.getGameSession().getServer().getConfigManager().getConfig().getSnakeSpeedBase();
         //for(int i = 0; i < (this.bodyPositions.size() / speedModifierBodycount); i++) {
         //    value = value + speedModifierValue;
         //}
@@ -530,17 +530,22 @@ public class Snake implements GameObject {
      * After killing the snake, it can't be used anymore.
      */
     public void killSnake() {
-        SlakeoverflowServer.getServer().getLogger().debug("GAME", "Killed snake " + gameSession.getSnakeId(this));
+        this.getGameSession().getServer().getLogger().debug("GAME", "Killed snake " + gameSession.getSnakeId(this));
 
         this.alive = false;
-        this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * SlakeoverflowServer.getServer().getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier())), this.posx, this.posy);
+        this.gameSession.spawnSuperFoodAt((int) Math.round((this.bodyPositions.size() * this.getGameSession().getServer().getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier())), this.posx, this.posy);
 
-        if (this.connection != null && this.connection.getAuthenticationState() == AuthenticationState.PLAYER && SlakeoverflowServer.getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
+        if (this.connection != null && this.connection.getAuthenticationState() == AuthenticationState.PLAYER && this.getGameSession().getServer().getConfigManager().getConfig().isUnauthenticatePlayerOnDeath()) {
             this.connection.unauthenticate();
         }
     }
 
     public boolean isAlive() {
         return this.alive;
+    }
+
+    @Override
+    public GameSession getGameSession() {
+        return this.gameSession;
     }
 }

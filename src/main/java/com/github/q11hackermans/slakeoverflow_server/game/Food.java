@@ -1,10 +1,12 @@
 package com.github.q11hackermans.slakeoverflow_server.game;
 
+import com.github.q11hackermans.slakeoverflow_server.GameSession;
+
 public class Food extends Item {
     private final int foodValue;
 
-    public Food(int posx, int posy, int foodValue) {
-        super(posx, posy);
+    public Food(GameSession gameSession, int posx, int posy, int foodValue) {
+        super(gameSession, posx, posy);
         this.foodValue = foodValue;
     }
 

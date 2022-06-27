@@ -7,10 +7,13 @@ import org.json.JSONObject;
 import java.io.*;
 
 public class ConfigManager {
+
+    private final SlakeoverflowServer server;
     private final File configFile;
     private final ServerConfig config;
 
-    public ConfigManager(boolean advancedOptionsEnabled, boolean loadConfigFile) {
+    public ConfigManager(SlakeoverflowServer server, boolean advancedOptionsEnabled, boolean loadConfigFile) {
+        this.server = server;
         this.config = new ServerConfig(advancedOptionsEnabled);
         this.configFile = new File(System.getProperty("user.dir"), "config.json");
 
@@ -84,17 +87,17 @@ public class ConfigManager {
                     this.config.setCustomServerTickrate(advancedSettings.getInt("advanced_custom_server_tickrate"));
                     this.config.setCustomServerTickrateIdle(advancedSettings.getInt("advanced_custom_server_tickrate_idle"));
 
-                    SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config loaded");
+                    this.server.getLogger().info("CONFIG", "Config loaded");
                 } catch (JSONException e) {
-                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file structure corrupt");
+                    this.server.getLogger().warning("CONFIG", "Config file structure corrupt");
                     this.recreateConfig();
                 } catch (IllegalArgumentException e) {
-                    SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Config file values corrupt");
+                    this.server.getLogger().warning("CONFIG", "Config file values corrupt");
                     this.recreateConfig();
                 }
             }
         } catch (IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
+            this.server.getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json.");
         }
     }
 
@@ -158,14 +161,18 @@ public class ConfigManager {
                 writer.flush();
                 writer.close();
 
-                SlakeoverflowServer.getServer().getLogger().info("CONFIG", "Config created");
+                this.server.getLogger().info("CONFIG", "Config created");
             }
         } catch (IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
+            this.server.getLogger().warning("CONFIG", "Configuration error. Please check r/w permission for ./config.json. Stopping server.");
         }
     }
 
     public ServerConfig getConfig() {
         return this.config;
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

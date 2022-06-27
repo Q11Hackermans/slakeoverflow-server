@@ -4,15 +4,18 @@ import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 
 public abstract class Item implements GameObject {
+
+    private final GameSession gameSession;
     private int posx;
     private int posy;
     private int despawnTime; // IN SECONDS
 
-    public Item(int posx, int posy) {
-        this(posx, posy, SlakeoverflowServer.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime());
+    public Item(GameSession gameSession, int posx, int posy) {
+        this(gameSession, posx, posy, gameSession.getServer().getConfigManager().getConfig().getItemDefaultDespawnTime());
     }
 
-    public Item(int posx, int posy, int despawnTime) {
+    public Item(GameSession gameSession, int posx, int posy, int despawnTime) {
+        this.gameSession = gameSession;
         this.posx = posx;
         this.posy = posy;
         this.despawnTime = despawnTime;
@@ -41,7 +44,7 @@ public abstract class Item implements GameObject {
      * @throws IllegalArgumentException if the position is outside of the worldborder
      */
     public void setPosition(int x, int y) {
-        GameSession gameSession = SlakeoverflowServer.getServer().getGameSession();
+        GameSession gameSession = this.getGameSession().getServer().getGameSession();
         if (gameSession != null) {
             if (x >= 0 && x < gameSession.getBorder()[0] && y >= 0 && y < gameSession.getBorder()[1]) {
                 this.posx = x;
@@ -71,4 +74,9 @@ public abstract class Item implements GameObject {
     }
 
     public abstract String getDescription();
+
+    @Override
+    public GameSession getGameSession() {
+        return this.gameSession;
+    }
 }

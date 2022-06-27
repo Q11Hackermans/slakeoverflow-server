@@ -31,20 +31,26 @@ import java.util.concurrent.TimeUnit;
 
 public class EventListener extends CMListenerAdapter {
 
+    private final SlakeoverflowServer server;
+
+    public EventListener(SlakeoverflowServer server) {
+        this.server = server;
+    }
+
     // SERVER EVENTS
     @Override
     public void onServerConnectionAttempt(CMSServerConnectionAttemptEvent event) {
-        if ((!SlakeoverflowServer.getServer().getIpBlacklist().contains(event.getClient().getSocket().getInetAddress()))) {
-            if(SlakeoverflowServer.getServer().getConnectionCount() < SlakeoverflowServer.getServer().getConfigManager().getConfig().getMaxConnections()) {
-                if (SlakeoverflowServer.getServer().getConfigManager().getConfig().isAutoConnectionAccept()) {
+        if ((!this.server.getIpBlacklist().contains(event.getClient().getSocket().getInetAddress()))) {
+            if(this.server.getConnectionCount() < this.server.getConfigManager().getConfig().getMaxConnections()) {
+                if (this.server.getConfigManager().getConfig().isAutoConnectionAccept()) {
                     event.getClient().setState(PendingClientState.ACCEPTED);
                 } else {
                     event.getClient().setTime(10000);
-                    SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (10 seconds to accept)");
+                    this.server.getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (10 seconds to accept)");
                 }
             } else {
                 event.getClient().setTime(5000);
-                SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (Server full, 5 seconds to accept)");
+                this.server.getLogger().info("CONNECTION", "Connection request from " + event.getClient().getSocket().getInetAddress() + " (" + event.getUuid() + ") (Server full, 5 seconds to accept)");
             }
         } else {
             event.getClient().setState(PendingClientState.DENIED);
@@ -53,12 +59,12 @@ public class EventListener extends CMListenerAdapter {
 
     @Override
     public void onServerConnectionAccept(CMSServerConnectionAcceptedEvent event) {
-        SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection " + event.getClient().getUniqueId() + " (" + event.getClient().getIP() + ") accepted");
+        this.server.getLogger().info("CONNECTION", "Connection " + event.getClient().getUniqueId() + " (" + event.getClient().getIP() + ") accepted");
     }
 
     @Override
     public void onServerConnectionRefused(CMSServerConnectionRefusedEvent event) {
-        SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Connection " + event.getUuid() + " (" + event.getClient().getSocket().getInetAddress() + ") refused");
+        this.server.getLogger().info("CONNECTION", "Connection " + event.getUuid() + " (" + event.getClient().getSocket().getInetAddress() + ") refused");
     }
 
     // CLIENT EVENTS
@@ -69,7 +75,7 @@ public class EventListener extends CMListenerAdapter {
         cmsClient.getInputStream().setStreamByteLimit(10000000);
 
         int count = 3;
-        while ((SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
+        while ((this.server.getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId()) == null)) {
             try {
                 TimeUnit.SECONDS.sleep(1000);
             } catch (InterruptedException ignored) {
@@ -84,11 +90,11 @@ public class EventListener extends CMListenerAdapter {
         JSONObject readyMessage = new JSONObject();
         readyMessage.put("cmd", "server_ready");
 
-        DataIOStreamHandler dataIOStreamHandler = SlakeoverflowServer.getServer().getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId());
+        DataIOStreamHandler dataIOStreamHandler = this.server.getDataIOManager().getHandlerByClientUUID(cmsClient.getUniqueId());
         try {
             dataIOStreamHandler.writeUTF(readyMessage.toString());
         } catch (IOException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Error while sending data to " + cmsClient.getUniqueId());
+            this.server.getLogger().warning("CONNECTION", "Error while sending data to " + cmsClient.getUniqueId());
             cmsClient.close();
         }
     }
@@ -97,7 +103,7 @@ public class EventListener extends CMListenerAdapter {
     public void onClientClosed(CMClientClosedEvent event) {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
-        SlakeoverflowServer.getServer().getLogger().info("CONNECTION", "Client " + cmsClient.getUniqueId() + " (" + cmsClient.getIP() + ") disconnected with reason " + event.getReason());
+        this.server.getLogger().info("CONNECTION", "Client " + cmsClient.getUniqueId() + " (" + cmsClient.getIP() + ") disconnected with reason " + event.getReason());
     }
 
     @Override
@@ -105,9 +111,9 @@ public class EventListener extends CMListenerAdapter {
         CMSClient cmsClient = (CMSClient) event.getClient();
 
         if (event.getStream() instanceof CMTimedInputStream) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
+            this.server.getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
         } else if (event.getStream() instanceof CMConsumingInputStream) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
+            this.server.getLogger().warning("CONNECTION", "InputStream byte limit ( + " + ((CMTimedInputStream) event.getStream()).getStreamByteLimit() + " bytes) of " + cmsClient.getUniqueId() + " was reached. Errors with communication may occur.");
         }
     }
 
@@ -120,18 +126,18 @@ public class EventListener extends CMListenerAdapter {
             JSONObject data = new JSONObject(event.getData());
 
             if (data.has("cmd")) {
-                ServerConnection connection = SlakeoverflowServer.getServer().getConnectionByUUID(cmsClient.getUniqueId());
+                ServerConnection connection = this.server.getConnectionByUUID(cmsClient.getUniqueId());
 
                 if(connection != null) {
                     switch (data.getString("cmd")) {
                         case "auth":
                             if (data.has("type")) {
                                 if (data.getInt("type") == AuthenticationState.PLAYER) {
-                                    SlakeoverflowServer.getServer().authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
+                                    this.server.authenticateConnectionAsPlayer(cmsClient.getUniqueId(), false);
                                 } else if (data.getInt("type") == AuthenticationState.SPECTATOR) {
-                                    SlakeoverflowServer.getServer().authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
+                                    this.server.authenticateConnectionAsSpectator(cmsClient.getUniqueId(), false);
                                 } else {
-                                    SlakeoverflowServer.getServer().unauthenticateConnection(cmsClient.getUniqueId(), false);
+                                    this.server.unauthenticateConnection(cmsClient.getUniqueId(), false);
                                 }
                             }
 
@@ -139,10 +145,10 @@ public class EventListener extends CMListenerAdapter {
                         case "login":
                         {
                             if(data.has("username") && data.has("password")) {
-                                AccountData account = SlakeoverflowServer.getServer().getAccountSystem().getAccount(data.getString("username"));
+                                AccountData account = this.server.getAccountSystem().getAccount(data.getString("username"));
 
                                 if(account != null) {
-                                    SlakeoverflowServer.getServer().loginConnection(cmsClient.getUniqueId(), account.getId(), data.getString("password"), false);
+                                    this.server.loginConnection(cmsClient.getUniqueId(), account.getId(), data.getString("password"), false);
                                 }
                             }
 
@@ -150,31 +156,31 @@ public class EventListener extends CMListenerAdapter {
                         }
                         case "logout":
                         {
-                            SlakeoverflowServer.getServer().logoutConnection(cmsClient.getUniqueId(), false);
+                            this.server.logoutConnection(cmsClient.getUniqueId(), false);
 
                             break;
                         }
                         case "register":
                         {
                             if(data.has("username") && data.has("password")) {
-                                SlakeoverflowServer.getServer().registerAccount(cmsClient.getUniqueId(), data.getString("username"), data.getString("password"), false);
+                                this.server.registerAccount(cmsClient.getUniqueId(), data.getString("username"), data.getString("password"), false);
                             }
 
                             break;
                         }
                         case "game_direction_change":
-                            if (SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                            if (this.server.getGameState() == GameState.RUNNING && this.server.getGameSession() != null) {
                                 if (data.has("direction")) {
                                     try {
                                         int sendDirection = data.getInt("direction");
 
                                         if (connection.getAuthenticationState() == AuthenticationState.PLAYER) {
-                                            Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
+                                            Snake snake = this.server.getGameSession().getSnakeOfConnection(connection);
 
                                             if (snake != null) {
 
                                                 if (Direction.isValid(sendDirection)) {
-                                                    SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "received snake[" + SlakeoverflowServer.getServer().getGameSession().getSnakeId(SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection)) + "] direction change to: " + Direction.toString(sendDirection));
+                                                    this.server.getLogger().debug("EVENTLISTENER", "received snake[" + this.server.getGameSession().getSnakeId(this.server.getGameSession().getSnakeOfConnection(connection)) + "] direction change to: " + Direction.toString(sendDirection));
                                                     snake.setNewFacing(sendDirection, true);
                                                 }
                                             }
@@ -186,13 +192,13 @@ public class EventListener extends CMListenerAdapter {
 
                             break;
                         case "game_snake_speed_boost":
-                            if(SlakeoverflowServer.getServer().getConfigManager().getConfig().isEnableSnakeSpeedBoost() && SlakeoverflowServer.getServer().getGameState() == GameState.RUNNING && SlakeoverflowServer.getServer().getGameSession() != null) {
+                            if(this.server.getConfigManager().getConfig().isEnableSnakeSpeedBoost() && this.server.getGameState() == GameState.RUNNING && this.server.getGameSession() != null) {
 
                                 if(connection.getAuthenticationState() == AuthenticationState.PLAYER) {
-                                    Snake snake = SlakeoverflowServer.getServer().getGameSession().getSnakeOfConnection(connection);
+                                    Snake snake = this.server.getGameSession().getSnakeOfConnection(connection);
 
                                     if(snake != null) {
-                                        SlakeoverflowServer.getServer().getLogger().debug("EVENTLISTENER", "Received snake speed boost request");
+                                        this.server.getLogger().debug("EVENTLISTENER", "Received snake speed boost request");
                                         snake.fastMove();
                                     }
                                 }
@@ -230,7 +236,7 @@ public class EventListener extends CMListenerAdapter {
                         }
                         case "get_server_info":
                         {
-                            ServerConfig config = SlakeoverflowServer.getServer().getConfigManager().getConfig();
+                            ServerConfig config = this.server.getConfigManager().getConfig();
 
                             JSONObject response = new JSONObject();
 
@@ -261,19 +267,19 @@ public class EventListener extends CMListenerAdapter {
                             response.put("game_settings", gameSettings);
 
                             JSONObject advancedSettings = new JSONObject();
-                            advancedSettings.put("server_tickrate", SlakeoverflowServer.getServer().getTickSpeed());
-                            advancedSettings.put("server_idle_tickrate", SlakeoverflowServer.getServer().getIdleTickSpeed());
+                            advancedSettings.put("server_tickrate", this.server.getTickSpeed());
+                            advancedSettings.put("server_idle_tickrate", this.server.getIdleTickSpeed());
                             response.put("advanced_settings", advancedSettings);
 
                             JSONObject serverStats = new JSONObject();
-                            advancedSettings.put("tickrate", SlakeoverflowServer.getServer().getTickRate());
-                            advancedSettings.put("connection_count", SlakeoverflowServer.getServer().getConnectionCount());
-                            advancedSettings.put("player_count", SlakeoverflowServer.getServer().getPlayerCount());
-                            advancedSettings.put("spectator_count", SlakeoverflowServer.getServer().getSpectatorCount());
+                            advancedSettings.put("tickrate", this.server.getTickRate());
+                            advancedSettings.put("connection_count", this.server.getConnectionCount());
+                            advancedSettings.put("player_count", this.server.getPlayerCount());
+                            advancedSettings.put("spectator_count", this.server.getSpectatorCount());
                             response.put("server_stats", serverStats);
 
                             JSONObject shopItems = new JSONObject();
-                            Map<Integer, ShopItem> shopItemMap = SlakeoverflowServer.getServer().getShopManager().getShopItems();
+                            Map<Integer, ShopItem> shopItemMap = this.server.getShopManager().getShopItems();
                             for(int id : shopItemMap.keySet()) {
                                 ShopItem shopItem = shopItemMap.get(id);
 
@@ -292,7 +298,7 @@ public class EventListener extends CMListenerAdapter {
                         }
                         case "chat":
                         {
-                            SlakeoverflowServer.getServer().getChatSystem().onChatEventReceived(connection, data);
+                            this.server.getChatSystem().onChatEventReceived(connection, data);
 
                             break;
                         }
@@ -301,7 +307,7 @@ public class EventListener extends CMListenerAdapter {
                             AccountData account = connection.getAccount();
 
                             if(account != null && data.has("item")) {
-                                if(SlakeoverflowServer.getServer().getShopManager().purchaseItem(account.getId(), data.getInt("item"))) {
+                                if(this.server.getShopManager().purchaseItem(account.getId(), data.getInt("item"))) {
                                     JSONObject successMessage = new JSONObject();
                                     successMessage.put("cmd", "shop_purchase_success");
                                     successMessage.put("item", data.getInt("item"));
@@ -319,8 +325,12 @@ public class EventListener extends CMListenerAdapter {
                 }
             }
         } catch (JSONException e) {
-            SlakeoverflowServer.getServer().getLogger().warning("CONNECTION", "Received wrong package format from " + cmsClient.getUniqueId());
+            this.server.getLogger().warning("CONNECTION", "Received wrong package format from " + cmsClient.getUniqueId());
             cmsClient.close();
         }
+    }
+
+    public SlakeoverflowServer getServer() {
+        return this.server;
     }
 }

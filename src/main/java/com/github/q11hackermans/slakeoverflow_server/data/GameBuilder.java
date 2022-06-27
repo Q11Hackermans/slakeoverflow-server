@@ -1,6 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.data;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
+import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
 
 import java.util.ArrayList;
@@ -92,7 +93,8 @@ public class GameBuilder {
     // BUILD
 
     public GameSession build() {
-        return new GameSession(this.borderX, this.borderY, this.fovsizeX, this.fovsizeY, this.nextItemDespawn, this.snakes, this.items);
+        //return new GameSession(this.borderX, this.borderY, this.fovsizeX, this.fovsizeY, this.nextItemDespawn, this.snakes, this.items);
+        return null;
     }
 
     // GET LISTS
