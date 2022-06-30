@@ -77,7 +77,7 @@ public class GameSession {
             for (Snake snake : this.snakeList) {
                 if (snake.getConnection() != null) {
                     if(snake.isFixedFovPlayerdataSystem()) {
-                        snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFOV(snake));
+                        snake.getConnection().sendUTF(this.getSendablePlayerdataFixedFov2(snake));
                     } else {
                         snake.getConnection().sendUTF(this.getSendablePlayerData(snake, true));
                     }
@@ -474,14 +474,14 @@ public class GameSession {
                 /*
                 If the distance between the snake and the start of the current fov is higher than the distance between the snake and the end of the before fov, use the current fov
                  */
-                if((snake.getPosX() - fovPos1) <= (fovPos2 - snake.getPosX())) {
+                if((snake.getPosX() - fovPos1) <= (transitionFovBeforePos1 - snake.getPosX())) {
 
                     fovX = i - 1;
                     snakeFovPos1X = transitionFovBeforePos1;
                     snakeFovPos2X = transitionFovBeforePos2;
                     break;
 
-                } else if((snake.getPosX() - fovPos1) > (fovPos2 - snake.getPosX())) {
+                } else if((snake.getPosX() - fovPos1) > (transitionFovBeforePos1 - snake.getPosX())) {
 
                     fovX = i;
                     snakeFovPos1X = fovPos1;
@@ -537,14 +537,14 @@ public class GameSession {
                 /*
                 If the distance between the snake and the start of the current fov is higher than the distance between the snake and the end of the before fov, use the current fov
                  */
-                if((snake.getPosY() - fovPos1) <= (fovPos2 - snake.getPosY())) {
+                if((snake.getPosY() - fovPos1) <= (transitionFovBeforePos1 - snake.getPosY())) {
 
                     fovY = i - 1;
                     snakeFovPos1Y = transitionFovBeforePos1;
                     snakeFovPos2Y = transitionFovBeforePos2;
                     break;
 
-                } else if((snake.getPosY() - fovPos1) > (fovPos2 - snake.getPosY())) {
+                } else if((snake.getPosY() - fovPos1) > (transitionFovBeforePos1 - snake.getPosY())) {
 
                     fovY = i;
                     snakeFovPos1Y = fovPos1;
