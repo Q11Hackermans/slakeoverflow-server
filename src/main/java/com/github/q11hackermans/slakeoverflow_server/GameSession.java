@@ -442,6 +442,127 @@ public class GameSession {
         return playerData.toString();
     }
 
+    private String getSendablePlayerdataFixedFov2(Snake snake) {
+        JSONObject playerData = new JSONObject();
+        playerData.put("cmd", "playerdata");
+        playerData.put("fovx", this.fovsizeX);
+        playerData.put("fovy", this.fovsizeY);
+
+        int fovCountX = (this.borderX / this.fovsizeX + 1) * 2;
+        int fovCountY = (this.borderY / this.fovsizeY + 1) * 2;
+
+        int fovX = -1;
+        int snakeFovPos1X = -1;
+        int snakeFovPos2X = -1;
+
+        for(int i = 0; i < fovCountX; i++) {
+            int fovPos1 = (this.fovsizeX / 2) * i;
+            int fovPos2 = fovPos1 + this.fovsizeX;
+
+            int transitionFovBeforePos1 = fovPos1 - (this.fovsizeX / 2);
+            int transitionFovBeforePos2 = transitionFovBeforePos1 + this.fovsizeX;
+
+            int transitionFovAfterPos1 = fovPos1 + (this.fovsizeX / 2);
+            int transitionFovAfterPos2 = transitionFovAfterPos1 + this.fovsizeX;
+
+            boolean fovCondition = (snake.getPosX() >= fovPos1 && snake.getPosX() < fovPos2);
+            boolean transitionFovConditionBefore = (snake.getPosX() >= transitionFovBeforePos1 && snake.getPosX() < transitionFovBeforePos2);
+            boolean transitionFovConditionAfter = (snake.getPosX() >= transitionFovAfterPos1 && snake.getPosX() < transitionFovAfterPos2);
+
+            if(fovCondition && transitionFovConditionBefore && !transitionFovConditionAfter) {
+
+                /*
+                If the distance between the snake and the start of the current fov is higher than the distance between the snake and the end of the before fov, use the current fov
+                 */
+                if((snake.getPosX() - fovPos1) <= (fovPos2 - snake.getPosX())) {
+
+                    fovX = i - 1;
+                    snakeFovPos1X = transitionFovBeforePos1;
+                    snakeFovPos2X = transitionFovBeforePos2;
+                    break;
+
+                } else if((snake.getPosX() - fovPos1) > (fovPos2 - snake.getPosX())) {
+
+                    fovX = i;
+                    snakeFovPos1X = fovPos1;
+                    snakeFovPos2X = fovPos2;
+                    break;
+
+                }
+            } else if(fovCondition && transitionFovConditionAfter && !transitionFovConditionBefore) {
+
+                if((snake.getPosX() - transitionFovAfterPos1) <= (fovPos2 - snake.getPosX())) {
+
+                    fovX = i;
+                    snakeFovPos1X = fovPos1;
+                    snakeFovPos2X = fovPos2;
+                    break;
+
+                } else if ((snake.getPosX() - transitionFovAfterPos1) > (fovPos2 - snake.getPosX())) {
+
+                    fovX = i + 1;
+                    snakeFovPos1X = transitionFovAfterPos1;
+                    snakeFovPos2X = transitionFovAfterPos2;
+                    break;
+
+                }
+
+            }
+        }
+
+        if(snakeFovPos1X < 0 || snakeFovPos2X < 0) {
+            return playerData.toString();
+        }
+
+        int fovY = -1;
+        int currentFovPos1Y = -1;
+        int currentFovPos2Y = -1;
+
+        for(int i = 0; i < fovCountY; i++) {
+            int fovPos1 = this.fovsizeY * i;
+            int fovPos2 = fovPos1 + this.fovsizeY;
+
+            if(snake.getPosY() >= fovPos1 && snake.getPosY() < fovPos2) {
+                fovY = i;
+                currentFovPos1Y = fovPos1;
+                currentFovPos2Y = fovPos2;
+                break;
+            }
+        }
+
+        if(currentFovPos1Y < 0 || currentFovPos2Y < 0) {
+            return playerData.toString();
+        }
+
+        int minY = currentFovPos1Y;
+        int maxY = currentFovPos2Y;
+
+        if(minY < 0) {
+            minY = 0;
+        }
+
+        if(maxY > this.borderY) {
+            maxY = this.borderY;
+        }
+
+        int minX = snakeFovPos1X;
+        int maxX = snakeFovPos2X;
+
+        if(minX < 0) {
+            minX = 0;
+        }
+
+        if(maxX > this.borderX) {
+            maxX = this.borderX;
+        }
+
+        playerData.put("fields", this.getFields(minY, maxY, minX, maxX, true, snake));
+        playerData.put("relative", true);
+        playerData.put("fixed_fov", true);
+
+        return playerData.toString();
+    }
+
     private JSONArray getFields(int minY, int maxY, int minX, int maxX, boolean relative, Snake snake) {
         JSONArray fields = new JSONArray();
 
