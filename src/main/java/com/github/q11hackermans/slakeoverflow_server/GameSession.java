@@ -515,27 +515,70 @@ public class GameSession {
         }
 
         int fovY = -1;
-        int currentFovPos1Y = -1;
-        int currentFovPos2Y = -1;
+        int snakeFovPos1Y = -1;
+        int snakeFovPos2Y = -1;
 
         for(int i = 0; i < fovCountY; i++) {
-            int fovPos1 = this.fovsizeY * i;
+            int fovPos1 = (this.fovsizeY / 2) * i;
             int fovPos2 = fovPos1 + this.fovsizeY;
 
-            if(snake.getPosY() >= fovPos1 && snake.getPosY() < fovPos2) {
-                fovY = i;
-                currentFovPos1Y = fovPos1;
-                currentFovPos2Y = fovPos2;
-                break;
+            int transitionFovBeforePos1 = fovPos1 - (this.fovsizeY / 2);
+            int transitionFovBeforePos2 = transitionFovBeforePos1 + this.fovsizeY;
+
+            int transitionFovAfterPos1 = fovPos1 + (this.fovsizeY / 2);
+            int transitionFovAfterPos2 = transitionFovAfterPos1 + this.fovsizeY;
+
+            boolean fovCondition = (snake.getPosY() >= fovPos1 && snake.getPosY() < fovPos2);
+            boolean transitionFovConditionBefore = (snake.getPosY() >= transitionFovBeforePos1 && snake.getPosY() < transitionFovBeforePos2);
+            boolean transitionFovConditionAfter = (snake.getPosY() >= transitionFovAfterPos1 && snake.getPosY() < transitionFovAfterPos2);
+
+            if(fovCondition && transitionFovConditionBefore && !transitionFovConditionAfter) {
+
+                /*
+                If the distance between the snake and the start of the current fov is higher than the distance between the snake and the end of the before fov, use the current fov
+                 */
+                if((snake.getPosY() - fovPos1) <= (fovPos2 - snake.getPosY())) {
+
+                    fovY = i - 1;
+                    snakeFovPos1Y = transitionFovBeforePos1;
+                    snakeFovPos2Y = transitionFovBeforePos2;
+                    break;
+
+                } else if((snake.getPosY() - fovPos1) > (fovPos2 - snake.getPosY())) {
+
+                    fovY = i;
+                    snakeFovPos1Y = fovPos1;
+                    snakeFovPos2Y = fovPos2;
+                    break;
+
+                }
+            } else if(fovCondition && transitionFovConditionAfter && !transitionFovConditionBefore) {
+
+                if((snake.getPosY() - transitionFovAfterPos1) <= (fovPos2 - snake.getPosY())) {
+
+                    fovY = i;
+                    snakeFovPos1Y = fovPos1;
+                    snakeFovPos2Y = fovPos2;
+                    break;
+
+                } else if ((snake.getPosY() - transitionFovAfterPos1) > (fovPos2 - snake.getPosY())) {
+
+                    fovY = i + 1;
+                    snakeFovPos1Y = transitionFovAfterPos1;
+                    snakeFovPos2Y = transitionFovAfterPos2;
+                    break;
+
+                }
+
             }
         }
 
-        if(currentFovPos1Y < 0 || currentFovPos2Y < 0) {
+        if(snakeFovPos1Y < 0 || snakeFovPos2Y < 0) {
             return playerData.toString();
         }
 
-        int minY = currentFovPos1Y;
-        int maxY = currentFovPos2Y;
+        int minY = snakeFovPos1Y;
+        int maxY = snakeFovPos2Y;
 
         if(minY < 0) {
             minY = 0;
