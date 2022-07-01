@@ -249,6 +249,8 @@ public class EventListener extends CMListenerAdapter {
                             serverSettings.put("allow_login", config.isAllowLogin());
                             serverSettings.put("also_disable_privileged_login", config.isAlsoDisablePrivilegedLogin());
                             serverSettings.put("allow_registration", config.isAllowRegistration());
+                            serverSettings.put("enable_chat", config.isEnableChat());
+                            serverSettings.put("allow_guest_chat", config.isAllowGuestChat());
                             response.put("server_settings", serverSettings);
 
                             JSONObject gameSettings = new JSONObject();
@@ -264,6 +266,9 @@ public class EventListener extends CMListenerAdapter {
                             gameSettings.put("item_superfood_despawn_time", config.getItemSuperFoodDespawnTime());
                             gameSettings.put("enable_spectator", config.isEnableSpectator());
                             gameSettings.put("spectator_update_interval", config.getSpectatorUpdateInterval());
+                            gameSettings.put("enable_snake_speed_boost", config.isEnableSnakeSpeedBoost());
+                            gameSettings.put("eat_own_snake", config.isEatOwnSnake());
+                            gameSettings.put("snake_death_superfood_multiplier", config.getSnakeDeathSuperfoodMultiplier());
                             response.put("game_settings", gameSettings);
 
                             JSONObject advancedSettings = new JSONObject();
