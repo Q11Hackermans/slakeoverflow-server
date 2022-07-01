@@ -114,6 +114,7 @@ Users/ServerConnections are managed by the `users` command with which you can do
 - Unauthenticate user (`user unauth <UUID>`)
 - Login user into an account (`user login <UUID> <accountID>`)
 - Logout user from an account (`user logout <UUID>`)
+- Mute/Ban users (user can reconnect) (`user kick/ban <UUID> true/false`)
 
 ##### User authentication states
 Users can be in 3 different states: UNAUTHENTICATED, PLAYER and SPECTATOR.
@@ -130,14 +131,16 @@ If user authentication is disabled, only the server can auth/unauth the user via
 
 ##### User accounts
 A user can log in into an account. The user stays logged in while the user is connected. The log in by user can be disabled in config via `allow_login` option.  
-Logins also can be set via console with the `user login/logout` command. The account system (user login/account) is independent from the authentication system (user authentication state).
+Logins also can be set via console with the `user login/logout` command. The account system (user login/account) is independent from the authentication system (user authentication state).  
+Accounts can be managed with the ``account`` command.
 
 #### Snakes
 If a game is running (not paused), all users which are in authentication state PLAYER will have their snake. In the snake, all data for this user for the current running game is saved. If a snake dies, it will get deleted. If `unauthenticate_player_on_death` is set to true, the player get unauthenticated automatically. Else the player remains in PLAYER auth state and will get a new snake automatically. The snakes can be managed by the `game modify snake` command (see game management).
 
 ## Config
 The configuration is used to configure the server.
-Config values can be set via the config.json file created on the first start of the server or via the config command in console.
+Config values can be set via the config.json file created on the first start of the server or via the config command in console.  
+The server has a config setup assistant which will trigger if no config file exists. It can be force-disabled via the ``-forceSkipSetupAssistant=true`` start argument.
 
 ### Server configuration options
 
@@ -204,6 +207,36 @@ If this option is disabled, the snake of this user will instantly respawn.
 Default: false
   
 If this option is enabled, the server will show optional debug messages.
+
+#### enable_chat
+Default: true
+  
+If this option is enabled, users can use the public chat.
+
+#### allow_guest_chat
+Default: false
+  
+If this option is enabled, users which are not logged in can also use the chat.
+
+#### enable_admin_command
+Default: false
+
+If this option is enabled, admins (PermissionLevel 2) can use the ``/admin`` command in chat to run any console command in chat.
+
+#### print_chat_to_console
+Default: true
+  
+If this option is enabled, public chat messages will be printed to console.
+
+#### print_chat_commands_to_console
+Default: true
+  
+If this option is enabled, chat commands runs will be printed to console. This includes the command input and output.
+
+#### verbose_chat_logs
+Default: false
+  
+If this option is enabled, every chat input/output will be printed in raw string format to console (not recommended).
 
 ### Game configuration options
 
