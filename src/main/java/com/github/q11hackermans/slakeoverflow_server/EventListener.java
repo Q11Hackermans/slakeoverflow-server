@@ -277,10 +277,10 @@ public class EventListener extends CMListenerAdapter {
                             response.put("advanced_settings", advancedSettings);
 
                             JSONObject serverStats = new JSONObject();
-                            advancedSettings.put("tickrate", this.server.getTickRate());
-                            advancedSettings.put("connection_count", this.server.getConnectionCount());
-                            advancedSettings.put("player_count", this.server.getPlayerCount());
-                            advancedSettings.put("spectator_count", this.server.getSpectatorCount());
+                            serverStats.put("tickrate", this.server.getTickRate());
+                            serverSettings.put("connection_count", this.server.getConnectionCount());
+                            serverSettings.put("player_count", this.server.getPlayerCount());
+                            serverSettings.put("spectator_count", this.server.getSpectatorCount());
                             response.put("server_stats", serverStats);
 
                             JSONObject shopItems = new JSONObject();
