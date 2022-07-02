@@ -647,10 +647,7 @@ public class SlakeoverflowServer {
      * Check if connections are logged in into an account that does not existsand log them out.
      */
     private void checkConnections() {
-        //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler() == null);
-        //this.connectionList.removeIf(serverConnection -> serverConnection.getDataIOStreamHandler().isClosed());
-        this.connectionList.removeIf(serverConnection -> serverConnection.getClient() == null);
-        this.connectionList.removeIf(serverConnection -> serverConnection.getClient().isClosed());
+        this.connectionList.removeIf(serverConnection -> (serverConnection.getClient() == null || serverConnection.getClient().isClosed()));
 
         for (CMSClient cmsClient : this.connectionhandler.getClientList()) {
             if (!this.containsConnection(cmsClient.getUniqueId())) {
