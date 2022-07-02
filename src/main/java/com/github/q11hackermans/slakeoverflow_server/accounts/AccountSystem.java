@@ -13,6 +13,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class AccountSystem {
 
@@ -41,6 +42,10 @@ public class AccountSystem {
         try {
 
             List<AccountData> accounts = this.getAccounts();
+
+            if(!this.isUsernameValid(username)) {
+                return -1;
+            }
 
             for(AccountData account : accounts) {
                 if(account.getUsername().equalsIgnoreCase(username)) {
@@ -114,6 +119,10 @@ public class AccountSystem {
         AccountData data = this.getAccount(id);
 
         List<AccountData> accounts = this.getAccounts();
+
+        if(!this.isUsernameValid(username)) {
+            return false;
+        }
 
         for(AccountData account : accounts) {
             if(account.getUsername().equalsIgnoreCase(username)) {
@@ -490,6 +499,10 @@ public class AccountSystem {
             return builder.toString();
         } catch(NoSuchAlgorithmException ignored) {}
         return "";
+    }
+
+    public boolean isUsernameValid(String username) {
+        return username.length() > 0 && username.length() < 16 && Pattern.compile("^[a-zA-Z0-9._-]", Pattern.CASE_INSENSITIVE).matcher(username).find();
     }
 
     public SlakeoverflowServer getServer() {
