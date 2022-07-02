@@ -275,6 +275,18 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("verbose_chat_logs")) {
                         server.getConfigManager().getConfig().setVerboseChatLogs(Boolean.parseBoolean(cmd[3]));
                         return "Updated value verbose_chat_logs to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("allow_login")) {
+                        server.getConfigManager().getConfig().setAllowLogin(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value allow_login to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("allow_registration")) {
+                        server.getConfigManager().getConfig().setAllowRegistration(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value allow_registration to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("allow_guests")) {
+                        server.getConfigManager().getConfig().setAllowGuests(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value allow_guests to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("also_disable_privileged_login")) {
+                        server.getConfigManager().getConfig().setAlsoDisablePrivilegedLogin(Boolean.parseBoolean(cmd[3]));
+                        return "Updated value also_disable_privileged_login to " + cmd[3];
                     } else {
                         return "Unknown config option";
                     }
