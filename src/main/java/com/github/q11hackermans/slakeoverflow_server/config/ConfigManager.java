@@ -81,6 +81,13 @@ public class ConfigManager {
                     this.config.setEnableSnakeSpeedBoost(gameSettings.getBoolean("enable_snake_speed_boost"));
                     this.config.setEatOwnSnake(gameSettings.getBoolean("eat_own_snake"));
                     this.config.setSnakeDeathSuperfoodMultiplier(gameSettings.getDouble("snake_death_superfood_multiplier"));
+                    this.config.setPlayingTimeCoinsRewardTime(gameSettings.getInt("playing_time_coins_reward_time"));
+                    this.config.setPlayingTimeCoinsRewardAmount(gameSettings.getInt("playing_time_coins_reward_amount"));
+                    this.config.setPlayingTimeCoinsRewardSnakeLengthIncrement(gameSettings.getInt("playing_time_coins_reward_snake_length_increment"));
+                    this.config.setFoodCoinsRewardAmount(gameSettings.getInt("food_coins_reward_amount"));
+                    this.config.setFoodCoinsRewardFoodValueIncrement(gameSettings.getInt("food_coins_reward_food_value_increment"));
+                    this.config.setSuperFoodCoinsRewardAmount(gameSettings.getInt("superfood_coins_reward_amount"));
+                    this.config.setSuperFoodCoinsRewardFoodValueIncrement(gameSettings.getInt("superfood_coins_reward_food_value_increment"));
 
                     JSONObject advancedSettings = config.getJSONObject("advanced_settings");
                     this.config.setOverrideServerTickrate(advancedSettings.getBoolean("advanced_override_server_tickrate"));
@@ -149,6 +156,13 @@ public class ConfigManager {
                 gameSettings.put("enable_snake_speed_boost", this.config.isEnableSnakeSpeedBoost());
                 gameSettings.put("eat_own_snake", this.config.isEatOwnSnake());
                 gameSettings.put("snake_death_superfood_multiplier", this.config.getSnakeDeathSuperfoodMultiplier());
+                gameSettings.put("playing_time_coins_reward_time", this.config.getPlayingTimeCoinsRewardTime());
+                gameSettings.put("playing_time_coins_reward_amount", this.config.getPlayingTimeCoinsRewardAmount());
+                gameSettings.put("playing_time_coins_reward_snake_length_increment", this.config.getPlayingTimeCoinsRewardSnakeLengthIncrement());
+                gameSettings.put("food_coins_reward_amount", this.config.getFoodCoinsRewardAmount());
+                gameSettings.put("food_coins_reward_food_value_increment", this.config.getFoodCoinsRewardFoodValueIncrement());
+                gameSettings.put("superfood_coins_reward_amount", this.config.getSuperFoodCoinsRewardAmount());
+                gameSettings.put("superfood_coins_reward_food_value_increment", this.config.getSuperFoodCoinsRewardFoodValueIncrement());
                 config.put("game_settings", gameSettings);
 
                 JSONObject advancedSettings = new JSONObject();

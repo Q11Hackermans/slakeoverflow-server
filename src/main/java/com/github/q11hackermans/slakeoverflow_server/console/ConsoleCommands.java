@@ -287,6 +287,55 @@ public class ConsoleCommands {
                     } else if (cmd[2].equalsIgnoreCase("also_disable_privileged_login")) {
                         server.getConfigManager().getConfig().setAlsoDisablePrivilegedLogin(Boolean.parseBoolean(cmd[3]));
                         return "Updated value also_disable_privileged_login to " + cmd[3];
+                    } else if (cmd[2].equalsIgnoreCase("playing_time_coins_reward_time")) {
+                        try {
+                            server.getConfigManager().getConfig().setPlayingTimeCoinsRewardTime(Integer.parseInt(cmd[3]));
+                            return "Updated value playing_time_coins_reward_time";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("playing_time_coins_reward_amount")) {
+                        try {
+                            server.getConfigManager().getConfig().setPlayingTimeCoinsRewardAmount(Integer.parseInt(cmd[3]));
+                            return "Updated value playing_time_coins_reward_amount";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("playing_time_coins_reward_snake_length_increment")) {
+                        try {
+                            server.getConfigManager().getConfig().setPlayingTimeCoinsRewardSnakeLengthIncrement(Integer.parseInt(cmd[3]));
+                            return "Updated value playing_time_coins_reward_snake_length_increment";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("food_coins_reward_amount")) {
+                        try {
+                            server.getConfigManager().getConfig().setFoodCoinsRewardAmount(Integer.parseInt(cmd[3]));
+                            return "Updated value food_coins_reward_amount";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("food_coins_reward_food_value_increment")) {
+                        try {
+                            server.getConfigManager().getConfig().setFoodCoinsRewardFoodValueIncrement(Integer.parseInt(cmd[3]));
+                            return "Updated value food_coins_reward_food_value_increment";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("superfood_coins_reward_amount")) {
+                        try {
+                            server.getConfigManager().getConfig().setSuperFoodCoinsRewardAmount(Integer.parseInt(cmd[3]));
+                            return "Updated value superfood_coins_reward_amount";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
+                    } else if (cmd[2].equalsIgnoreCase("superfood_coins_reward_food_value_increment")) {
+                        try {
+                            server.getConfigManager().getConfig().setSuperFoodCoinsRewardFoodValueIncrement(Integer.parseInt(cmd[3]));
+                            return "Updated value superfood_coins_reward_food_value_increment";
+                        } catch (IllegalArgumentException e) {
+                            return "You can only set a positive int value";
+                        }
                     } else {
                         return "Unknown config option";
                     }
@@ -368,6 +417,10 @@ public class ConsoleCommands {
                         "user_authentication: " + server.getConfigManager().getConfig().isUserAuthentication() + "\n" +
                         "unauthenticate_player_on_death: " + server.getConfigManager().getConfig().isUnauthenticatePlayerOnDeath() + "\n" +
                         "print_debug_messages: " + server.getConfigManager().getConfig().isPrintDebugMessages() + "\n" +
+                        "allow_login: " + server.getConfigManager().getConfig().isAllowLogin() + "\n" +
+                        "allow_registration: " + server.getConfigManager().getConfig().isAllowRegistration() + "\n" +
+                        "allow_guests: " + server.getConfigManager().getConfig().isAllowGuests() + "\n" +
+                        "also_disable_privileged_login: " + server.getConfigManager().getConfig().isAlsoDisablePrivilegedLogin() + "\n" +
                         "enable_chat: " + server.getConfigManager().getConfig().isEnableChat() + "\n" +
                         "allow_guest_chat: " + server.getConfigManager().getConfig().isAllowGuestChat() + "\n" +
                         "enable_admin_command: " + server.getConfigManager().getConfig().isEnableAdminCommand() + "\n" +
@@ -392,6 +445,13 @@ public class ConsoleCommands {
                         "enable_snake_speed_boost: " + server.getConfigManager().getConfig().isEnableSnakeSpeedBoost() + "\n" +
                         "eat_own_snake: " + server.getConfigManager().getConfig().isEatOwnSnake() + "\n" +
                         "snake_death_superfood_multiplier: " + server.getConfigManager().getConfig().getSnakeDeathSuperfoodMultiplier() + "\n" +
+                        "playing_time_coins_reward_time: " + server.getConfigManager().getConfig().getPlayingTimeCoinsRewardTime() + "\n" +
+                        "playing_time_coins_reward_amount: " + server.getConfigManager().getConfig().getPlayingTimeCoinsRewardAmount() + "\n" +
+                        "playing_time_coins_reward_snake_length_increment: " + server.getConfigManager().getConfig().getPlayingTimeCoinsRewardSnakeLengthIncrement() + "\n" +
+                        "food_coins_reward_amount: " + server.getConfigManager().getConfig().getFoodCoinsRewardAmount() + "\n" +
+                        "food_coins_reward_food_value_increment: " + server.getConfigManager().getConfig().getFoodCoinsRewardFoodValueIncrement() + "\n" +
+                        "superfood_coins_reward_amount: " + server.getConfigManager().getConfig().getSuperFoodCoinsRewardAmount() + "\n" +
+                        "superfood_coins_reward_food_value_increment: " + server.getConfigManager().getConfig().getSuperFoodCoinsRewardFoodValueIncrement() + "\n" +
                         "Advanced Settings:\n" +
                         "enable_advanced_options: " + server.getConfigManager().getConfig().isAdvancedOptionsEnabled() + "\n" +
                         "advanced_override_server_tickrate: " + server.getConfigManager().getConfig().isOverrideServerTickrate() + "\n" +

@@ -1271,6 +1271,13 @@ public class SlakeoverflowServer {
                         gameSettings.put("default_gamefield_size_y", 100);
                         gameSettings.put("enable_spectator", true);
                         gameSettings.put("spectator_update_interval", 200);
+                        gameSettings.put("playing_time_coins_reward_time", 0);
+                        gameSettings.put("playing_time_coins_reward_amount", 0);
+                        gameSettings.put("playing_time_coins_reward_snake_length_increment", 0);
+                        gameSettings.put("food_coins_reward_amount", 0);
+                        gameSettings.put("food_coins_reward_food_value_increment", 0);
+                        gameSettings.put("superfood_coins_reward_amount", 0);
+                        gameSettings.put("superfood_coins_reward_food_value_increment", 0);
 
                         if(inputString.equalsIgnoreCase("DEFAULT")) {
                             gameSettings.put("min_food_value", 1);

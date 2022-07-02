@@ -320,6 +320,16 @@ public class AccountSystem {
         return false;
     }
 
+    public synchronized boolean changeBalance(long id, int balance) {
+        AccountData account = this.getAccount(id);
+
+        if(account != null) {
+            return this.updateBalance(account.getId(), account.getBalance() + balance);
+        }
+
+        return false;
+    }
+
     /**
      * Update shop data of an account
      * @param id Account ID

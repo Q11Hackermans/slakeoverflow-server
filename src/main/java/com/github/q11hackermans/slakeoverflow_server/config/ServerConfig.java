@@ -39,6 +39,14 @@ public class ServerConfig {
     private boolean enableSnakeSpeedBoost;
     private boolean eatOwnSnake;
     private double snakeDeathSuperfoodMultiplier;
+    private int playingTimeCoinsRewardTime;
+    private int playingTimeCoinsRewardSnakeLengthIncrement;
+    private int playingTimeCoinsRewardAmount;
+    private int foodCoinsRewardAmount;
+    private int foodCoinsRewardFoodValueIncrement;
+    private int superFoodCoinsRewardAmount;
+    private int superFoodCoinsRewardFoodValueIncrement;
+
 
     // ADVANCED OPTIONS
     private final boolean advancedOptionsEnabled;
@@ -84,6 +92,13 @@ public class ServerConfig {
         this.enableSnakeSpeedBoost = true;
         this.eatOwnSnake = true;
         this.snakeDeathSuperfoodMultiplier = 0.3;
+        this.playingTimeCoinsRewardTime = 36000; // Half an hour with default tickrate
+        this.playingTimeCoinsRewardSnakeLengthIncrement = 1;
+        this.playingTimeCoinsRewardAmount = 10;
+        this.foodCoinsRewardAmount = 100;
+        this.foodCoinsRewardFoodValueIncrement = 1;
+        this.superFoodCoinsRewardAmount = 1000;
+        this.superFoodCoinsRewardFoodValueIncrement = 1;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
@@ -456,6 +471,62 @@ public class ServerConfig {
 
     public void setVerboseChatLogs(boolean verboseChatLogs) {
         this.verboseChatLogs = verboseChatLogs;
+    }
+
+    public int getPlayingTimeCoinsRewardTime() {
+        return playingTimeCoinsRewardTime;
+    }
+
+    public void setPlayingTimeCoinsRewardTime(int playingTimeCoinsRewardTime) {
+        this.playingTimeCoinsRewardTime = playingTimeCoinsRewardTime;
+    }
+
+    public int getPlayingTimeCoinsRewardSnakeLengthIncrement() {
+        return playingTimeCoinsRewardSnakeLengthIncrement;
+    }
+
+    public void setPlayingTimeCoinsRewardSnakeLengthIncrement(int playingTimeCoinsRewardSnakeLengthIncrement) {
+        this.playingTimeCoinsRewardSnakeLengthIncrement = playingTimeCoinsRewardSnakeLengthIncrement;
+    }
+
+    public int getPlayingTimeCoinsRewardAmount() {
+        return playingTimeCoinsRewardAmount;
+    }
+
+    public void setPlayingTimeCoinsRewardAmount(int playingTimeCoinsRewardAmount) {
+        this.playingTimeCoinsRewardAmount = playingTimeCoinsRewardAmount;
+    }
+
+    public int getFoodCoinsRewardAmount() {
+        return foodCoinsRewardAmount;
+    }
+
+    public void setFoodCoinsRewardAmount(int foodCoinsRewardAmount) {
+        this.foodCoinsRewardAmount = foodCoinsRewardAmount;
+    }
+
+    public int getSuperFoodCoinsRewardAmount() {
+        return superFoodCoinsRewardAmount;
+    }
+
+    public void setSuperFoodCoinsRewardAmount(int superFoodCoinsRewardAmount) {
+        this.superFoodCoinsRewardAmount = superFoodCoinsRewardAmount;
+    }
+
+    public int getFoodCoinsRewardFoodValueIncrement() {
+        return foodCoinsRewardFoodValueIncrement;
+    }
+
+    public void setFoodCoinsRewardFoodValueIncrement(int foodCoinsRewardFoodValueIncrement) {
+        this.foodCoinsRewardFoodValueIncrement = foodCoinsRewardFoodValueIncrement;
+    }
+
+    public int getSuperFoodCoinsRewardFoodValueIncrement() {
+        return superFoodCoinsRewardFoodValueIncrement;
+    }
+
+    public void setSuperFoodCoinsRewardFoodValueIncrement(int superFoodCoinsRewardFoodValueIncrement) {
+        this.superFoodCoinsRewardFoodValueIncrement = superFoodCoinsRewardFoodValueIncrement;
     }
 
     // ADVANCED

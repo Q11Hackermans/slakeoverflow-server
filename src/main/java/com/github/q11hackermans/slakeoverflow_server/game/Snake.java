@@ -2,6 +2,7 @@ package com.github.q11hackermans.slakeoverflow_server.game;
 
 import com.github.q11hackermans.slakeoverflow_server.GameSession;
 import com.github.q11hackermans.slakeoverflow_server.SlakeoverflowServer;
+import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.constants.Direction;
@@ -29,6 +30,7 @@ public class Snake implements GameObject {
     private int fastMoveMultiplier;
     private boolean hasMoved;
     private boolean fixedFovPlayerdataSystem;
+    private int rewardTimer;
 
     public Snake(GameSession gameSession, ServerConnection connection, int x, int y, int facing, List<int[]> bodyPositions) {
         this.gameSession = gameSession;
@@ -46,6 +48,7 @@ public class Snake implements GameObject {
         this.fastMoveMultiplier = 1;
         this.hasMoved = false;
         this.fixedFovPlayerdataSystem = false;
+        this.rewardTimer = 0;
 
         if (bodyPositions != null) {
             this.bodyPositions.addAll(bodyPositions);
@@ -280,6 +283,22 @@ public class Snake implements GameObject {
             this.hasMoved = false;
         }
 
+        if(this.rewardTimer > this.gameSession.getServer().getConfigManager().getConfig().getPlayingTimeCoinsRewardTime()) {
+            this.rewardTimer = 0;
+
+            if(this.connection != null) {
+                AccountData account = this.connection.getAccount();
+
+                if(account != null) {
+                    int addValue = this.gameSession.getServer().getConfigManager().getConfig().getPlayingTimeCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getPlayingTimeCoinsRewardSnakeLengthIncrement() * this.getLength());
+
+                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), addValue);
+                }
+            }
+        } else {
+            this.rewardTimer += 1;
+        }
+
     }
 
     /**
@@ -336,15 +355,25 @@ public class Snake implements GameObject {
                     } else {
                         this.killSnake();
                     }
-                }
-                int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
-                if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField(this.posx, (this.posy - 1));
-                    if(gameObject instanceof Item) {
-                        gameSession.killItem((Item) gameObject);
+                } else if(newHeadField instanceof Item) {
+                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    if (foodValue > 0) {
+                        this.growSnake(foodValue);
+
+                        if(this.connection != null) {
+                            AccountData account = this.connection.getAccount();
+                            if(account != null) {
+                                if(newHeadField instanceof Food) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() * foodValue));
+                                } else if(newHeadField instanceof SuperFood) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardFoodValueIncrement() * foodValue));
+                                }
+                            }
+                        }
                     }
+
+                    gameSession.killItem((Item) newHeadField);
                 }
-                growSnake(foodValue);
 
                 this.moveBodies();
                 this.posy--;
@@ -367,15 +396,25 @@ public class Snake implements GameObject {
                     } else {
                         this.killSnake();
                     }
-                }
-                int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
-                if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField((this.posx + 1), this.posy);
-                    if(gameObject instanceof Item) {
-                        gameSession.killItem((Item) gameObject);
+                } else if(newHeadField instanceof Item) {
+                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    if (foodValue > 0) {
+                        this.growSnake(foodValue);
+
+                        if(this.connection != null) {
+                            AccountData account = this.connection.getAccount();
+                            if(account != null) {
+                                if(newHeadField instanceof Food) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() * foodValue));
+                                } else if(newHeadField instanceof SuperFood) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardFoodValueIncrement() * foodValue));
+                                }
+                            }
+                        }
                     }
+
+                    gameSession.killItem((Item) newHeadField);
                 }
-                growSnake(foodValue);
 
                 this.moveBodies();
                 this.posx++;
@@ -398,15 +437,25 @@ public class Snake implements GameObject {
                     } else {
                         this.killSnake();
                     }
-                }
-                int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
-                if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField(this.posx, (this.posy + 1));
-                    if(gameObject instanceof Item) {
-                        gameSession.killItem((Item) gameObject);
+                } else if(newHeadField instanceof Item) {
+                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    if (foodValue > 0) {
+                        this.growSnake(foodValue);
+
+                        if(this.connection != null) {
+                            AccountData account = this.connection.getAccount();
+                            if(account != null) {
+                                if(newHeadField instanceof Food) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() * foodValue));
+                                } else if(newHeadField instanceof SuperFood) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardFoodValueIncrement() * foodValue));
+                                }
+                            }
+                        }
                     }
+
+                    gameSession.killItem((Item) newHeadField);
                 }
-                growSnake(foodValue);
 
                 this.moveBodies();
                 this.posy++;
@@ -429,15 +478,25 @@ public class Snake implements GameObject {
                     } else {
                         this.killSnake();
                     }
-                }
-                int foodValue = gameSession.getFoodValue((this.posx - 1), this.posy);
-                if (foodValue > 0) {
-                    GameObject gameObject = gameSession.getField((this.posx - 1), this.posy);
-                    if(gameObject instanceof Item) {
-                        gameSession.killItem((Item) gameObject);
+                } else if(newHeadField instanceof Item) {
+                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    if (foodValue > 0) {
+                        this.growSnake(foodValue);
+
+                        if(this.connection != null) {
+                            AccountData account = this.connection.getAccount();
+                            if(account != null) {
+                                if(newHeadField instanceof Food) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getFoodCoinsRewardAmount() * foodValue));
+                                } else if(newHeadField instanceof SuperFood) {
+                                    this.gameSession.getServer().getAccountSystem().changeBalance(account.getId(), this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardAmount() + (this.gameSession.getServer().getConfigManager().getConfig().getSuperFoodCoinsRewardFoodValueIncrement() * foodValue));
+                                }
+                            }
+                        }
                     }
+
+                    gameSession.killItem((Item) newHeadField);
                 }
-                growSnake(foodValue);
 
                 this.moveBodies();
                 this.posx--;
