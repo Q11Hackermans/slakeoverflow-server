@@ -1,5 +1,7 @@
 package com.github.q11hackermans.slakeoverflow_server.config;
 
+import com.github.q11hackermans.slakeoverflow_server.constants.DefaultConfigValues;
+
 import java.nio.charset.StandardCharsets;
 
 public class ServerConfig {
@@ -33,7 +35,7 @@ public class ServerConfig {
     private int defaultGameFieldSizeX;
     private int defaultGameFieldSizeY;
     private int itemDefaultDespawnTime;
-    private int ItemSuperFoodDespawnTime;
+    private int itemSuperFoodDespawnTime;
     private boolean enableSpectator;
     private int spectatorUpdateInterval;
     private boolean enableSnakeSpeedBoost;
@@ -56,55 +58,55 @@ public class ServerConfig {
 
     public ServerConfig(boolean advancedOptionsEnabled) {
         // SERVER OPTIONS
-        this.port = 26677;
-        this.autoConnectionAccept = true;
-        this.userAuthentication = true;
-        this.maxConnections = 20;
-        this.allowGuests = true;
-        this.allowLogin = true;
-        this.alsoDisablePrivilegedLogin = false;
-        this.allowRegistration = true;
-        this.serverName = "Slakeoverflow-Server";
-        this.printDebugMessages = false;
-        this.enableChat = true;
-        this.allowGuestChat = false;
-        this.enableAdminCommand = true;
-        this.printChatToConsole = true;
-        this.printChatCommandsToConsole = true;
-        this.verboseChatLogs = false;
+        this.port = DefaultConfigValues.port;
+        this.autoConnectionAccept = DefaultConfigValues.autoConnectionAccept;
+        this.userAuthentication = DefaultConfigValues.userAuthentication;
+        this.maxConnections = DefaultConfigValues.maxConnections;
+        this.allowGuests = DefaultConfigValues.allowGuests;
+        this.allowLogin = DefaultConfigValues.allowLogin;
+        this.alsoDisablePrivilegedLogin = DefaultConfigValues.alsoDisablePrivilegedLogin;
+        this.allowRegistration = DefaultConfigValues.allowRegistration;
+        this.serverName = DefaultConfigValues.serverName;
+        this.printDebugMessages = DefaultConfigValues.printDebugMessages;
+        this.enableChat = DefaultConfigValues.enableChat;
+        this.allowGuestChat = DefaultConfigValues.allowGuestChat;
+        this.enableAdminCommand = DefaultConfigValues.enableAdminCommand;
+        this.printChatToConsole = DefaultConfigValues.printChatToConsole;
+        this.printChatCommandsToConsole = DefaultConfigValues.printChatCommandsToConsole;
+        this.verboseChatLogs = DefaultConfigValues.verboseChatLogs;
 
         // GAME OPTIONS
-        this.maxPlayers = 20;
-        this.maxSpectators = 2;
-        this.minFoodValue = 1;
-        this.maxFoodValue = 2;
-        this.defaultSnakeLength = 3;
-        this.snakeSpeedBase = 2;
-        this.snakeSpeedModifierValue = 1;
-        this.snakeSpeedModifierBodycount = 30;
-        this.defaultGameFieldSizeX = 100;
-        this.defaultGameFieldSizeY = 100;
-        this.unauthenticatePlayerOnDeath = true;
-        this.itemDefaultDespawnTime = 60;
-        this.ItemSuperFoodDespawnTime = 120;
-        this.enableSpectator = true;
-        this.spectatorUpdateInterval = 200;
-        this.enableSnakeSpeedBoost = true;
-        this.eatOwnSnake = true;
-        this.snakeDeathSuperfoodMultiplier = 0.3;
-        this.playingTimeCoinsRewardTime = 36000; // Half an hour with default tickrate
-        this.playingTimeCoinsRewardSnakeLengthIncrement = 1;
-        this.playingTimeCoinsRewardAmount = 10;
-        this.foodCoinsRewardAmount = 100;
-        this.foodCoinsRewardFoodValueIncrement = 1;
-        this.superFoodCoinsRewardAmount = 1000;
-        this.superFoodCoinsRewardFoodValueIncrement = 1;
+        this.maxPlayers = DefaultConfigValues.maxPlayers;
+        this.maxSpectators = DefaultConfigValues.maxSpectators;
+        this.minFoodValue = DefaultConfigValues.minFoodValue;
+        this.maxFoodValue = DefaultConfigValues.maxFoodValue;
+        this.defaultSnakeLength = DefaultConfigValues.defaultSnakeLength;
+        this.snakeSpeedBase = DefaultConfigValues.snakeSpeedBase;
+        this.snakeSpeedModifierValue = DefaultConfigValues.snakeSpeedModifierValue;
+        this.snakeSpeedModifierBodycount = DefaultConfigValues.snakeSpeedModifierBodycount;
+        this.defaultGameFieldSizeX = DefaultConfigValues.defaultGameFieldSizeX;
+        this.defaultGameFieldSizeY = DefaultConfigValues.defaultGameFieldSizeY;
+        this.unauthenticatePlayerOnDeath = DefaultConfigValues.unauthenticatePlayerOnDeath;
+        this.itemDefaultDespawnTime = DefaultConfigValues.itemDefaultDespawnTime;
+        this.itemSuperFoodDespawnTime = DefaultConfigValues.itemSuperFoodDespawnTime;
+        this.enableSpectator = DefaultConfigValues.enableSpectator;
+        this.spectatorUpdateInterval = DefaultConfigValues.spectatorUpdateInterval;
+        this.enableSnakeSpeedBoost = DefaultConfigValues.enableSnakeSpeedBoost;
+        this.eatOwnSnake = DefaultConfigValues.eatOwnSnake;
+        this.snakeDeathSuperfoodMultiplier = DefaultConfigValues.snakeDeathSuperfoodMultiplier;
+        this.playingTimeCoinsRewardTime = DefaultConfigValues.playingTimeCoinsRewardTime;
+        this.playingTimeCoinsRewardSnakeLengthIncrement = DefaultConfigValues.playingTimeCoinsRewardSnakeLengthIncrement;
+        this.playingTimeCoinsRewardAmount = DefaultConfigValues.playingTimeCoinsRewardAmount;
+        this.foodCoinsRewardAmount = DefaultConfigValues.foodCoinsRewardAmount;
+        this.foodCoinsRewardFoodValueIncrement = DefaultConfigValues.foodCoinsRewardFoodValueIncrement;
+        this.superFoodCoinsRewardAmount = DefaultConfigValues.superFoodCoinsRewardAmount;
+        this.superFoodCoinsRewardFoodValueIncrement = DefaultConfigValues.superFoodCoinsRewardFoodValueIncrement;
 
         // ADVANCED OPTIONS
         this.advancedOptionsEnabled = advancedOptionsEnabled;
-        this.overrideServerTickrate = false;
-        this.customServerTickrate = 50;
-        this.customServerTickrateIdle = 950;
+        this.overrideServerTickrate = DefaultConfigValues.overrideServerTickrate;
+        this.customServerTickrate = DefaultConfigValues.customServerTickrate;
+        this.customServerTickrateIdle = DefaultConfigValues.customServerTickrateIdle;
     }
 
 
@@ -291,12 +293,12 @@ public class ServerConfig {
     }
 
     public int getItemSuperFoodDespawnTime() {
-        return ItemSuperFoodDespawnTime;
+        return itemSuperFoodDespawnTime;
     }
 
     public void setItemSuperFoodDespawnTime(int itemSuperFoodDespawnTime) {
         if (itemSuperFoodDespawnTime > 0) {
-            this.ItemSuperFoodDespawnTime = itemSuperFoodDespawnTime;
+            this.itemSuperFoodDespawnTime = itemSuperFoodDespawnTime;
         } else {
             throw new IllegalArgumentException("The time must be higher than 0");
         }

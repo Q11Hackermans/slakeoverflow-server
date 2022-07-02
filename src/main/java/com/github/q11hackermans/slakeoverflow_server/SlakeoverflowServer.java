@@ -9,6 +9,7 @@ import com.github.q11hackermans.slakeoverflow_server.console.ConsoleLogger;
 import com.github.q11hackermans.slakeoverflow_server.console.ServerConsole;
 import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
 import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
+import com.github.q11hackermans.slakeoverflow_server.constants.DefaultConfigValues;
 import com.github.q11hackermans.slakeoverflow_server.constants.GameState;
 import com.github.q11hackermans.slakeoverflow_server.data.SnakeData;
 import com.github.q11hackermans.slakeoverflow_server.game.Item;
@@ -1034,10 +1035,10 @@ public class SlakeoverflowServer {
 
                 System.out.println("Do you want to use this setup assistant (boolean)?");
                 if(Boolean.parseBoolean(scanner.nextLine())) {
-                    serverSettings.put("print_chat_to_console", true);
-                    serverSettings.put("print_chat_commands_to_console", true);
-                    serverSettings.put("verbose_chat_logs", false);
-                    serverSettings.put("print_debug_messages", false);
+                    serverSettings.put("print_chat_to_console", DefaultConfigValues.printChatToConsole);
+                    serverSettings.put("print_chat_commands_to_console", DefaultConfigValues.printChatCommandsToConsole);
+                    serverSettings.put("verbose_chat_logs", DefaultConfigValues.verboseChatLogs);
+                    serverSettings.put("print_debug_messages", DefaultConfigValues.printDebugMessages);
 
                     int attempts = 0;
                     while (attempts < 3) {
@@ -1267,29 +1268,29 @@ public class SlakeoverflowServer {
                         System.out.println("Which preset should be loaded for the GameSettings? (Available choices: DEFAULT, ULTRA_SLOW, SLOW, FAST, ULTRA_FAST");
                         String inputString = scanner.nextLine();
 
-                        gameSettings.put("default_gamefield_size_x", 100);
-                        gameSettings.put("default_gamefield_size_y", 100);
-                        gameSettings.put("enable_spectator", true);
-                        gameSettings.put("spectator_update_interval", 200);
-                        gameSettings.put("playing_time_coins_reward_time", 0);
-                        gameSettings.put("playing_time_coins_reward_amount", 0);
-                        gameSettings.put("playing_time_coins_reward_snake_length_increment", 0);
-                        gameSettings.put("food_coins_reward_amount", 0);
-                        gameSettings.put("food_coins_reward_food_value_increment", 0);
-                        gameSettings.put("superfood_coins_reward_amount", 0);
-                        gameSettings.put("superfood_coins_reward_food_value_increment", 0);
+                        gameSettings.put("default_gamefield_size_x", DefaultConfigValues.defaultGameFieldSizeX);
+                        gameSettings.put("default_gamefield_size_y", DefaultConfigValues.defaultGameFieldSizeY);
+                        gameSettings.put("enable_spectator", DefaultConfigValues.enableSpectator);
+                        gameSettings.put("spectator_update_interval", DefaultConfigValues.spectatorUpdateInterval);
+                        gameSettings.put("playing_time_coins_reward_time", DefaultConfigValues.playingTimeCoinsRewardTime);
+                        gameSettings.put("playing_time_coins_reward_amount", DefaultConfigValues.playingTimeCoinsRewardAmount);
+                        gameSettings.put("playing_time_coins_reward_snake_length_increment", DefaultConfigValues.playingTimeCoinsRewardSnakeLengthIncrement);
+                        gameSettings.put("food_coins_reward_amount", DefaultConfigValues.foodCoinsRewardAmount);
+                        gameSettings.put("food_coins_reward_food_value_increment", DefaultConfigValues.foodCoinsRewardFoodValueIncrement);
+                        gameSettings.put("superfood_coins_reward_amount", DefaultConfigValues.superFoodCoinsRewardAmount);
+                        gameSettings.put("superfood_coins_reward_food_value_increment", DefaultConfigValues.superFoodCoinsRewardFoodValueIncrement);
 
                         if(inputString.equalsIgnoreCase("DEFAULT")) {
-                            gameSettings.put("min_food_value", 1);
-                            gameSettings.put("max_food_value", 2);
-                            gameSettings.put("snake_speed_base", 2);
-                            gameSettings.put("snake_speed_modifier_value", 1);
-                            gameSettings.put("snake_speed_modifier_bodycount", 15);
-                            gameSettings.put("default_item_despawn_time", 60);
-                            gameSettings.put("item_superfood_despawn_time", 120);
-                            gameSettings.put("enable_snake_speed_boost", true);
-                            gameSettings.put("eat_own_snake", true);
-                            gameSettings.put("snake_death_superfood_multiplier", 0.3);
+                            gameSettings.put("min_food_value", DefaultConfigValues.minFoodValue);
+                            gameSettings.put("max_food_value", DefaultConfigValues.maxFoodValue);
+                            gameSettings.put("snake_speed_base", DefaultConfigValues.snakeSpeedBase);
+                            gameSettings.put("snake_speed_modifier_value", DefaultConfigValues.snakeSpeedModifierValue);
+                            gameSettings.put("snake_speed_modifier_bodycount", DefaultConfigValues.snakeSpeedModifierBodycount);
+                            gameSettings.put("default_item_despawn_time", DefaultConfigValues.itemDefaultDespawnTime);
+                            gameSettings.put("item_superfood_despawn_time", DefaultConfigValues.itemSuperFoodDespawnTime);
+                            gameSettings.put("enable_snake_speed_boost", DefaultConfigValues.enableSnakeSpeedBoost);
+                            gameSettings.put("eat_own_snake", DefaultConfigValues.eatOwnSnake);
+                            gameSettings.put("snake_death_superfood_multiplier", DefaultConfigValues.snakeDeathSuperfoodMultiplier);
                             attempts = 3;
                         } else if (inputString.equalsIgnoreCase("ULTRA_SLOW")) {
                             gameSettings.put("min_food_value", 1);
@@ -1352,9 +1353,9 @@ public class SlakeoverflowServer {
 
                     System.out.println("Setting up config file...");
 
-                    advancedSettings.put("advanced_override_server_tickrate", false);
-                    advancedSettings.put("advanced_custom_server_tickrate", 50);
-                    advancedSettings.put("advanced_custom_server_tickrate_idle", 950);
+                    advancedSettings.put("advanced_override_server_tickrate", DefaultConfigValues.overrideServerTickrate);
+                    advancedSettings.put("advanced_custom_server_tickrate", DefaultConfigValues.customServerTickrate);
+                    advancedSettings.put("advanced_custom_server_tickrate_idle", DefaultConfigValues.customServerTickrateIdle);
 
                     jsonConfig.put("server_settings", serverSettings);
                     jsonConfig.put("game_settings", gameSettings);
