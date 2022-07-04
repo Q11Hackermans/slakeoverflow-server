@@ -397,7 +397,7 @@ public class Snake implements GameObject {
                         this.killSnake();
                     }
                 } else if(newHeadField instanceof Item) {
-                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    int foodValue = gameSession.getFoodValue((this.posx + 1), this.posy);
                     if (foodValue > 0) {
                         this.growSnake(foodValue);
 
@@ -438,7 +438,7 @@ public class Snake implements GameObject {
                         this.killSnake();
                     }
                 } else if(newHeadField instanceof Item) {
-                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy + 1));
                     if (foodValue > 0) {
                         this.growSnake(foodValue);
 
@@ -479,7 +479,7 @@ public class Snake implements GameObject {
                         this.killSnake();
                     }
                 } else if(newHeadField instanceof Item) {
-                    int foodValue = gameSession.getFoodValue(this.posx, (this.posy - 1));
+                    int foodValue = gameSession.getFoodValue((this.posx - 1), this.posy);
                     if (foodValue > 0) {
                         this.growSnake(foodValue);
 
