@@ -58,6 +58,7 @@ public class SlakeoverflowServer {
     private final int idleTickSpeed;
     private int tickThreadCounter;
     private int tickThreadState;
+    private int tickDuration;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -129,6 +130,7 @@ public class SlakeoverflowServer {
         // THREADS
         this.tickThreadCounter = 20;
         this.tickThreadState = 0;
+        this.tickDuration = 0;
 
         this.managerThread = new Thread(() -> {
             try {
@@ -893,14 +895,27 @@ public class SlakeoverflowServer {
                         if (manualTicks > 0) {
                             manualTicks--;
                         }
+
+                        if(this.tickDuration < this.tickSpeed) {
+                            Thread.sleep(this.tickSpeed - this.tickDuration);
+                        } else {
+                            this.logger.warning("TICK", "Skipping " + this.tickDuration/50 + " ticks");
+                        }
+                        this.tickDuration = 0;
+
                     } else {
                         if (gameState != GameState.RUNNING && gameState != GameState.PAUSED) {
                             manualTicks = 0;
                         }
 
-                        Thread.sleep(this.idleTickSpeed);
+                        if(this.tickDuration < (this.idleTickSpeed + this.tickSpeed)) {
+                            Thread.sleep((this.idleTickSpeed + this.tickSpeed) - this.tickDuration);
+                        } else {
+                            this.logger.warning("TICK", "Skipping " + this.tickDuration/50 + " ticks");
+                        }
+                        this.tickDuration = 0;
+
                     }
-                    Thread.sleep(this.tickSpeed);
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                     if (!(e instanceof InterruptedException)) {
@@ -922,6 +937,19 @@ public class SlakeoverflowServer {
         Thread thread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
                 try {
+                    if(this.tickThread.isAlive()) {
+                        if(this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
+
+                        } else {
+
+                        }
+
+                        if(this.tickDuration < Integer.MAX_VALUE) {
+                            this.tickDuration += 1;
+                        }
+                    }
+
+                    /*
                     if (this.tickThread.isAlive()) {
                         int waittime = -40;
                         if (this.game != null && gameState == GameState.RUNNING) {
@@ -957,6 +985,9 @@ public class SlakeoverflowServer {
                             }
                         }
                     }
+
+
+                     */
 
                     Thread.sleep(this.tickSpeed);
                     if (!(this.game != null && gameState == GameState.RUNNING)) {
