@@ -5,6 +5,7 @@ import com.github.q11hackermans.slakeoverflow_server.accounts.AccountData;
 import com.github.q11hackermans.slakeoverflow_server.connections.ServerConnection;
 import com.github.q11hackermans.slakeoverflow_server.console.ConsoleCommands;
 import com.github.q11hackermans.slakeoverflow_server.constants.AccountPermissionLevel;
+import com.github.q11hackermans.slakeoverflow_server.constants.AuthenticationState;
 import com.github.q11hackermans.slakeoverflow_server.game.Snake;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -129,7 +130,7 @@ public class ChatSystem {
                     this.server.getLogger().info("CHAT", "[COMMAND] [RESULT] " + connection.getClientId() + ": " + result);
                 }
 
-                this.send(result, false, connection);
+                this.multipleLinesMessage(result, connection);
 
             } else {
 
@@ -351,10 +352,14 @@ public class ChatSystem {
                             "account delete\n";
                 }
             } else if (cmd[0].equalsIgnoreCase("togglefov")) {
-                Snake snake = this.server.getGameSession().getSnakeOfConnection(commandExecutor);
-                if(snake != null) {
-                    snake.setFixedFovPlayerdataSystem(!snake.isFixedFovPlayerdataSystem());
-                    return "Toggled FOV mode";
+                if(commandExecutor.getAuthenticationState() == AuthenticationState.PLAYER) {
+                    Snake snake = this.server.getGameSession().getSnakeOfConnection(commandExecutor);
+                    if(snake != null) {
+                        snake.setFixedFovPlayerdataSystem(!snake.isFixedFovPlayerdataSystem());
+                        return "Toggled FOV mode";
+                    } else {
+                        return "You are not ingame";
+                    }
                 } else {
                     return "You are not ingame";
                 }
@@ -444,6 +449,14 @@ public class ChatSystem {
         }
 
         return false;
+    }
+
+    public void multipleLinesMessage(String message, ServerConnection connection) {
+        String[] lines = message.split("\n");
+
+        for(String line : lines) {
+            this.send(line, false, connection);
+        }
     }
 
     // GETTER
