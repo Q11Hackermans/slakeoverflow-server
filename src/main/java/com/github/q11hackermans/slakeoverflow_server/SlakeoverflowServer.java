@@ -57,6 +57,7 @@ public class SlakeoverflowServer {
     private final int tickSpeed;
     private int tickThreadState;
     private int tickDuration;
+    private int skippedTicks;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -126,6 +127,7 @@ public class SlakeoverflowServer {
         // THREADS
         this.tickThreadState = 0;
         this.tickDuration = 0;
+        this.skippedTicks = 0;
 
         this.managerThread = new Thread(() -> {
             try {
@@ -846,6 +848,10 @@ public class SlakeoverflowServer {
         return this.tickRate;
     }
 
+    public int getSkippedTicks() {
+        return this.skippedTicks;
+    }
+
     public int getManualTicks() {
         return this.manualTicks;
     }
@@ -911,7 +917,9 @@ public class SlakeoverflowServer {
                     if(localTickDuration < this.tickSpeed) {
                         Thread.sleep(this.tickSpeed - localTickDuration);
                     } else {
-                        this.logger.warning("TICK", "Skipping " + localTickDuration/this.tickSpeed + " ticks (TPS: " + this.tickRate + ")");
+                        if(this.skippedTicks < Integer.MAX_VALUE) {
+                            this.skippedTicks += localTickDuration/this.tickSpeed;
+                        }
                     }
                     this.tickDuration = 0;
                     this.tickThreadState = 0;
@@ -934,6 +942,8 @@ public class SlakeoverflowServer {
      */
     private Thread getTimesThreadTemplate() {
         Thread thread = new Thread(() -> {
+            int skippedTicksCounter = 0;
+
             while (!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
                 try {
                     if(this.tickThread.isAlive()) {
@@ -963,6 +973,16 @@ public class SlakeoverflowServer {
                             }
                         } else {
                             this.tickDuration += 1;
+                        }
+
+                        if(skippedTicksCounter > 60000) {
+                            if(this.skippedTicks > 0) {
+                                this.logger.warning("TICK", "Skipped " + skippedTicks + " ticks during the last minute");
+                                this.skippedTicks = 0;
+                            }
+                            skippedTicksCounter = 0;
+                        } else {
+                            skippedTicksCounter += 1;
                         }
                     }
 
