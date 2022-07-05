@@ -273,7 +273,7 @@ public class EventListener extends CMListenerAdapter {
 
                             JSONObject advancedSettings = new JSONObject();
                             advancedSettings.put("server_tickrate", this.server.getTickSpeed());
-                            advancedSettings.put("server_idle_tickrate", this.server.getIdleTickSpeed());
+                            advancedSettings.put("server_idle_tickrate", -1);
                             response.put("advanced_settings", advancedSettings);
 
                             JSONObject serverStats = new JSONObject();

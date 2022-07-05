@@ -55,9 +55,9 @@ public class SlakeoverflowServer {
     // TICK THREAD
     private Thread tickThread;
     private final int tickSpeed;
-    private final int idleTickSpeed;
-    private int tickThreadCounter;
     private int tickThreadState;
+    private int tickDuration;
+    private int skippedTicks;
     // GAME SESSION
     private int gameState;
     private GameSession game;
@@ -68,7 +68,7 @@ public class SlakeoverflowServer {
     private final List<InetAddress> ipBlacklist;
     private boolean alreadyStopping;
     // STATS
-    private int tickRate;
+    private double tickRate;
 
 
     public SlakeoverflowServer(boolean advancedConfigOptions, boolean defaultConfigValues) throws IOException {
@@ -88,10 +88,8 @@ public class SlakeoverflowServer {
         this.configManager = new ConfigManager(this, advancedConfigOptions, !defaultConfigValues);
         if (!defaultConfigValues) {
             this.tickSpeed = this.configManager.getConfig().getCustomServerTickrate();
-            this.idleTickSpeed = this.configManager.getConfig().getCustomServerTickrateIdle();
         } else {
             this.tickSpeed = 50;
-            this.idleTickSpeed = 950;
         }
 
 
@@ -127,8 +125,9 @@ public class SlakeoverflowServer {
         this.tickRate = 0;
 
         // THREADS
-        this.tickThreadCounter = 20;
         this.tickThreadState = 0;
+        this.tickDuration = 0;
+        this.skippedTicks = 0;
 
         this.managerThread = new Thread(() -> {
             try {
@@ -817,10 +816,6 @@ public class SlakeoverflowServer {
         return (this.gameState == GameState.RUNNING || this.gameState == GameState.PAUSED);
     }
 
-    public int getTickThreadCounter() {
-        return this.tickThreadCounter;
-    }
-
     public boolean isManagerThreadAlive() {
         return this.managerThread.isAlive();
     }
@@ -845,8 +840,16 @@ public class SlakeoverflowServer {
         return this.timesThread.getState();
     }
 
-    public int getTickRate() {
+    public int getTickDuration() {
+        return this.tickDuration;
+    }
+
+    public double getTickRate() {
         return this.tickRate;
+    }
+
+    public int getSkippedTicks() {
+        return this.skippedTicks;
     }
 
     public int getManualTicks() {
@@ -859,10 +862,6 @@ public class SlakeoverflowServer {
 
     public int getTickSpeed() {
         return this.tickSpeed;
-    }
-
-    public int getIdleTickSpeed() {
-        return this.idleTickSpeed;
     }
 
     public ChatSystem getChatSystem() {
@@ -881,26 +880,49 @@ public class SlakeoverflowServer {
      */
     private Thread getTickThreadTemplate() {
         Thread thread = new Thread(() -> {
+            int statusCounter = 0;
+
             while (!Thread.currentThread().isInterrupted() && this.tickThread == Thread.currentThread()) {
                 try {
-                    this.tickRate = this.tickThreadCounter;
-                    this.tickThreadCounter = 20;
-                    this.tickThreadState = 0;
-                    this.sendStatusMessage();
+
+                    // STATUS MESSAGE
+                    if(statusCounter > 10) {
+                        statusCounter = 0;
+                        this.sendStatusMessage();
+                    } else {
+                        statusCounter++;
+                    }
+
+                    // GAMESESSION TICK
                     if (this.game != null && (gameState == GameState.RUNNING || (gameState == GameState.PAUSED && manualTicks > 0))) {
                         this.game.tick();
 
                         if (manualTicks > 0) {
                             manualTicks--;
                         }
+
                     } else {
                         if (gameState != GameState.RUNNING && gameState != GameState.PAUSED) {
                             manualTicks = 0;
                         }
-
-                        Thread.sleep(this.idleTickSpeed);
                     }
-                    Thread.sleep(this.tickSpeed);
+
+                    // TICK RATE SYSTEM
+                    int localTickDuration = this.tickDuration;
+                    if(localTickDuration > this.tickSpeed) {
+                        this.tickRate = ((1/(double) localTickDuration)*1000);
+                    } else {
+                        this.tickRate = ((1/(double) this.tickSpeed)*1000);
+                    }
+                    if(localTickDuration < this.tickSpeed) {
+                        Thread.sleep(this.tickSpeed - localTickDuration);
+                    } else {
+                        if(this.skippedTicks < Integer.MAX_VALUE) {
+                            this.skippedTicks += localTickDuration/this.tickSpeed;
+                        }
+                    }
+                    this.tickDuration = 0;
+                    this.tickThreadState = 0;
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                     if (!(e instanceof InterruptedException)) {
@@ -920,29 +942,23 @@ public class SlakeoverflowServer {
      */
     private Thread getTimesThreadTemplate() {
         Thread thread = new Thread(() -> {
+            int skippedTicksCounter = 0;
+
             while (!Thread.currentThread().isInterrupted() && this.timesThread == Thread.currentThread()) {
                 try {
-                    if (this.tickThread.isAlive()) {
-                        int waittime = -40;
-                        if (this.game != null && gameState == GameState.RUNNING) {
-                            waittime = waittime - 840;
-                        }
-                        if (this.tickThreadCounter > waittime) {
-                            this.tickThreadCounter--;
-                        } else {
-                            if (this.tickThreadState == 0) {
-                                this.tickThread.interrupt();
-                                this.tickRate = this.tickThreadCounter;
-                                this.tickThreadCounter = 20;
+                    if(this.tickThread.isAlive()) {
+                        if(this.tickDuration > this.tickSpeed*500) {
+                            if(this.tickThreadState == 0) {
+                                this.tickDuration = 0;
                                 this.tickThreadState = 1;
                                 this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState) + "/3). Interrupting...");
-                            } else if (this.tickThreadState == 1) {
                                 this.tickThread.interrupt();
-                                this.tickThread.stop();
-                                this.tickRate = this.tickThreadCounter;
-                                this.tickThreadCounter = 20;
+                            } else if(this.tickThreadState == 1) {
+                                this.tickDuration = 0;
                                 this.tickThreadState = 2;
                                 this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState) + "/3). Killing...");
+                                this.tickThread.interrupt();
+                                this.tickThread.stop();
                             } else {
                                 try {
                                     this.logger.warning("TIMES", "TICK Thread not responding (" + (this.tickThreadState + 1) + "/3). Server shutdown...\n" +
@@ -955,13 +971,22 @@ public class SlakeoverflowServer {
                                 }
                                 stop();
                             }
+                        } else {
+                            this.tickDuration += 1;
+                        }
+
+                        if(skippedTicksCounter > 60000) {
+                            if(this.skippedTicks > 0) {
+                                this.logger.warning("TICK", "Skipped " + skippedTicks + " ticks during the last minute");
+                                this.skippedTicks = 0;
+                            }
+                            skippedTicksCounter = 0;
+                        } else {
+                            skippedTicksCounter += 1;
                         }
                     }
 
-                    Thread.sleep(this.tickSpeed);
-                    if (!(this.game != null && gameState == GameState.RUNNING)) {
-                        Thread.sleep(this.idleTickSpeed);
-                    }
+                    Thread.sleep(1);
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                     if (!(e instanceof InterruptedException)) {
